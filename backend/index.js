@@ -18,10 +18,12 @@ const allowedOrigins = [
   'http://localhost:3001',
   'http://localhost:3002',
   'http://localhost:3003',
-  // Allow Dev Tunnels URLs (VS Code Port Forwarding)
-  ...(process.env.ALLOWED_ORIGIN ? [process.env.ALLOWED_ORIGIN] : []),
-  // Allow any *.devtunnels.ms domain for Dev Tunnels
+  'https://daophong.id.vn',
+  'https://www.daophong.id.vn',
+  /^https:\/\/.*\.vercel\.app$/,
+  /^https:\/\/.*\.trycloudflare\.com$/,
   /^https:\/\/.*\.devtunnels\.ms$/,
+  ...(process.env.ALLOWED_ORIGIN ? [process.env.ALLOWED_ORIGIN] : []),
 ];
 
 app.use(cors({
@@ -235,7 +237,7 @@ app.put('/api/account/profile', authRequired, async (req, res) => {
     
     // Handle password update
     if (password) {
-      const bcrypt = require('bcrypt');
+      const bcrypt = require('bcryptjs');
       updateData.passwordHash = await bcrypt.hash(password, 10);
     }
     

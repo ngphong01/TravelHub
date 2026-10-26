@@ -1,6 +1,7 @@
 {
   "version": 2,
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://having-falling-decades-colors.trycloudflare.com/api/$1" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
