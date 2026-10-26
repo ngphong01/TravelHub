@@ -25,7 +25,7 @@ if (!fs.existsSync(nodeModulesPath)) {
   console.log('✅ node_modules tồn tại');
 }
 
-const frontendNodeModulesPath = path.join(__dirname, '..', 'frontend', 'node_modules');
+const frontendNodeModulesPath = path.join(__dirname, '..', '..', 'frontend', 'node_modules');
 if (!fs.existsSync(frontendNodeModulesPath)) {
   errors.push('❌ frontend/node_modules không tồn tại. Chạy: npm run install:all');
 } else {

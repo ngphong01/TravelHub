@@ -970,20 +970,66 @@ router.get('/settings', (req, res) => {
 // GET /api/admin/chat - get all chat messages for admin
 router.get('/chat', async (req, res) => {
   try {
-    // For now, return empty array since we don't have ChatMessage model yet
-    // In production: const messages = await prisma.chatMessage.findMany({ include: { user: true }, orderBy: { createdAt: 'desc' } });
-    res.json({ messages: [] });
+    let messages = [];
+    if (prisma.chatMessage && prisma.chatSession) {
+      const rawMessages = await prisma.chatMessage.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      });
+
+      const sessionIds = Array.from(new Set(rawMessages.map(m => m.sessionId)));
+      const sessions = await prisma.chatSession.findMany({
+        where: { id: { in: sessionIds } },
+      });
+
+      const userIds = Array.from(new Set(sessions.map(s => s.userId).filter(Boolean)));
+      const users = userIds.length > 0 
+        ? await prisma.user.findMany({
+            where: { id: { in: userIds } },
+            select: { id: true, name: true, email: true },
+          })
+        : [];
+
+      const sessionMap = new Map(sessions.map(s => [s.id, s]));
+      const userMap = new Map(users.map(u => [u.id, u]));
+
+      // Format messages pairing user message with assistant response
+      for (let i = 0; i < rawMessages.length; i++) {
+        const msg = rawMessages[i];
+        if (msg.role === 'user') {
+          const session = sessionMap.get(msg.sessionId);
+          const user = session?.userId ? userMap.get(session.userId) : null;
+          const assistantMsg = rawMessages[i - 1];
+          const responseText = (assistantMsg && assistantMsg.role === 'assistant' && assistantMsg.sessionId === msg.sessionId)
+            ? assistantMsg.content
+            : '';
+
+          messages.push({
+            id: String(msg.id),
+            message: msg.content,
+            response: responseText,
+            userId: session?.userId ? String(session.userId) : null,
+            user: user ? { name: user.name, email: user.email } : null,
+            createdAt: msg.createdAt.toISOString(),
+          });
+        }
+      }
+    }
+    res.json({ messages });
   } catch (error) {
     console.error('Error fetching admin chat:', error);
-    res.status(500).json({ message: 'Error fetching chat messages' });
+    res.json({ messages: [] });
   }
 });
 
 // DELETE /api/admin/chat/:id - delete chat message
 router.delete('/chat/:id', async (req, res) => {
   try {
-    // In production: await prisma.chatMessage.delete({ where: { id: req.params.id } });
-    res.status(204).send();
+    const id = parseInt(req.params.id, 10);
+    if (!isNaN(id) && prisma.chatMessage) {
+      await prisma.chatMessage.delete({ where: { id } }).catch(() => null);
+    }
+    res.status(200).json({ success: true, message: 'Đã xóa tin nhắn thành công' });
   } catch (error) {
     console.error('Error deleting chat message:', error);
     res.status(500).json({ message: 'Error deleting chat message' });

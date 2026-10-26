@@ -731,14 +731,26 @@ router.get('/callback/:provider', async (req, res) => {
   const { provider } = req.params;
   const { code, error, state } = req.query;
 
+  // Unpack state if present for dynamic returnUrl and redirectUri
+  let returnUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+  let matchedRedirectUri = process.env.OAUTH_GOOGLE_REDIRECT_URI || `http://localhost:3000/api/auth/callback/google`;
+
+  if (state) {
+    try {
+      const decoded = JSON.parse(Buffer.from(state, 'base64url').toString('utf8'));
+      if (decoded.returnUrl) returnUrl = decoded.returnUrl.replace(/\/$/, '');
+      if (decoded.redirectUri) matchedRedirectUri = decoded.redirectUri;
+    } catch (e) {
+      // fallback if state is not base64url JSON
+    }
+  }
+
   if (error) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
-    return res.redirect(`${frontendUrl}/signin?error=${encodeURIComponent(error)}`);
+    return res.redirect(`${returnUrl}/signin?error=${encodeURIComponent(error)}`);
   }
 
   if (!code) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
-    return res.redirect(`${frontendUrl}/signin?error=no_code`);
+    return res.redirect(`${returnUrl}/signin?error=no_code`);
   }
 
   try {
@@ -750,7 +762,7 @@ router.get('/callback/:provider', async (req, res) => {
           code,
           client_id: process.env.GOOGLE_CLIENT_ID,
           client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: process.env.OAUTH_GOOGLE_REDIRECT_URI || `http://localhost:3000/api/auth/callback/google`,
+          redirect_uri: matchedRedirectUri,
           grant_type: 'authorization_code',
         }),
       });
@@ -909,10 +921,9 @@ router.get('/callback/:provider', async (req, res) => {
       const token = signToken(user);
       const refreshToken = await createRefreshToken(user.id);
 
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
       const redirectUrl = user.role === 'ADMIN' 
-        ? `${frontendUrl}/admin/dashboard?token=${token}`
-        : `${frontendUrl}/account?token=${token}`;
+        ? `${returnUrl}/admin/dashboard?token=${token}`
+        : `${returnUrl}/account?token=${token}`;
       
       res.cookie('tg_token', token, {
         httpOnly: false,
@@ -1060,11 +1071,29 @@ router.get('/authorize/:provider', (req, res) => {
       const clientId = process.env.GOOGLE_CLIENT_ID;
       // 🔥 CRITICAL: Đảm bảo scope bao gồm profile để lấy avatar
       const scope = process.env.OAUTH_GOOGLE_SCOPE || 'openid email profile';
-      const redirectUri = process.env.OAUTH_GOOGLE_REDIRECT_URI || 'http://localhost:3000/api/auth/callback/google';
+      
+      let clientReturnUrl = req.query.return_url || '';
+      if (!clientReturnUrl && req.headers.referer) {
+        try { clientReturnUrl = new URL(req.headers.referer).origin; } catch (e) {}
+      }
+      const host = (req.headers['x-forwarded-host'] || req.headers.host || '').toLowerCase();
+      const isProd = host.includes('daophong.id.vn') || host.includes('vercel.app') || (clientReturnUrl && clientReturnUrl.includes('daophong.id.vn'));
+
+      let redirectUri = process.env.OAUTH_GOOGLE_REDIRECT_URI || 'http://localhost:3000/api/auth/callback/google';
+      if (isProd) {
+        redirectUri = 'https://www.daophong.id.vn/api/auth/callback/google';
+      }
+
       if (!clientId) {
         return res.status(500).json({ message: 'Google client id not configured' });
       }
-      const state = Math.random().toString(36).slice(2);
+      const stateData = {
+        nonce: Math.random().toString(36).slice(2),
+        returnUrl: clientReturnUrl || (isProd ? 'https://www.daophong.id.vn' : (process.env.FRONTEND_URL || 'http://localhost:3001')),
+        redirectUri,
+      };
+      const state = Buffer.from(JSON.stringify(stateData)).toString('base64url');
+
       const params = new URLSearchParams({
         response_type: 'code',
         client_id: clientId,

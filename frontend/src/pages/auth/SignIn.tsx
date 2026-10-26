@@ -324,11 +324,8 @@ export default function SignInPage() {
             <button
               type="button"
               onClick={() => {
-                // Backend runs on port 3000
-                const backendBase = process.env.REACT_APP_BACKEND_URL 
-                  ? process.env.REACT_APP_BACKEND_URL.replace(/\/$/, '')
-                  : 'http://localhost:3000'; // Backend port
-                window.location.href = `${backendBase}/api/auth/authorize/google`;
+                const returnUrl = window.location.origin;
+                window.location.href = `/api/auth/authorize/google?return_url=${encodeURIComponent(returnUrl)}`;
               }}
               className="w-full flex items-center justify-center gap-3 py-3.5 px-4 border-2 border-gray-200 rounded-2xl hover:border-blue-300 hover:bg-blue-50 transition-all text-sm font-bold text-gray-700 hover:text-blue-700 shadow-sm hover:shadow-md transform hover:scale-[1.02]"
             >
