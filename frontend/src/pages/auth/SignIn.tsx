@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { EnvelopeIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import TravelHubLogo from '../../components/TravelHubLogo';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -32,6 +33,8 @@ export default function SignInPage() {
         userFriendlyError = 'Không nhận được mã xác thực từ Google. Vui lòng thử lại.';
       } else if (decodedError.includes('configuration')) {
         userFriendlyError = 'Lỗi cấu hình đăng nhập Google. Vui lòng liên hệ quản trị viên.';
+      } else if (decodedError.includes('oauth_failed')) {
+        userFriendlyError = 'Đăng nhập Google thất bại (Google Client Secret cần được cập nhật trong Google Cloud Console). Bạn có thể đăng nhập bằng Email / Mật khẩu ngay bên dưới.';
       }
       
       setError(userFriendlyError);
@@ -193,19 +196,9 @@ export default function SignInPage() {
       <div className="max-w-md w-full relative z-10">
         {/* Logo & Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3 mb-6 group">
-            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl transform group-hover:scale-110 transition-transform duration-300">
-              <img 
-                src="/uploads/avatars/travelgo-admin.png"
-                alt="TravelHub Logo"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span className="font-extrabold text-3xl">
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Travel</span>
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Hub</span>
-            </span>
-          </Link>
+          <div className="flex justify-center mb-6">
+            <TravelHubLogo variant="dark" size="xl" asLink={true} />
+          </div>
           
           <h2 className="text-4xl font-extrabold mb-3">
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">

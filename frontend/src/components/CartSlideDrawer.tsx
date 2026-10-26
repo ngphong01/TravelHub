@@ -96,9 +96,12 @@ export default function CartSlideDrawer({ isOpen, onClose }: CartSlideDrawerProp
                 >
                   <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-200 dark:bg-slate-700 flex-shrink-0">
                     <img
-                      src={item.image || '/uploads/avatars/travelgo-admin.png'}
+                      src={item.image || '/uploads/tours/halong-bay-karsts.jpg'}
                       alt={item.title}
                       className="w-full h-full object-cover"
+                      onError={(e: any) => {
+                        e.target.src = '/uploads/tours/halong-bay-karsts.jpg';
+                      }}
                     />
                   </div>
                   <div className="flex-1 min-w-0">

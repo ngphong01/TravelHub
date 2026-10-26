@@ -1,0 +1,43 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="th-orbit" x1="10" y1="20" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#00F0FF" />
+      <stop offset="60%" stopColor="#0284C7" />
+      <stop offset="100%" stopColor="#0369A1" />
+    </linearGradient>
+    <linearGradient id="th-pin" x1="20" y1="40" x2="80" y2="95" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#0284C7" />
+      <stop offset="50%" stopColor="#0369A1" />
+      <stop offset="100%" stopColor="#075985" />
+    </linearGradient>
+    <linearGradient id="th-wing-cyan" x1="25" y1="20" x2="65" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#38BDF8" />
+      <stop offset="100%" stopColor="#0284C7" />
+    </linearGradient>
+    <linearGradient id="th-wing-gold" x1="45" y1="15" x2="85" y2="55" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#FDE047" />
+      <stop offset="50%" stopColor="#F59E0B" />
+      <stop offset="100%" stopColor="#D97706" />
+    </linearGradient>
+    <linearGradient id="th-pin-bottom" x1="35" y1="70" x2="65" y2="95" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#F59E0B" />
+      <stop offset="100%" stopColor="#B45309" />
+    </linearGradient>
+  </defs>
+
+  <rect width="100" height="100" rx="22" fill="#003580" />
+  <!-- Orbit Loop -->
+  <ellipse cx="50" cy="48" rx="36" ry="24" transform="rotate(-25 50 48)" stroke="url(#th-orbit)" stroke-width="5" stroke-linecap="round" stroke-dasharray="180 30" opacity="0.95" />
+  <!-- Pin Body -->
+  <path d="M 50 94 C 36 78 22 62 22 46 C 22 28 34.5 15 50 15 C 65.5 15 78 28 78 46 C 78 62 64 78 50 94 Z" fill="none" stroke="url(#th-pin)" stroke-width="5.5" stroke-linejoin="round" />
+  <!-- Golden Apex -->
+  <path d="M 50 94 L 38 78 L 50 72 L 62 78 Z" fill="url(#th-pin-bottom)" opacity="0.9" />
+  <!-- Plane Left Wing -->
+  <path d="M 78 18 L 28 42 L 50 56 Z" fill="url(#th-wing-cyan)" stroke="#FFFFFF" stroke-width="1.2" />
+  <!-- Plane Right Wing -->
+  <path d="M 78 18 L 50 56 L 68 50 Z" fill="url(#th-wing-gold)" stroke="#FFFFFF" stroke-width="1.2" />
+  <!-- Plane Center Keel -->
+  <path d="M 78 18 L 50 56 L 46 64 L 43 51 Z" fill="#0369A1" opacity="0.9" />
+  <!-- Speed Swoosh -->
+  <path d="M 20 62 C 26 50 36 46 44 48" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" opacity="0.8" />
+</svg>

@@ -111,10 +111,21 @@ export function getDestinationImageUrl(destination: { name: string; image?: stri
     // If it's other relative path, return as-is
     return destination.image;
   }
-  
   // Fallback: Try to get from uploads folder based on destination name
-  // This is useful if database doesn't have image field yet
   const imageUrl = getDestinationImage(destination.name);
-  return imageUrl || ''; // Return empty string if no image found
+  return imageUrl || '';
 }
 
+// Helper to get tour image URL with appropriate fallback
+export function getTourImageUrl(image?: string | null): string {
+  if (!image) {
+    return '/uploads/tours/halong-bay-karsts.jpg';
+  }
+  if (image.startsWith('http://') || image.startsWith('https://')) {
+    return image;
+  }
+  if (image.startsWith('/')) {
+    return image;
+  }
+  return `/uploads/tours/${image}`;
+}

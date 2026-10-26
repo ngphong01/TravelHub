@@ -708,11 +708,11 @@ export default function TourDetail() {
 
 
 
-  const mainImage = images[selectedImageIndex] || images[0] || '/placeholder.jpg';
+  const mainImage = images[selectedImageIndex] || images[0] || '/uploads/tours/halong-bay-karsts.jpg';
   const price = tour.price || 980000;
   const originalPrice = tour.originalPrice;
   const destinationName = tour.destination?.name || 'Phú Quốc';
-  const tourImage = tour.image && tour.image.startsWith('http') ? tour.image : (tour.image && tour.image.startsWith('/uploads') ? tour.image : `/uploads/destinations/${tour.image}`) || '/placeholder.jpg';
+  const tourImage = tour.image && tour.image.startsWith('http') ? tour.image : (tour.image && tour.image.startsWith('/uploads') ? tour.image : `/uploads/tours/${tour.image}`) || '/uploads/tours/halong-bay-karsts.jpg';
 
   return (
     <>

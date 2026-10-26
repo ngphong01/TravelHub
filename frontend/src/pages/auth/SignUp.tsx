@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import TravelHubLogo from '../../components/TravelHubLogo';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -92,25 +93,9 @@ export default function SignUpPage() {
         <div className="max-w-md w-full relative z-10">
           {/* Logo */}
           <div className="text-center mb-6">
-            <Link to="/" className="inline-flex items-center gap-3 justify-center group">
-              <div className="w-14 h-14 rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 bg-white p-2">
-                <img
-                  src="/uploads/avatars/travelgo-admin.png"
-                  alt="TravelHub Logo"
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">TH</div>';
-                  }}
-                />
-              </div>
-              <div className="text-left">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  TravelHub
-                </h1>
-                <p className="text-xs text-gray-500">Khám phá thế giới</p>
-              </div>
-            </Link>
+            <div className="flex justify-center">
+              <TravelHubLogo variant="dark" size="lg" asLink={true} />
+            </div>
           </div>
 
           <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-emerald-200/50">
@@ -211,25 +196,9 @@ export default function SignUpPage() {
       <div className="max-w-md w-full relative z-10">
         {/* Logo & Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3 mb-6 group">
-            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105 bg-white p-2">
-              <img
-                src="/uploads/avatars/travelgo-admin.png"
-                alt="TravelHub Logo"
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">TH</div>';
-                }}
-              />
-            </div>
-            <div className="text-left">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                TravelHub
-              </h1>
-              <p className="text-xs text-gray-500">Khám phá thế giới</p>
-            </div>
-          </Link>
+          <div className="flex justify-center mb-6">
+            <TravelHubLogo variant="dark" size="xl" asLink={true} />
+          </div>
           
           <h2 className="text-4xl font-extrabold mb-3">
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">

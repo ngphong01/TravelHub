@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   EnvelopeIcon,
   PhoneIcon,
@@ -8,93 +9,58 @@ import {
   CheckCircleIcon,
   PaperAirplaneIcon,
   UserIcon,
-  BuildingOfficeIcon,
-  GlobeAltIcon,
+  BuildingOffice2Icon,
+  SparklesIcon,
+  ShieldCheckIcon,
+  QuestionMarkCircleIcon,
 } from '@heroicons/react/24/outline';
 import MapEmbed from '../components/MapEmbed';
-
-function NewsletterSection() {
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim() || isSubmitting) return;
-
-    setIsSubmitting(true);
-    try {
-      const response = await fetch('/api/newsletter/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email.trim() }),
-      });
-
-      if (response.ok) {
-        setSubmitted(true);
-        setEmail('');
-        setTimeout(() => setSubmitted(false), 5000);
-      } else {
-        alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
-      }
-    } catch (error) {
-      console.error('Error subscribing:', error);
-      alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <section className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-8 md:p-12 text-white text-center">
-      <h2 className="text-3xl font-bold mb-4">Đăng ký nhận bản tin</h2>
-      <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-        Nhận thông tin ưu đãi độc quyền, điểm đến mới và tin tức du lịch mỗi tuần
-      </p>
-      {submitted && (
-        <div className="mb-4 p-3 bg-green-500/20 rounded-lg border border-green-300/50">
-          <p className="text-green-100 font-semibold">Đăng ký thành công! Cảm ơn bạn đã quan tâm.</p>
-        </div>
-      )}
-      <form onSubmit={handleSubscribe} className="max-w-xl mx-auto flex gap-4">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Nhập email của bạn..."
-          required
-          className="flex-1 px-6 py-4 rounded-xl text-gray-900 text-lg focus:outline-none focus:ring-4 focus:ring-white/50"
-        />
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="px-8 py-4 bg-white text-blue-600 rounded-xl hover:bg-gray-100 transition-colors font-semibold text-lg whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? 'Đang đăng ký...' : 'Đăng ký ngay'}
-        </button>
-      </form>
-    </section>
-  );
-}
+import SEOHead from '../components/SEOHead';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    subject: '',
+    subject: 'Tư vấn đặt tour',
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const branches = [
+    {
+      city: 'Hà Nội (Trụ sở chính)',
+      badge: 'Headquarters',
+      address: 'Tầng 8, Tòa nhà TravelHub Tower, 6/160 Tân Triều, Thanh Trì, Hà Nội',
+      phone: '0868 156 027',
+      email: 'phong@triennguyen.com',
+      hours: '08:00 - 18:30 (Thứ 2 - Chủ Nhật)',
+    },
+    {
+      city: 'TP. Hồ Chí Minh',
+      badge: 'Chi nhánh Nam Bộ',
+      address: 'Tầng 12, Tòa nhà Bitexco Financial, Số 2 Hải Triều, P. Bến Nghé, Quận 1, TP.HCM',
+      phone: '0868 156 027',
+      email: 'saigon@travelhub.vn',
+      hours: '08:00 - 18:30 (Thứ 2 - Thứ 7)',
+    },
+    {
+      city: 'Đà Nẵng',
+      badge: 'Chi nhánh Miền Trung',
+      address: 'Tầng 5, Tòa nhà Indochina Riverside, 74 Bạch Đằng, P. Hải Châu 1, Q. Hải Châu, Đà Nẵng',
+      phone: '0868 156 027',
+      email: 'danang@travelhub.vn',
+      hours: '08:00 - 18:00 (Thứ 2 - Thứ 7)',
+    },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     setIsSubmitting(true);
-    
+    setErrorMessage('');
+
     try {
       const response = await fetch('/api/support', {
         method: 'POST',
@@ -102,380 +68,436 @@ export default function Contact() {
         body: JSON.stringify({
           userEmail: formData.email,
           subject: formData.subject,
-          message: `Tên: ${formData.name}\nSĐT: ${formData.phone}\n\n${formData.message}`,
+          message: `Khách hàng: ${formData.name}\nSố điện thoại: ${formData.phone}\nChuyên mục: ${formData.subject}\n\nNội dung:\n${formData.message}`,
         }),
       });
 
       if (response.ok) {
         setSubmitted(true);
-        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-        setTimeout(() => setSubmitted(false), 5000);
+        setFormData({ name: '', email: '', phone: '', subject: 'Tư vấn đặt tour', message: '' });
+        setTimeout(() => setSubmitted(false), 6000);
       } else {
-        const data = await response.json();
-        alert(data.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+        const data = await response.json().catch(() => ({}));
+        setErrorMessage(data.message || 'Có lỗi xảy ra trong quá trình gửi yêu cầu. Vui lòng liên hệ trực tiếp hotline.');
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      console.error('Error submitting support form:', error);
+      setErrorMessage('Không thể kết nối đến máy chủ. Vui lòng gọi trực tiếp hotline 0868 156 027.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
 
-  // Branch offices
-  const branches = [
-    {
-      city: 'Hà Nội',
-      address: '6/160 Tân Triều, Thanh Trì, Hà Nội',
-      phone: '0868156027',
-      email: 'phong@triennguyen.com',
-      hours: '8:00 - 18:00',
-    },
-    {
-      city: 'TP.HCM',
-      address: '6/160 Tân Triều, Thanh Trì, Hà Nội',
-      phone: '0868156027',
-      email: 'phong@triennguyen.com',
-      hours: '8:00 - 18:00',
-    },
-    {
-      city: 'Đà Nẵng',
-      address: '6/160 Tân Triều, Thanh Trì, Hà Nội',
-      phone: '0868156027',
-      email: 'phong@triennguyen.com',
-      hours: '8:00 - 17:00',
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-cyan-500 via-teal-500 to-sky-500 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-6 py-2.5 mb-6">
-              <ChatBubbleLeftRightIcon className="h-6 w-6" />
-              <span className="font-semibold">Liên hệ & Hỗ trợ</span>
+    <>
+      <SEOHead
+        title="Trung Tâm Hỗ Trợ & Liên Hệ 24/7 - TravelHub"
+        description="Tổng đài CSKH 24/7 TravelHub: 0868 156 027. Đội ngũ chuyên gia du lịch luôn sẵn sàng tư vấn tour, giải đáp thắc mắc và hỗ trợ đặt dịch vụ nhanh chóng."
+        url="/contact"
+      />
+
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors">
+        {/* =========================================================================
+            1. LUXURY HERO BANNER - Cohesive Royal Navy & Gold TravelHub Palette
+            ========================================================================= */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#00224f] via-[#003580] to-[#0f172a] text-white py-16 sm:py-20 lg:py-24">
+          <div className="absolute inset-0 opacity-15 pointer-events-none">
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 2px 2px, white 1.5px, transparent 0)',
+                backgroundSize: '36px 36px',
+              }}
+            />
+          </div>
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 backdrop-blur-md rounded-full text-blue-200 text-sm font-semibold mb-6 shadow-sm">
+              <ShieldCheckIcon className="h-5 w-5 text-amber-400" />
+              <span>Trung Tâm Trợ Giúp & Chăm Sóc Khách Hàng TravelHub</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
-              Liên hệ với chúng tôi
+
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-4 tracking-tight">
+              Chúng Tôi Luôn Sẵn Sàng <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500">Đồng Hành Cùng Bạn</span>
             </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ để được tư vấn tốt nhất.
+
+            <p className="text-base sm:text-lg text-blue-100/90 max-w-2xl mx-auto font-normal leading-relaxed mb-10">
+              Đội ngũ tư vấn viên chuyên nghiệp và Trợ lý ảo AI hoạt động 24/7 giải quyết mọi thắc mắc về lịch trình, thanh toán và bảo hành dịch vụ.
             </p>
-          </div>
-        </div>
-      </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Contact Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white rounded-xl shadow-lg p-6 text-center border-2 border-blue-200 hover:border-blue-400 transition-colors">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <PhoneIcon className="h-8 w-8 text-blue-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Hotline</h3>
-            <p className="text-2xl font-bold text-blue-600 mb-2">0868156027</p>
-            <p className="text-gray-600">24/7 hỗ trợ khách hàng</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6 text-center border-2 border-purple-200 hover:border-purple-400 transition-colors">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <EnvelopeIcon className="h-8 w-8 text-purple-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Email</h3>
-            <p className="text-lg font-semibold text-purple-600 mb-2">phong@triennguyen.com</p>
-            <p className="text-gray-600">Phản hồi trong 24 giờ</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6 text-center border-2 border-pink-200 hover:border-pink-400 transition-colors">
-            <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MapPinIcon className="h-8 w-8 text-pink-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Địa chỉ</h3>
-            <p className="text-lg text-gray-700 mb-2">6/160 Tân Triều</p>
-            <p className="text-gray-600">Thanh Trì, Hà Nội</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Contact Form */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-3xl font-bold mb-6">Gửi yêu cầu</h2>
-
-            {submitted && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-                <CheckCircleIcon className="h-6 w-6 text-green-600" />
-                <p className="text-green-700 font-semibold">
-                  Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất có thể.
-                </p>
+            {/* Quick Metrics */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 border-t border-white/10">
+              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 text-center">
+                <div className="text-2xl font-black text-amber-300">24/7</div>
+                <div className="text-xs text-blue-200 mt-0.5">Tổng đài hoạt động</div>
               </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Họ và tên <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Nhập họ và tên"
-                  />
-                </div>
+              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 text-center">
+                <div className="text-2xl font-black text-emerald-300">&lt; 5 phút</div>
+                <div className="text-xs text-blue-200 mt-0.5">Thời gian phản hồi</div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Số điện thoại <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="0900 123 456"
-                    />
-                  </div>
-                </div>
+              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 text-center">
+                <div className="text-2xl font-black text-cyan-300">100%</div>
+                <div className="text-xs text-blue-200 mt-0.5">Bảo mật thông tin</div>
               </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Chủ đề <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Chọn chủ đề</option>
-                  <option value="tour">Tư vấn tour</option>
-                  <option value="booking">Đặt tour</option>
-                  <option value="payment">Thanh toán</option>
-                  <option value="refund">Hoàn tiền</option>
-                  <option value="complaint">Khiếu nại</option>
-                  <option value="other">Khác</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Nội dung yêu cầu <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows={5}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  placeholder="Mô tả chi tiết yêu cầu của bạn..."
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-semibold text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <>Đang gửi...</>
-                ) : (
-                  <>
-                    <PaperAirplaneIcon className="h-5 w-5" />
-                    Gửi yêu cầu
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-
-          {/* Map & Info */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold mb-4">Văn phòng chính</h2>
-              <MapEmbed query="Học viện Công nghệ Bưu chính Viễn thông, Hà Đông, Hà Nội" className="mb-4" />
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <MapPinIcon className="h-5 w-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-gray-900">Địa chỉ</p>
-                    <p className="text-gray-600">6/160 Tân Triều, Thanh Trì, Hà Nội</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <ClockIcon className="h-5 w-5 text-blue-600 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-gray-900">Giờ làm việc</p>
-                    <p className="text-gray-600">Thứ 2 - Chủ nhật: 8:00 - 18:00</p>
-                  </div>
-                </div>
+              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 text-center">
+                <div className="text-2xl font-black text-amber-300">99.8%</div>
+                <div className="text-xs text-blue-200 mt-0.5">Khách hàng hài lòng</div>
               </div>
             </div>
-
-            {/* Direct Contact - Messenger & Zalo */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <PhoneIcon className="h-6 w-6 text-green-600" />
-                Liên hệ trực tiếp
-              </h3>
-              <p className="text-gray-700 mb-4">
-                Nhắn tin cho chúng tôi qua các kênh sau
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <a
-                  href="https://m.me/your-page"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all hover:shadow-md"
-                >
-                  <img 
-                    src="/uploads/avatars/Messenger.png" 
-                    alt="Messenger"
-                    className="w-12 h-12 rounded-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/default-avatar.png';
-                    }}
-                  />
-                  <div>
-                    <p className="font-semibold text-gray-900">Facebook Messenger</p>
-                    <p className="text-xs text-gray-600">Chat ngay</p>
-                  </div>
-                </a>
-                <a
-                  href="https://zalo.me/0868156027"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all hover:shadow-md"
-                >
-                  <img 
-                    src="/uploads/avatars/zalo.jpg" 
-                    alt="Zalo"
-                    className="w-12 h-12 rounded-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/default-avatar.png';
-                    }}
-                  />
-                  <div>
-                    <p className="font-semibold text-gray-900">Zalo</p>
-                    <p className="text-xs text-gray-600">0868156027</p>
-                  </div>
-                </a>
-              </div>
-            </div>
-
-            {/* Chatbot Info */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                <GlobeAltIcon className="h-6 w-6 text-purple-600" />
-                Chatbot tự động
-              </h3>
-              <p className="text-gray-700">
-                Trả lời câu hỏi nhanh chóng 24/7. Hãy thử hỏi về tour, giá cả, hoặc bất kỳ thắc mắc nào!
-              </p>
-              <button className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold">
-                Mở chatbot
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Branch Offices */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 text-center">Chi nhánh & Đại lý</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {branches.map((branch, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />
-                  <h3 className="text-xl font-bold text-gray-900">{branch.city}</h3>
-                </div>
-                <div className="space-y-3 text-gray-700">
-                  <div className="flex items-start gap-2">
-                    <MapPinIcon className="h-5 w-5 text-gray-400 mt-0.5" />
-                    <span>{branch.address}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <PhoneIcon className="h-5 w-5 text-gray-400" />
-                    <span>{branch.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <EnvelopeIcon className="h-5 w-5 text-gray-400" />
-                    <span>{branch.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ClockIcon className="h-5 w-5 text-gray-400" />
-                    <span>{branch.hours}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </section>
 
-        {/* Newsletter */}
-        <section className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-8 md:p-12 text-white text-center">
-          <h2 className="text-3xl font-bold mb-4">Đăng ký nhận bản tin</h2>
-          <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-            Nhận thông tin ưu đãi độc quyền, điểm đến mới và tin tức du lịch mỗi tuần
-          </p>
-          <form className="max-w-xl mx-auto flex gap-4">
-            <input
-              type="email"
-              placeholder="Nhập email của bạn..."
-              className="flex-1 px-6 py-4 rounded-xl text-gray-900 text-lg focus:outline-none focus:ring-4 focus:ring-white/50"
-            />
-            <button
-              type="submit"
-              className="px-8 py-4 bg-white text-blue-600 rounded-xl hover:bg-gray-100 transition-colors font-semibold text-lg whitespace-nowrap"
+        {/* =========================================================================
+            2. DIRECT CONTACT CHANNELS (Hotline, Zalo, AI Chat, Email)
+            ========================================================================= */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Hotline Card */}
+            <a
+              href="tel:0868156027"
+              className="group bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xl border border-slate-200/80 dark:border-slate-800 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex items-start gap-4"
             >
-              Đăng ký ngay
-            </button>
-          </form>
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center flex-shrink-0 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                <PhoneIcon className="h-7 w-7" />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Hotline 24/7 Toàn Quốc</span>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mt-0.5">0868 156 027</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Cước gọi miễn phí • Hỗ trợ khẩn cấp 24/7</p>
+                <span className="inline-block mt-3 text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
+                  Gọi ngay bây giờ →
+                </span>
+              </div>
+            </a>
+
+            {/* Zalo & Chat Card */}
+            <a
+              href="https://zalo.me/0868156027"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xl border border-slate-200/80 dark:border-slate-800 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex items-start gap-4"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-cyan-50 dark:bg-cyan-950/50 flex items-center justify-center flex-shrink-0 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform">
+                <ChatBubbleLeftRightIcon className="h-7 w-7" />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-cyan-600 uppercase tracking-wider">Zalo & Chat Chuyên Viên</span>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mt-0.5">0868 156 027</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Nhắn tin Zalo nhận lịch trình & báo giá tức thì</p>
+                <span className="inline-block mt-3 text-xs font-bold text-cyan-600 dark:text-cyan-400 group-hover:translate-x-1 transition-transform">
+                  Mở Zalo nhắn tin →
+                </span>
+              </div>
+            </a>
+
+            {/* Email Card */}
+            <a
+              href="mailto:phong@triennguyen.com"
+              className="group bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xl border border-slate-200/80 dark:border-slate-800 hover:border-amber-500 hover:shadow-2xl transition-all duration-300 flex items-start gap-4"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center flex-shrink-0 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+                <EnvelopeIcon className="h-7 w-7" />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">Hòm Thư Điện Tử</span>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white mt-0.5 truncate max-w-[200px]">phong@triennguyen.com</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Gửi hợp đồng, đối tác & xuất hóa đơn VAT</p>
+                <span className="inline-block mt-3 text-xs font-bold text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform">
+                  Gửi thư điện tử →
+                </span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        {/* =========================================================================
+            3. MAIN CONTENT: SUPPORT FORM + FAQ + CHATBOT ACCESS
+            ========================================================================= */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Form Column (7 cols) */}
+            <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-200/80 dark:border-slate-800">
+              <div className="flex items-center gap-2 mb-2 text-blue-600 dark:text-blue-400 font-bold text-sm uppercase tracking-wider">
+                <PaperAirplaneIcon className="h-4 w-4" />
+                <span>Tiếp Nhận Yêu Cầu Trực Tuyến</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-2">
+                Gửi Yêu Cầu Hỗ Trợ
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+                Quý khách vui lòng cung cấp thông tin bên dưới. Bộ phận chăm sóc khách hàng TravelHub sẽ xử lý và liên hệ lại trong thời gian sớm nhất.
+              </p>
+
+              {submitted && (
+                <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-2xl flex items-center gap-3">
+                  <CheckCircleIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                  <p className="text-emerald-800 dark:text-emerald-200 font-semibold text-sm">
+                    Gửi yêu cầu thành công! Chuyên viên TravelHub đã tiếp nhận và sẽ liên hệ hỗ trợ bạn trong ít phút.
+                  </p>
+                </div>
+              )}
+
+              {errorMessage && (
+                <div className="mb-6 p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 rounded-2xl text-rose-800 dark:text-rose-200 text-sm font-semibold">
+                  {errorMessage}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+                      Họ và tên <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm font-medium transition-all"
+                        placeholder="Nguyễn Văn A"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+                      Số điện thoại <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <PhoneIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                        className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm font-medium transition-all"
+                        placeholder="0912 345 678"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+                      Địa chỉ Email <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <EnvelopeIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm font-medium transition-all"
+                        placeholder="email@example.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+                      Chủ đề cần hỗ trợ
+                    </label>
+                    <select
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm font-medium transition-all"
+                    >
+                      <option value="Tư vấn đặt tour">Tư vấn đặt tour du lịch</option>
+                      <option value="Xác nhận thanh toán">Xác nhận thanh toán & Vé</option>
+                      <option value="Thay đổi / Hủy vé">Yêu cầu hoàn hủy / Đổi ngày</option>
+                      <option value="Hợp tác doanh nghiệp">Hợp tác đại lý & Doanh nghiệp</option>
+                      <option value="Khiếu nại dịch vụ">Góp ý & Khiếu nại dịch vụ</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
+                    Nội dung chi tiết <span className="text-rose-500">*</span>
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    rows={5}
+                    required
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm font-medium transition-all resize-none"
+                    placeholder="Quý khách vui lòng mô tả chi tiết thông tin tour cần đặt, ngày khởi hành, số lượng người hoặc vấn đề cần trợ giúp..."
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-bold text-base shadow-lg shadow-blue-600/30 hover:shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span>Đang Gửi Yêu Cầu...</span>
+                    </>
+                  ) : (
+                    <>
+                      <PaperAirplaneIcon className="h-5 w-5" />
+                      <span>Gửi Yêu Cầu Hỗ Trợ Ngay</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+
+            {/* Sidebar Column (5 cols) */}
+            <div className="lg:col-span-5 space-y-6">
+              {/* AI Assistant Banner */}
+              <div className="bg-gradient-to-br from-indigo-900 via-blue-900 to-slate-900 text-white rounded-3xl p-6 shadow-xl border border-blue-500/30 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl" />
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-400/20 flex items-center justify-center text-amber-300">
+                    <SparklesIcon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-white">Trợ Lý AI Du Lịch 24/7</h3>
+                    <p className="text-xs text-blue-200">Phản hồi siêu tốc dưới 2 giây</p>
+                  </div>
+                </div>
+                <p className="text-sm text-blue-100/90 leading-relaxed mb-4">
+                  Cần lên lịch trình du lịch Đà Lạt, tìm khách sạn view biển Phú Quốc, hay kiểm tra giá vé máy bay? Hãy trò chuyện ngay với AI của TravelHub!
+                </p>
+                <Link
+                  to="/chatbot"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold rounded-xl text-sm transition-all shadow-md"
+                >
+                  <span>Chat Ngay Với AI</span>
+                  <span>→</span>
+                </Link>
+              </div>
+
+              {/* Working Hours & Commitments */}
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl border border-slate-200/80 dark:border-slate-800">
+                <h3 className="font-bold text-base text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <ClockIcon className="h-5 w-5 text-blue-600" />
+                  <span>Cam Kết Thời Gian Phục Vụ</span>
+                </h3>
+                <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-emerald-500 font-bold">✓</span>
+                    <span><strong>Tổng đài Hotline:</strong> Phục vụ 24/7/365, kể cả ngày lễ Tết.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-emerald-500 font-bold">✓</span>
+                    <span><strong>Zalo Chuyên Viên:</strong> Phản hồi ngay trong vòng 3 phút.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-emerald-500 font-bold">✓</span>
+                    <span><strong>Hỗ trợ hoàn hủy:</strong> Xử lý trong 24 giờ làm việc.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-emerald-500 font-bold">✓</span>
+                    <span><strong>Bảo hiểm du lịch:</strong> Cung cấp hợp đồng số tức thì sau thanh toán.</span>
+                  </li>
+                </ul>
+
+                <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <span className="text-xs text-slate-500">Xem giải đáp câu hỏi thường gặp?</span>
+                  <Link to="/faq" className="text-xs font-bold text-blue-600 hover:underline">
+                    Xem FAQ →
+                  </Link>
+                </div>
+              </div>
+
+              {/* Google Map Mini Frame */}
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-xl border border-slate-200/80 dark:border-slate-800 overflow-hidden">
+                <div className="flex items-center gap-2 mb-3 px-2">
+                  <MapPinIcon className="h-5 w-5 text-rose-500" />
+                  <span className="text-sm font-bold text-slate-900 dark:text-white">Vị Trí Trụ Sở TravelHub Hà Nội</span>
+                </div>
+                <div className="rounded-2xl overflow-hidden h-48 border border-slate-200 dark:border-slate-700">
+                  <MapEmbed query="6/160 Tân Triều, Thanh Trì, Hà Nội" title="Vị trí TravelHub" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* =========================================================================
+            4. BRANCH OFFICES ACROSS VIETNAM (Hà Nội, TP.HCM, Đà Nẵng)
+            ========================================================================= */}
+        <section className="bg-slate-100/70 dark:bg-slate-900/50 py-16 border-t border-slate-200/60 dark:border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">Hệ Thống Mạng Lưới Toàn Quốc</span>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1 mb-3">
+                Văn Phòng & Chi Nhánh TravelHub
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Quý khách có thể đến trực tiếp các văn phòng đại diện để được tư vấn và thanh toán trực tiếp.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {branches.map((branch, i) => (
+                <div
+                  key={i}
+                  className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg border border-slate-200/80 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                      <BuildingOffice2Icon className="h-6 w-6" />
+                    </div>
+                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 text-xs font-bold rounded-full">
+                      {branch.badge}
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white mb-3">{branch.city}</h3>
+
+                  <div className="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                    <div className="flex items-start gap-2.5">
+                      <MapPinIcon className="h-5 w-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                      <span>{branch.address}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <PhoneIcon className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                      <a href={`tel:${branch.phone.replace(/\s+/g, '')}`} className="font-semibold text-slate-900 dark:text-white hover:text-blue-600">
+                        {branch.phone}
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <EnvelopeIcon className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                      <span>{branch.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <ClockIcon className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                      <span>{branch.hours}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
       </div>
-    </div>
+    </>
   );
 }

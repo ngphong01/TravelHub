@@ -427,11 +427,11 @@ export default function ToursPage() {
                   {/* Image with badges & compare button */}
                   <div className="relative h-56 w-full overflow-hidden bg-gray-100 dark:bg-slate-800">
                     <img
-                      src={tour.image || '/uploads/avatars/travelgo-admin.png'}
+                      src={tour.image || '/uploads/tours/halong-bay-karsts.jpg'}
                       alt={tour.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e: any) => {
-                        e.target.src = '/uploads/avatars/travelgo-admin.png';
+                        e.target.src = '/uploads/tours/halong-bay-karsts.jpg';
                       }}
                     />
                     {tour.featured && (

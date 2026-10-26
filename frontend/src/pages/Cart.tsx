@@ -130,11 +130,11 @@ export default function CartPage() {
                     <div className="flex items-center gap-4 flex-1">
                       <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-slate-800 flex-shrink-0 border border-gray-100 dark:border-slate-800">
                         <img
-                          src={item.image || '/uploads/avatars/travelgo-admin.png'}
+                          src={item.image || '/uploads/tours/halong-bay-karsts.jpg'}
                           alt={item.title}
                           className="w-full h-full object-cover"
                           onError={(e: any) => {
-                            e.target.src = '/uploads/avatars/travelgo-admin.png';
+                            e.target.src = '/uploads/tours/halong-bay-karsts.jpg';
                           }}
                         />
                       </div>

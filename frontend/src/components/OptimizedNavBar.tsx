@@ -227,11 +227,11 @@ export default function OptimizedNavBar() {
         <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg overflow-hidden shadow">
             <img 
-              src="/uploads/avatars/travelgo-admin.png"
+              src="/logo.png"
               alt="TravelHub Logo"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = "/uploads/avatars/travelgo-logo.png";
+                target.src = "/favicon.svg";
               }}
               className="w-full h-full object-cover"
             />

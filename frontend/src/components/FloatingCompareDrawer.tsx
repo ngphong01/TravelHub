@@ -52,7 +52,7 @@ export default function FloatingCompareDrawer({
                 key={t.id}
                 className="relative w-11 h-11 rounded-2xl overflow-hidden border-2 border-slate-900 shadow-md flex-shrink-0 group"
               >
-                <img src={t.image || '/uploads/avatars/travelgo-admin.png'} alt={t.name} className="w-full h-full object-cover" />
+                <img src={t.image || '/uploads/tours/halong-bay-karsts.jpg'} alt={t.name} className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={() => onRemoveTour(t.id)}
@@ -131,9 +131,12 @@ export default function FloatingCompareDrawer({
                     {/* Image */}
                     <div className="relative h-44 rounded-xl overflow-hidden mb-4 shadow-sm">
                       <img
-                        src={tour.image || '/uploads/avatars/travelgo-admin.png'}
+                        src={tour.image || '/uploads/tours/halong-bay-karsts.jpg'}
                         alt={tour.name}
                         className="w-full h-full object-cover"
+                        onError={(e: any) => {
+                          e.target.src = '/uploads/tours/halong-bay-karsts.jpg';
+                        }}
                       />
                       <button
                         onClick={() => onRemoveTour(tour.id)}

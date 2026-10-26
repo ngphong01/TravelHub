@@ -12,19 +12,26 @@ interface SEOHeadProps {
 }
 
 export default function SEOHead({
-  title = 'TravelGo - Khám phá thế giới cùng chúng tôi',
-  description = 'TravelGo - Công ty du lịch hàng đầu Việt Nam. Khám phá những điểm đến tuyệt vời trong và ngoài nước.',
-  keywords = 'du lịch, tour, điểm đến, travel, vietnam travel',
+  title = 'TravelHub - Sàn Thương Mại Điện Tử Du Lịch Hàng Đầu',
+  description = 'TravelHub - Khám phá và đặt tour du lịch, khách sạn nghỉ dưỡng, vé tham quan với giá tốt nhất Việt Nam.',
+  keywords = 'travelhub, du lịch, tour du lịch, khách sạn, vé tham quan, du lịch việt nam',
   image = '/logo.png',
   url = window.location.href,
   type = 'website',
   schema,
 }: SEOHeadProps) {
-  const fullTitle = title.includes('TravelGo') ? title : `${title} | TravelGo`;
-  const siteUrl = process.env.REACT_APP_SITE_URL || 'http://localhost:3001';
+  const fullTitle = title.includes('TravelHub') ? title : `${title} | TravelHub`;
+  const siteUrl = process.env.REACT_APP_SITE_URL || 'https://www.daophong.id.vn';
 
   return (
     <Helmet>
+      {/* Favicon & Icons */}
+      <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" />
+      <link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <link rel="shortcut icon" href="/favicon.ico?v=2" />
+      <link rel="apple-touch-icon" href="/logo.png" />
+
       {/* Basic Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="description" content={description} />

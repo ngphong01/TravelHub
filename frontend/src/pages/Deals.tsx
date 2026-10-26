@@ -1,940 +1,567 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
-  GiftIcon,
   TagIcon,
-  ChevronRightIcon,
-  XMarkIcon,
-  StarIcon,
-  MapPinIcon,
   ClockIcon,
-  CalendarDaysIcon,
+  SparklesIcon,
+  FireIcon,
   TicketIcon,
-  UserGroupIcon,
+  CheckBadgeIcon,
+  MapPinIcon,
+  StarIcon,
+  ArrowRightIcon,
+  ShieldCheckIcon,
+  GiftIcon,
+  ClipboardDocumentCheckIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
+import { getTours, Tour } from '../services/tour';
+import { getActivePromos, PromoCode } from '../services/promo';
+import { getTourImageUrl } from '../utils/imageHelper';
+import SEOHead from '../components/SEOHead';
+import Skeleton from '../components/Skeleton';
 
-type TabType = 'today' | 'combo' | 'member' | 'season' | 'flight-hotel';
-type DiscountFilter = 'all' | 10 | 20 | 30 | 50;
-type ProductType = 'all' | 'tour' | 'combo' | 'hotel' | 'flight';
-type TimeFilter = 'all' | 'today' | 'weekend' | 'holiday';
+type TabType = 'all' | 'flash' | 'combo' | 'voucher';
 
-interface Deal {
-  id: number;
+interface ComboDeal {
+  id: string;
   title: string;
   originalPrice: number;
   salePrice: number;
   discount: number;
   imageUrl: string;
-  destination?: string;
-  validUntil: string;
-  duration?: string;
-  rating?: number;
-  reviewCount?: number;
-  includes?: string[];
-  reason?: string;
-  tag?: 'hot' | 'new' | 'limited';
+  destination: string;
+  duration: string;
+  rating: number;
+  reviewCount: number;
+  includes: string[];
+  tag: string;
 }
 
-export default function Deals() {
-  const [activeTab, setActiveTab] = useState<TabType>('today');
-  const [discountFilter, setDiscountFilter] = useState<DiscountFilter>('all');
-  const [productFilter, setProductFilter] = useState<ProductType>('all');
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
-  const [destinationFilter, setDestinationFilter] = useState<string>('all');
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
+const LUXURY_COMBOS: ComboDeal[] = [
+  {
+    id: 'combo-halong',
+    title: 'Combo Du Thuyền Hạ Long 5 Sao + Khách Sạn View Vịnh',
+    originalPrice: 4850000,
+    salePrice: 3390000,
+    discount: 30,
+    imageUrl: '/uploads/tours/halong-bay-karsts.jpg',
+    destination: 'Hạ Long',
+    duration: '3 ngày 2 đêm',
+    rating: 4.9,
+    reviewCount: 342,
+    includes: ['Cabin du thuyền 5 sao', '3 bữa Buffet hải sản', 'Vé chèo kayak & Hang Sửng Sốt', 'Xe limousine đưa đón Hà Nội'],
+    tag: 'Bán chạy nhất',
+  },
+  {
+    id: 'combo-phuquoc',
+    title: 'Combo Phú Quốc Nghỉ Dưỡng Bãi Dài + Cáp Treo Hòn Thơm',
+    originalPrice: 6200000,
+    salePrice: 4340000,
+    discount: 30,
+    imageUrl: '/uploads/tours/phuquoc-sunset-sanato.jpg',
+    destination: 'Phú Quốc',
+    duration: '4 ngày 3 đêm',
+    rating: 4.9,
+    reviewCount: 520,
+    includes: ['Resort 5 sao sát biển', 'Buffet sáng mỗi ngày', 'Vé Cáp treo Sun World 2 chiều', 'Tour cano 4 đảo ngắm san hô'],
+    tag: 'Siêu HOT',
+  },
+  {
+    id: 'combo-danang',
+    title: 'Combo Đà Nẵng - Hội An: Khách Sạn Mỹ Khê + Vé Cầu Vàng',
+    originalPrice: 4200000,
+    salePrice: 2940000,
+    discount: 30,
+    imageUrl: '/uploads/tours/danang-golden-bridge.jpg',
+    destination: 'Đà Nẵng & Hội An',
+    duration: '3 ngày 2 đêm',
+    rating: 4.8,
+    reviewCount: 418,
+    includes: ['Khách sạn 4 sao view biển', 'Vé cáp treo Bà Nà Hills & Buffet', 'Tour xích lô phố cổ Hội An', 'Đưa đón sân bay Đà Nẵng'],
+    tag: 'Ưu đãi gia đình',
+  },
+  {
+    id: 'combo-dalat',
+    title: 'Combo Đà Lạt Săn Mây + Resort Rừng Thông Hồ Tuyền Lâm',
+    originalPrice: 3600000,
+    salePrice: 2520000,
+    discount: 30,
+    imageUrl: '/uploads/tours/dalat-sanmay.jpg',
+    destination: 'Đà Lạt',
+    duration: '3 ngày 2 đêm',
+    rating: 4.9,
+    reviewCount: 289,
+    includes: ['Villa phong cách Pháp', 'Tour săn mây đón bình minh', 'Vé tham quan Thung lũng Tình Yêu', 'Tiệc nướng BBQ tối ấm cúng'],
+    tag: 'Lãng mạn',
+  },
+];
 
-  // Flash Sale Countdown
-  const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 59, seconds: 59 });
+export default function Deals() {
+  const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [selectedDestination, setSelectedDestination] = useState<string>('all');
+
+  // Flash sale countdown timer (resets every 24 hours)
+  const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 35, seconds: 42 });
 
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        }
+        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+        if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
         return { hours: 23, minutes: 59, seconds: 59 };
       });
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Mock data
-  const flashSales: Deal[] = [
-    {
-      id: 1,
-      title: 'Tour Đà Lạt 3N2Đ - Thành phố ngàn hoa',
-      originalPrice: 4500000,
-      salePrice: 3150000,
-      discount: 30,
-      imageUrl: '/uploads/destinations/Tour-Da-Lat-3-Ngay-2-Dem.png',
-      destination: 'Đà Lạt',
-      validUntil: '15/11/2025',
-      duration: '3 ngày 2 đêm',
-      rating: 4.8,
-      reviewCount: 230,
-      tag: 'hot',
-    },
-    {
-      id: 2,
-      title: 'Phú Quốc 4N3Đ - Đảo ngọc thiên đường',
-      originalPrice: 5500000,
-      salePrice: 3850000,
-      discount: 30,
-      imageUrl: '/uploads/tours/phuquoc-sao-beach.jpg',
-      destination: 'Phú Quốc',
-      validUntil: '20/11/2025',
-      duration: '4 ngày 3 đêm',
-      rating: 4.9,
-      reviewCount: 450,
-      tag: 'hot',
-    },
-    {
-      id: 3,
-      title: 'Combo Hà Nội - Hạ Long',
-      originalPrice: 3800000,
-      salePrice: 2660000,
-      discount: 30,
-      imageUrl: '/uploads/destinations/Combo Hà Nội - Hạ Long.jpg',
-      destination: 'Hà Nội, Hạ Long',
-      validUntil: '18/11/2025',
-      duration: '3 ngày 2 đêm',
-      rating: 4.7,
-      reviewCount: 180,
-      tag: 'new',
-    },
-    {
-      id: 4,
-      title: 'Nha Trang 3N2Đ - Biển xanh cát trắng',
-      originalPrice: 4200000,
-      salePrice: 2940000,
-      discount: 30,
-      imageUrl: '/uploads/destinations/Nha Trang 3N2Đ.jpg',
-      destination: 'Nha Trang',
-      validUntil: '22/11/2025',
-      duration: '3 ngày 2 đêm',
-      rating: 4.6,
-      reviewCount: 320,
-      tag: 'limited',
-    },
-  ];
+  // Fetch real tours from backend
+  const { data: tours = [], isLoading: isLoadingTours } = useQuery({
+    queryKey: ['tours', 'deals'],
+    queryFn: getTours,
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const combos: Deal[] = [
-    {
-      id: 1,
-      title: 'Tour + Khách sạn + Vé máy bay',
-      originalPrice: 8000000,
-      salePrice: 5600000,
-      discount: 30,
-      imageUrl: '/uploads/destinations/combo-ve-may-bay-va-khach-san.jpg',
-      destination: 'Nhiều điểm đến',
-      validUntil: '30/11/2025',
-      includes: ['Tour 3 ngày', 'Khách sạn 4 sao', 'Vé máy bay khứ hồi', 'Bữa sáng'],
-    },
-    {
-      id: 2,
-      title: 'Book sớm - Giảm sâu',
-      originalPrice: 5000000,
-      salePrice: 3750000,
-      discount: 25,
-      imageUrl: '/uploads/destinations/combo-da-nang-hoi-an.jpg',
-      destination: 'Tất cả tour',
-      validUntil: '31/12/2025',
-      includes: ['Giảm 25% khi đặt sớm', 'Tặng bảo hiểm du lịch', 'Hỗ trợ visa'],
-    },
-    {
-      id: 3,
-      title: 'Đi nhóm - Ưu đãi thêm người',
-      originalPrice: 6000000,
-      salePrice: 3000000,
-      discount: 50,
-      imageUrl: '/uploads/destinations/Đi nhóm - Ưu đãi thêm người.jpg',
-      destination: 'Tất cả tour',
-      validUntil: '25/11/2025',
-      includes: ['Từ 4 người trở lên', 'Giảm thêm 10%', 'Tặng bữa tối đặc biệt'],
-    },
-  ];
+  // Fetch active promo codes
+  const { data: promos = [], isLoading: isLoadingPromos } = useQuery({
+    queryKey: ['promos', 'active', 'deals'],
+    queryFn: () => getActivePromos(20),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const seasonalDeals: Deal[] = [
-    {
-      id: 1,
-      title: 'Combo biển đảo mùa hè',
-      originalPrice: 5000000,
-      salePrice: 3750000,
-      discount: 25,
-      imageUrl: '/uploads/tours/phuquoc-white-sand.jpg',
-      destination: 'Nhiều điểm đến',
-      validUntil: '31/08/2025',
-    },
-    {
-      id: 2,
-      title: 'Tour năm mới đặc biệt',
-      originalPrice: 6000000,
-      salePrice: 4800000,
-      discount: 20,
-      imageUrl: '/uploads/destinations/Tour năm mới đặc biệt.jpg',
-      destination: 'Nhiều điểm đến',
-      validUntil: '31/12/2024',
-    },
-  ];
-
-  const specialOffers = [
-    {
-      title: 'Ưu đãi độc quyền cho thành viên',
-      description: 'Thành viên Gold trở lên được giảm thêm 10% trên mọi tour',
-      code: 'MEMBER10',
-      color: 'from-amber-500 to-orange-500',
-    },
-    {
-      title: 'Đặt sớm – Giảm thêm 10%',
-      description: 'Đặt tour trước 30 ngày nhận thêm ưu đãi 10%',
-      code: 'EARLY10',
-      color: 'from-blue-500 to-cyan-500',
-    },
-    {
-      title: 'Giảm thêm 5% khi đi nhóm từ 4 người',
-      description: 'Áp dụng cho tất cả tour khi đặt từ 4 người trở lên',
-      code: 'GROUP5',
-      color: 'from-purple-500 to-pink-500',
-    },
-  ];
-
-  const personalizedDeals: Deal[] = [
-    {
-      id: 1,
-      title: 'Đà Nẵng - Hội An 3N2Đ',
-      originalPrice: 4000000,
-      salePrice: 2400000,
-      discount: 40,
-      imageUrl: '/uploads/destinations/Hội An - Đà Nẵng.jpg',
-      destination: 'Đà Nẵng, Hội An',
-      validUntil: '25/11/2025',
-      duration: '3 ngày 2 đêm',
-      reason: 'Dựa trên lịch sử tìm kiếm của bạn',
-    },
-  ];
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setTimeout(() => setSubscribed(false), 3000);
-      setEmail('');
-    }
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2500);
   };
 
-  const filteredDeals = (deals: Deal[]) => {
-    return deals.filter((deal) => {
-      if (discountFilter !== 'all' && deal.discount < discountFilter) return false;
-      if (destinationFilter !== 'all' && deal.destination && !deal.destination.toLowerCase().includes(destinationFilter.toLowerCase())) return false;
-      return true;
-    });
-  };
+  // Generate flash sale tours from real tours
+  const flashSaleTours = tours.slice(0, 8).map((tour, idx) => {
+    const discountRate = idx % 2 === 0 ? 0.35 : 0.25;
+    const basePrice = tour.price && tour.price > 0 ? tour.price : 2500000;
+    const originalPrice = Math.round(basePrice / (1 - discountRate));
+    return {
+      ...tour,
+      salePrice: basePrice,
+      originalPrice,
+      discountPercent: Math.round(discountRate * 100),
+      tag: idx === 0 ? 'Cháy vé' : idx === 1 ? 'Giảm sâu nhất' : 'Hot hôm nay',
+    };
+  });
 
-  const activeFiltersCount = [discountFilter !== 'all', productFilter !== 'all', timeFilter !== 'all', destinationFilter !== 'all'].filter(Boolean).length;
+  const filteredCombos = selectedDestination === 'all'
+    ? LUXURY_COMBOS
+    : LUXURY_COMBOS.filter((c) => c.destination.toLowerCase().includes(selectedDestination.toLowerCase()));
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Compact Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white overflow-hidden">
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-            backgroundSize: '40px 40px',
-          }} />
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-            {/* Left Content */}
-            <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
-                <span className="text-sm font-medium">Ưu đãi đặc biệt hôm nay</span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-                Khuyến mãi & Ưu đãi
-              </h1>
-              <p className="text-lg text-blue-100 mb-6 max-w-xl">
-                Tiết kiệm đến 50% cho hành trình mơ ước của bạn
-              </p>
-              <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
-                <Link
-                  to="/destinations"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl"
-                >
-                  Khám phá ngay
-                </Link>
-                <button
-                  onClick={() => setShowFilters(true)}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl hover:bg-white/20 transition-all border border-white/20"
-                >
-                  Bộ lọc
-                </button>
-              </div>
-            </div>
-
-            {/* Flash Sale Countdown - Compact */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                <span className="text-sm font-semibold">Flash Sale kết thúc sau</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <TimeUnit value={timeLeft.hours} label="Giờ" />
-                <span className="text-2xl font-bold">:</span>
-                <TimeUnit value={timeLeft.minutes} label="Phút" />
-                <span className="text-2xl font-bold">:</span>
-                <TimeUnit value={timeLeft.seconds} label="Giây" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Modern Tab Navigation */}
-        <div className="mb-8">
-          <div className="bg-white rounded-2xl shadow-sm p-2 inline-flex gap-2 overflow-x-auto">
-            {[
-              { id: 'today' as TabType, label: 'Hôm nay' },
-              { id: 'combo' as TabType, label: 'Combo' },
-              { id: 'member' as TabType, label: 'Thành viên' },
-              { id: 'season' as TabType, label: 'Theo mùa' },
-              { id: 'flight-hotel' as TabType, label: 'Vé & KS' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Quick Filter Bar */}
-        <div className="mb-8 flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => setShowFilters(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-colors"
-          >
-            <span className="font-medium">Bộ lọc</span>
-            {activeFiltersCount > 0 && (
-              <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                {activeFiltersCount}
-              </span>
-            )}
-          </button>
-
-          {/* Active Filters */}
-          {discountFilter !== 'all' && (
-            <FilterTag
-              label={`Giảm ≥${discountFilter}%`}
-              onRemove={() => setDiscountFilter('all')}
-            />
-          )}
-          {destinationFilter !== 'all' && (
-            <FilterTag
-              label={destinationFilter}
-              onRemove={() => setDestinationFilter('all')}
-            />
-          )}
-          {productFilter !== 'all' && (
-            <FilterTag
-              label={productFilter}
-              onRemove={() => setProductFilter('all')}
-            />
-          )}
-          {timeFilter !== 'all' && (
-            <FilterTag
-              label={timeFilter}
-              onRemove={() => setTimeFilter('all')}
-            />
-          )}
-        </div>
-
-        {/* Personalized Section */}
-        {personalizedDeals.length > 0 && (
-          <section className="mb-12">
-            <div className="bg-gradient-to-r from-purple-50 via-pink-50 to-blue-50 rounded-2xl p-6 mb-6 border border-purple-100">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-lg">★</span>
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-xl font-bold text-gray-900 mb-1">
-                    Dành riêng cho bạn
-                  </h2>
-                  <p className="text-gray-600">
-                    {personalizedDeals[0].reason} - Giảm đến {personalizedDeals[0].discount}%
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {personalizedDeals.map((deal) => (
-                <EnhancedDealCard key={deal.id} deal={deal} featured />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Main Content */}
-        {activeTab === 'today' && (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Flash Sale hôm nay</h2>
-              <span className="text-sm text-gray-500">{filteredDeals(flashSales).length} ưu đãi</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredDeals(flashSales).map((deal) => (
-                <EnhancedDealCard key={deal.id} deal={deal} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'combo' && (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Combo hấp dẫn</h2>
-              <span className="text-sm text-gray-500">{filteredDeals(combos).length} combo</span>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredDeals(combos).map((deal) => (
-                <EnhancedDealCard key={deal.id} deal={deal} showIncludes />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'member' && (
-          <div className="space-y-8">
-            {/* TravelPoints Section - Redesigned */}
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-100">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">★</span>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">TravelPoints</h2>
-                  <p className="text-gray-600">
-                    Tích điểm mỗi lần đặt tour và đổi thành ưu đãi hấp dẫn
-                  </p>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <PointCard
-                  points="1 điểm"
-                  value="1,000 VNĐ"
-                  color="from-blue-500 to-cyan-500"
-                />
-                <PointCard
-                  points="100 điểm"
-                  value="Voucher 5%"
-                  color="from-purple-500 to-pink-500"
-                />
-                <PointCard
-                  points="500 điểm"
-                  value="Voucher 15%"
-                  color="from-orange-500 to-red-500"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'season' && (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Khuyến mãi theo mùa</h2>
-              <span className="text-sm text-gray-500">{filteredDeals(seasonalDeals).length} ưu đãi</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredDeals(seasonalDeals).map((deal) => (
-                <EnhancedDealCard key={deal.id} deal={deal} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'flight-hotel' && (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-gray-400 text-2xl">●</span>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Đang phát triển</h3>
-            <p className="text-gray-600 mb-6">Tính năng này sẽ sớm có mặt</p>
-            <Link
-              to="/destinations"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold"
-            >
-              Xem các tour hiện có
-            </Link>
-          </div>
-        )}
-
-        {/* Special Offers - Redesigned */}
-        <section className="mt-16 mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Ưu đãi đặc biệt</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {specialOffers.map((offer, index) => (
-              <div
-                key={index}
-                className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-transparent hover:shadow-xl transition-all"
-              >
-                <div className={`w-12 h-12 bg-gradient-to-br ${offer.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-white`}>
-                  <span className="font-bold text-lg">★</span>
-                </div>
-                <h3 className="font-bold text-lg text-gray-900 mb-2">{offer.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">{offer.description}</p>
-                <div className="flex items-center justify-between">
-                  <div className="bg-gray-100 text-gray-700 text-sm font-mono font-semibold px-3 py-1.5 rounded-lg">
-                    {offer.code}
-                  </div>
-                  <button className="text-blue-600 hover:text-blue-700 font-semibold text-sm">
-                    Sao chép
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Social Proof - Compact */}
-        <section className="mb-12">
-          <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gray-900 mb-1">4.8/5</div>
-                <div className="text-sm text-gray-500">Đánh giá trung bình</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gray-900 mb-1">2,300+</div>
-                <div className="text-sm text-gray-500">Khách hàng hài lòng</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gray-900 mb-1">100%</div>
-                <div className="text-sm text-gray-500">Hoàn tiền nếu huỷ</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-gray-900 mb-1">24/7</div>
-                <div className="text-sm text-gray-500">Hỗ trợ khách hàng</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Newsletter - Redesigned */}
-        <section className="mb-12">
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-8 lg:p-12 text-white relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute inset-0" style={{
-                backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-                backgroundSize: '30px 30px',
-              }} />
-            </div>
-            <div className="relative max-w-2xl mx-auto text-center">
-              <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl">★</span>
-              </div>
-              <h2 className="text-2xl lg:text-3xl font-bold mb-3">
-                Nhận ưu đãi độc quyền
-              </h2>
-              <p className="text-blue-100 mb-6">
-                Đăng ký nhận thông báo về các chương trình khuyến mãi mới nhất
-              </p>
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email của bạn"
-                  required
-                  className="flex-1 px-4 py-3 rounded-xl text-gray-900 border-0 focus:outline-none focus:ring-2 focus:ring-white/50"
-                />
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors whitespace-nowrap"
-                >
-                  {subscribed ? '✓ Đã đăng ký' : 'Đăng ký'}
-                </button>
-              </form>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* Filter Sidebar */}
-      <FilterSidebar
-        show={showFilters}
-        onClose={() => setShowFilters(false)}
-        discountFilter={discountFilter}
-        setDiscountFilter={setDiscountFilter}
-        productFilter={productFilter}
-        setProductFilter={setProductFilter}
-        timeFilter={timeFilter}
-        setTimeFilter={setTimeFilter}
-        destinationFilter={destinationFilter}
-        setDestinationFilter={setDestinationFilter}
-      />
-    </div>
-  );
-}
-
-// Enhanced Components
-
-function TimeUnit({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="text-center">
-      <div className="text-3xl font-bold tabular-nums">
-        {String(value).padStart(2, '0')}
-      </div>
-      <div className="text-xs text-white/70 mt-0.5">{label}</div>
-    </div>
-  );
-}
-
-function FilterTag({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium">
-      <span className="capitalize">{label}</span>
-      <button
-        onClick={onRemove}
-        className="hover:bg-blue-100 rounded-full p-0.5 transition-colors"
-      >
-        <span className="text-blue-700 font-bold">×</span>
-      </button>
-    </div>
-  );
-}
-
-function PointCard({ points, value, color }: { points: string; value: string; color: string }) {
-  return (
-    <div className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-lg transition-shadow">
-      <div className={`w-10 h-10 bg-gradient-to-br ${color} rounded-lg flex items-center justify-center mb-3`}>
-        <span className="text-white font-bold">★</span>
-      </div>
-      <div className="text-xl font-bold text-gray-900 mb-1">{points}</div>
-      <div className="text-sm text-gray-600">= {value}</div>
-    </div>
-  );
-}
-
-function EnhancedDealCard({ 
-  deal, 
-  showIncludes = false,
-  featured = false 
-}: { 
-  deal: Deal; 
-  showIncludes?: boolean;
-  featured?: boolean;
-}) {
-  const finalImageUrl = deal.imageUrl?.startsWith('http') 
-    ? deal.imageUrl 
-    : `${window.location.origin}${deal.imageUrl}`;
-
-  const tagConfig = {
-    hot: { label: 'Hot', color: 'bg-red-500' },
-    new: { label: 'Mới', color: 'bg-green-500' },
-    limited: { label: 'Giới hạn', color: 'bg-orange-500' },
-  };
-
-  return (
-    <div className={`group bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-xl hover:border-transparent transition-all ${featured ? 'ring-2 ring-purple-500' : ''}`}>
-      <div className="relative h-48 bg-gray-100 overflow-hidden">
-        {deal.imageUrl ? (
-          <img
-            src={finalImageUrl}
-            alt={deal.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500" />
-        )}
-        
-        {/* Overlay Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-        
-        {/* Discount Badge */}
-        <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1.5 rounded-xl text-sm font-bold shadow-lg">
-          -{deal.discount}%
-        </div>
-
-        {/* Tag Badge */}
-        {deal.tag && (
-          <div className={`absolute top-3 left-3 ${tagConfig[deal.tag].color} text-white px-3 py-1 rounded-lg text-xs font-bold shadow-lg`}>
-            {tagConfig[deal.tag].label}
-          </div>
-        )}
-
-        {/* Rating */}
-        {deal.rating && (
-          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl flex items-center gap-1.5">
-            <span className="text-yellow-400 font-bold">★</span>
-            <span className="text-sm font-semibold text-gray-900">{deal.rating}</span>
-            <span className="text-xs text-gray-500">({deal.reviewCount})</span>
-          </div>
-        )}
-      </div>
-
-      <div className="p-5">
-        {/* Title */}
-        <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-          {deal.title}
-        </h3>
-
-        {/* Destination & Duration */}
-        <div className="space-y-1.5 mb-4">
-          {deal.destination && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="text-gray-400">📍</span>
-              <span>{deal.destination}</span>
-            </div>
-          )}
-          {deal.duration && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="text-gray-400">⏱</span>
-              <span>{deal.duration}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Includes */}
-        {showIncludes && deal.includes && (
-          <div className="mb-4 space-y-1.5">
-            {deal.includes.slice(0, 3).map((item, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-1.5 flex-shrink-0" />
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Price */}
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-sm text-gray-400 line-through">
-            {new Intl.NumberFormat('vi-VN').format(deal.originalPrice)}đ
-          </span>
-          <span className="text-2xl font-bold text-blue-600">
-            {new Intl.NumberFormat('vi-VN').format(deal.salePrice)}đ
-          </span>
-        </div>
-
-        {/* Valid Until */}
-        <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-          <span>📅</span>
-          <span>Áp dụng đến {deal.validUntil}</span>
-        </div>
-
-        {/* CTA Button */}
-        <Link
-          to={`/checkout?type=combo&amount=${deal.salePrice}&title=${encodeURIComponent(deal.title)}&includes=${deal.includes ? encodeURIComponent(JSON.stringify(deal.includes)) : ''}`}
-          className="block w-full text-center px-4 py-3 bg-gray-900 text-white rounded-xl hover:bg-blue-600 transition-colors font-semibold group-hover:shadow-lg"
-        >
-          Đặt ngay
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function FilterSidebar({
-  show,
-  onClose,
-  discountFilter,
-  setDiscountFilter,
-  productFilter,
-  setProductFilter,
-  timeFilter,
-  setTimeFilter,
-  destinationFilter,
-  setDestinationFilter,
-}: {
-  show: boolean;
-  onClose: () => void;
-  discountFilter: DiscountFilter;
-  setDiscountFilter: (filter: DiscountFilter) => void;
-  productFilter: ProductType;
-  setProductFilter: (filter: ProductType) => void;
-  timeFilter: TimeFilter;
-  setTimeFilter: (filter: TimeFilter) => void;
-  destinationFilter: string;
-  setDestinationFilter: (filter: string) => void;
-}) {
-  if (!show) return null;
+  const filteredTours = selectedDestination === 'all'
+    ? flashSaleTours
+    : flashSaleTours.filter((t) => t.destination?.name?.toLowerCase().includes(selectedDestination.toLowerCase()) || t.name.toLowerCase().includes(selectedDestination.toLowerCase()));
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
-        onClick={onClose}
+      <SEOHead
+        title="Săn Deal Du Lịch & Combo Ưu Đãi Độc Quyền - TravelHub"
+        description="Tổng hợp khuyến mãi tour du lịch, combo vé máy bay + khách sạn và mã giảm giá tốt nhất hôm nay. Giảm đến 50% chỉ có tại TravelHub."
+        url="/deals"
       />
 
-      {/* Sidebar */}
-      <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white z-50 shadow-2xl overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Bộ lọc</h2>
-          <button
-            onClick={onClose}
-            className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-          >
-            <span className="text-gray-600 font-bold text-xl">×</span>
-          </button>
-        </div>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors">
+        {/* =========================================================================
+            1. HERO SECTION: ROYAL NAVY & GOLD LUXURY BANNER
+            ========================================================================= */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#00224f] via-[#003580] to-[#0f172a] text-white py-16 sm:py-20">
+          <div className="absolute inset-0 opacity-15 pointer-events-none">
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 2px 2px, white 1.5px, transparent 0)',
+                backgroundSize: '36px 36px',
+              }}
+            />
+          </div>
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-amber-400/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="p-6 space-y-6">
-          {/* Discount Filter */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="font-semibold text-gray-900">Mức giảm giá</div>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 backdrop-blur-md rounded-full text-blue-200 text-sm font-semibold mb-6 shadow-sm">
+              <FireIcon className="h-5 w-5 text-amber-400 animate-bounce" />
+              <span>Đại Tiệc Ưu Đãi Du Lịch 2026</span>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: 'Tất cả', value: 'all' as DiscountFilter },
-                { label: '≥ 10%', value: 10 as DiscountFilter },
-                { label: '≥ 20%', value: 20 as DiscountFilter },
-                { label: '≥ 30%', value: 30 as DiscountFilter },
-                { label: '≥ 50%', value: 50 as DiscountFilter },
-              ].map((filter) => (
-                <button
-                  key={filter.value}
-                  onClick={() => setDiscountFilter(filter.value)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium border-2 transition-all ${
-                    discountFilter === filter.value
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
+
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black mb-4 tracking-tight">
+              Săn Deal Du Lịch <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500">Giảm Đến 50%</span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-blue-100/90 max-w-2xl mx-auto font-normal leading-relaxed mb-8">
+              Khám phá trọn vẹn vẻ đẹp Việt Nam với các gói combo khách sạn 5 sao, vé máy bay và tour trọn gói giá tốt nhất được cập nhật mỗi ngày.
+            </p>
+
+            {/* Countdown Clock */}
+            <div className="inline-flex items-center gap-3 bg-white/10 border border-white/20 backdrop-blur-md px-6 py-3.5 rounded-2xl shadow-xl">
+              <ClockIcon className="h-6 w-6 text-amber-400 flex-shrink-0" />
+              <div className="text-left">
+                <span className="text-xs text-blue-200 block font-semibold uppercase tracking-wider">Flash Sale kết thúc sau:</span>
+                <div className="flex items-center gap-2 text-xl sm:text-2xl font-black text-amber-300 font-mono mt-0.5">
+                  <span className="bg-black/30 px-2 py-0.5 rounded-lg">{String(timeLeft.hours).padStart(2, '0')}</span>
+                  <span>:</span>
+                  <span className="bg-black/30 px-2 py-0.5 rounded-lg">{String(timeLeft.minutes).padStart(2, '0')}</span>
+                  <span>:</span>
+                  <span className="bg-black/30 px-2 py-0.5 rounded-lg">{String(timeLeft.seconds).padStart(2, '0')}</span>
+                </div>
+              </div>
             </div>
           </div>
+        </section>
 
-          {/* Product Type */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="font-semibold text-gray-900">Loại sản phẩm</div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
+        {/* =========================================================================
+            2. NAVIGATION TABS & DESTINATION FILTERS
+            ========================================================================= */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200/80 dark:border-slate-800 p-2 sm:p-3 flex flex-wrap items-center justify-between gap-3">
+            {/* Tabs */}
+            <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
               {[
-                { label: 'Tất cả', value: 'all' as ProductType },
-                { label: 'Tour', value: 'tour' as ProductType },
-                { label: 'Combo', value: 'combo' as ProductType },
-                { label: 'Khách sạn', value: 'hotel' as ProductType },
-                { label: 'Vé máy bay', value: 'flight' as ProductType },
-              ].map((filter) => (
+                { id: 'all' as TabType, label: 'Tất Cả Ưu Đãi', icon: SparklesIcon },
+                { id: 'flash' as TabType, label: 'Flash Sale 24h', icon: FireIcon },
+                { id: 'combo' as TabType, label: 'Combo Du Lịch', icon: TagIcon },
+                { id: 'voucher' as TabType, label: 'Kho Voucher', icon: TicketIcon },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+                      isActive
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Quick Destination Select */}
+            <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+              <span className="text-xs font-bold text-slate-400 uppercase hidden md:inline">Điểm đến:</span>
+              {['all', 'Hạ Long', 'Phú Quốc', 'Đà Lạt', 'Đà Nẵng', 'Ninh Bình'].map((dest) => (
                 <button
-                  key={filter.value}
-                  onClick={() => setProductFilter(filter.value)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium border-2 transition-all ${
-                    productFilter === filter.value
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
+                  key={dest}
+                  onClick={() => setSelectedDestination(dest)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    selectedDestination === dest
+                      ? 'bg-amber-400 text-slate-900 font-bold shadow-sm'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                   }`}
                 >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Destination */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="font-semibold text-gray-900">Điểm đến</div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: 'Tất cả', value: 'all' },
-                { label: 'Đà Lạt', value: 'đà lạt' },
-                { label: 'Phú Quốc', value: 'phú quốc' },
-                { label: 'Bangkok', value: 'bangkok' },
-                { label: 'Tokyo', value: 'tokyo' },
-                { label: 'Nha Trang', value: 'nha trang' },
-              ].map((filter) => (
-                <button
-                  key={filter.value}
-                  onClick={() => setDestinationFilter(filter.value)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium border-2 transition-all ${
-                    destinationFilter === filter.value
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Time Filter */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="font-semibold text-gray-900">Thời gian</div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: 'Tất cả', value: 'all' as TimeFilter },
-                { label: 'Hôm nay', value: 'today' as TimeFilter },
-                { label: 'Cuối tuần', value: 'weekend' as TimeFilter },
-                { label: 'Dịp lễ', value: 'holiday' as TimeFilter },
-              ].map((filter) => (
-                <button
-                  key={filter.value}
-                  onClick={() => setTimeFilter(filter.value)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium border-2 transition-all ${
-                    timeFilter === filter.value
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  {filter.label}
+                  {dest === 'all' ? 'Tất cả' : dest}
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex gap-3">
-          <button
-            onClick={() => {
-              setDiscountFilter('all');
-              setProductFilter('all');
-              setTimeFilter('all');
-              setDestinationFilter('all');
-            }}
-            className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Đặt lại
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
-          >
-            Áp dụng
-          </button>
+        {/* =========================================================================
+            3. MAIN CONTENT SECTIONS
+            ========================================================================= */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+          {/* A. VOUCHER CARDS (TICKET STRIP) */}
+          {(activeTab === 'all' || activeTab === 'voucher') && (
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-wider">
+                    <TicketIcon className="h-4 w-4" />
+                    <span>Voucher Độc Quyền</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">
+                    Mã Giảm Giá Đang Mở Dùng
+                  </h2>
+                </div>
+                <Link to="/promo-codes" className="text-xs sm:text-sm font-bold text-blue-600 hover:underline">
+                  Xem tất cả mã →
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  { code: 'TRAVELHUB2026', discount: 'Giảm 500K', desc: 'Đơn từ 3 triệu cho tour trọn gói', badge: 'Voucher Năm Mới' },
+                  { code: 'MEMBER10', discount: 'Giảm 10%', desc: 'Độc quyền thành viên VIP TravelHub', badge: 'VIP Member' },
+                  { code: 'EARLYBIRD', discount: 'Giảm 300K', desc: 'Khi đặt tour trước ngày khởi hành 20 ngày', badge: 'Đặt Sớm' },
+                  { code: 'GROUP5', discount: 'Giảm 5%', desc: 'Áp dụng cho nhóm bạn hoặc gia đình từ 4 người', badge: 'Đi Nhóm' },
+                ].map((voucher) => (
+                  <div
+                    key={voucher.code}
+                    className="relative bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-lg border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between hover:shadow-xl transition-all"
+                  >
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-md self-start mb-2">
+                      {voucher.badge}
+                    </span>
+                    <div className="text-xl font-black text-blue-600 dark:text-blue-400 mb-1">
+                      {voucher.discount}
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+                      {voucher.desc}
+                    </p>
+
+                    <div className="pt-3 border-t border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                        {voucher.code}
+                      </span>
+                      <button
+                        onClick={() => handleCopyCode(voucher.code)}
+                        className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
+                          copiedCode === voucher.code
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        }`}
+                      >
+                        {copiedCode === voucher.code ? 'Đã chép!' : 'Lưu mã'}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* B. COMBO PACKAGES (FLIGHT + HOTEL + TOUR) */}
+          {(activeTab === 'all' || activeTab === 'combo') && (
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <div className="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-wider">
+                    <TagIcon className="h-4 w-4" />
+                    <span>Gói Tiết Kiệm Nhất</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">
+                    Gói Combo Nghỉ Dưỡng Trọn Gói 2026
+                  </h2>
+                </div>
+                <span className="text-xs text-slate-500 font-medium">{filteredCombos.length} combo cao cấp</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {filteredCombos.map((combo) => (
+                  <div
+                    key={combo.id}
+                    className="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
+                  >
+                    <div className="relative h-48 overflow-hidden bg-slate-200 dark:bg-slate-800">
+                      <img
+                        src={combo.imageUrl}
+                        alt={combo.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/uploads/tours/halong-bay-karsts.jpg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <span className="absolute top-3 left-3 px-2.5 py-1 bg-amber-500 text-white text-[11px] font-bold rounded-lg shadow-md">
+                        {combo.tag}
+                      </span>
+                      <span className="absolute top-3 right-3 px-2.5 py-1 bg-rose-600 text-white text-xs font-black rounded-lg shadow-md">
+                        -{combo.discount}%
+                      </span>
+                      <div className="absolute bottom-3 left-3 text-white text-xs flex items-center gap-1 font-semibold">
+                        <MapPinIcon className="h-4 w-4 text-amber-400" />
+                        <span>{combo.destination}</span>
+                      </div>
+                    </div>
+
+                    <div className="p-5 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-1 text-xs text-amber-500 mb-1.5">
+                          <StarIconSolid className="h-4 w-4" />
+                          <span className="font-bold text-slate-800 dark:text-slate-200">{combo.rating}</span>
+                          <span className="text-slate-400">({combo.reviewCount} đánh giá)</span>
+                        </div>
+
+                        <h3 className="font-black text-base text-slate-900 dark:text-white line-clamp-2 group-hover:text-blue-600 transition-colors mb-3">
+                          {combo.title}
+                        </h3>
+
+                        <ul className="space-y-1.5 mb-4 text-xs text-slate-600 dark:text-slate-400">
+                          {combo.includes.map((item, i) => (
+                            <li key={i} className="flex items-center gap-1.5">
+                              <span className="text-emerald-500 font-bold">✓</span>
+                              <span className="truncate">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex items-baseline gap-2 mb-3">
+                          <span className="text-xs text-slate-400 line-through">
+                            {combo.originalPrice.toLocaleString('vi-VN')}đ
+                          </span>
+                          <span className="text-xl font-black text-blue-600 dark:text-blue-400">
+                            {combo.salePrice.toLocaleString('vi-VN')}đ
+                          </span>
+                        </div>
+
+                        <Link
+                          to={`/checkout?type=combo&amount=${combo.salePrice}&title=${encodeURIComponent(combo.title)}`}
+                          className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl text-center block transition-all shadow-md"
+                        >
+                          Đặt Combo Ngay
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* C. FLASH SALE TOURS (REAL DATABASE TOURS) */}
+          {(activeTab === 'all' || activeTab === 'flash') && (
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <div className="flex items-center gap-2 text-rose-600 font-bold text-xs uppercase tracking-wider">
+                    <FireIcon className="h-4 w-4" />
+                    <span>Giảm Giá Giờ Vàng</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">
+                    Tour Du Lịch Giảm Giá Sốc Hôm Nay
+                  </h2>
+                </div>
+                <Link to="/tours" className="text-xs sm:text-sm font-bold text-blue-600 hover:underline">
+                  Xem tất cả tour →
+                </Link>
+              </div>
+
+              {isLoadingTours ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[1, 2, 3, 4].map((n) => (
+                    <Skeleton key={n} className="h-80 rounded-3xl" />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {filteredTours.map((tour) => {
+                    const imgUrl = getTourImageUrl(tour.image);
+                    return (
+                      <div
+                        key={tour.id}
+                        className="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
+                      >
+                        <div className="relative h-48 overflow-hidden bg-slate-200 dark:bg-slate-800">
+                          <img
+                            src={imgUrl}
+                            alt={tour.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            loading="lazy"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/uploads/tours/halong-bay-karsts.jpg';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                          <span className="absolute top-3 left-3 px-2.5 py-1 bg-rose-600 text-white text-[11px] font-bold rounded-lg shadow-md">
+                            {tour.tag}
+                          </span>
+                          <span className="absolute top-3 right-3 px-2.5 py-1 bg-amber-500 text-white text-xs font-black rounded-lg shadow-md">
+                            -{tour.discountPercent}%
+                          </span>
+                          <div className="absolute bottom-3 left-3 text-white text-xs flex items-center gap-1 font-semibold">
+                            <MapPinIcon className="h-4 w-4 text-amber-400" />
+                            <span>{tour.destination?.name || 'Việt Nam'}</span>
+                          </div>
+                        </div>
+
+                        <div className="p-5 flex-1 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center gap-1 text-xs text-amber-500 mb-1.5">
+                              <StarIconSolid className="h-4 w-4" />
+                              <span className="font-bold text-slate-800 dark:text-slate-200">{tour.rating || 4.9}</span>
+                              <span className="text-slate-400">({tour.reviewCount || 120} đánh giá)</span>
+                            </div>
+
+                            <h3 className="font-black text-base text-slate-900 dark:text-white line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
+                              {tour.name}
+                            </h3>
+
+                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+                              {tour.shortDescription || tour.description || 'Hành trình khám phá tuyệt vời cùng hướng dẫn viên chuyên nghiệp và dịch vụ trọn gói chuẩn 5 sao.'}
+                            </p>
+                          </div>
+
+                          <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div className="flex items-baseline gap-2 mb-3">
+                              <span className="text-xs text-slate-400 line-through">
+                                {tour.originalPrice.toLocaleString('vi-VN')}đ
+                              </span>
+                              <span className="text-xl font-black text-blue-600 dark:text-blue-400">
+                                {tour.salePrice.toLocaleString('vi-VN')}đ
+                              </span>
+                            </div>
+
+                            <Link
+                              to={`/tours/${tour.slug}`}
+                              className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold rounded-xl text-center block transition-all shadow-md"
+                            >
+                              Xem Chi Tiết & Đặt Vé
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* D. BRAND GUARANTEES */}
+          <section className="bg-gradient-to-r from-blue-900/10 via-indigo-900/10 to-blue-900/10 dark:bg-slate-900 rounded-3xl p-8 sm:p-10 border border-blue-200/50 dark:border-blue-900/50">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center sm:text-left">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <ShieldCheckIcon className="h-7 w-7" />
+                </div>
+                <div>
+                  <h4 className="font-black text-base text-slate-900 dark:text-white mb-1">Cam Kết Giá Rẻ Nhất</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Hoàn tiền 100% phần chênh lệch nếu bạn tìm thấy giá tour cùng chất lượng rẻ hơn trên thị trường.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <CheckBadgeIcon className="h-7 w-7" />
+                </div>
+                <div>
+                  <h4 className="font-black text-base text-slate-900 dark:text-white mb-1">Xác Nhận Tức Thì</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Nhận vé điện tử và hợp đồng tour qua email & Zalo ngay khi hoàn tất thanh toán trong 30 giây.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <ClockIcon className="h-7 w-7" />
+                </div>
+                <div>
+                  <h4 className="font-black text-base text-slate-900 dark:text-white mb-1">Hỗ Trợ Đổi Hủy 24/7</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Hỗ trợ linh hoạt đổi ngày khởi hành hoặc hủy tour theo quy định minh bạch, hoàn tiền nhanh chóng.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </>

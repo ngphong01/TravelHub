@@ -191,12 +191,12 @@ export default function AdminSidebar() {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl shadow-lg overflow-hidden bg-white">
             <img
-              src="/uploads/avatars/travelgo-admin.png"
+              src="/logo.png"
               alt="TravelHub Logo"
               className="w-full h-full object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = "/uploads/avatars/travelgo-logo.png";
+                target.src = "/favicon.svg";
               }}
             />
           </div>
