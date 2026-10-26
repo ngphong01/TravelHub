@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 interface GenerateTourDescriptionProps {
@@ -73,12 +73,12 @@ export default function GenerateTourDescription({
       {isGenerating ? (
         <>
           <ArrowPathIcon className="h-5 w-5 animate-spin" />
-          <span>Đang tạo...</span>
+          <span>Đang tạo nội dung...</span>
         </>
       ) : (
         <>
-          <SparklesIcon className="h-5 w-5" />
-          <span>Tạo mô tả bằng AI</span>
+          <PencilSquareIcon className="h-5 w-5" />
+          <span>Tạo mô tả tự động</span>
         </>
       )}
     </button>

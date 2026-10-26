@@ -10,7 +10,6 @@ import {
   StarIcon,
   ArrowRightIcon,
   TrophyIcon,
-  SparklesIcon,
   PhotoIcon,
   VideoCameraIcon,
   CalendarIcon,
@@ -50,7 +49,7 @@ export default function Featured() {
     { id: 2, name: 'Tour Phú Quốc 4N3Đ', bookings: 980, price: 3570000, originalPrice: 4200000, discount: 15, Icon: SunIcon, imageUrl: '/uploads/destinations/Tour Phú Quốc 4N3Đ.png' },
     { id: 3, name: 'Sapa 2 ngày trekking', bookings: 756, price: 2520000, originalPrice: 2800000, discount: 10, Icon: MapPinIcon, imageUrl: '/uploads/destinations/Sapa 2 ngày trekking.jpg' },
     { id: 4, name: 'Hà Nội - Hạ Long - Ninh Bình', bookings: 650, price: 3344000, originalPrice: 3800000, discount: 12, Icon: BuildingOffice2Icon, imageUrl: '/uploads/destinations/ha-noi-ha-long-ninh-binh.jpg' },
-    { id: 5, name: 'Combo Hội An - Đà Nẵng', bookings: 542, price: 2624000, originalPrice: 3200000, discount: 18, Icon: SparklesIcon, imageUrl: '/uploads/destinations/Hội An - Đà Nẵng.jpg' },
+    { id: 5, name: 'Combo Hội An - Đà Nẵng', bookings: 542, price: 2624000, originalPrice: 3200000, discount: 18, Icon: MapPinIcon, imageUrl: '/uploads/destinations/Hội An - Đà Nẵng.jpg' },
   ];
 
   const topDestinations = featuredDestinations?.slice(0, 5) || [];
@@ -70,7 +69,7 @@ export default function Featured() {
       date: '15/03/2025',
       location: 'Đà Lạt',
       type: 'Festival',
-      Icon: SparklesIcon,
+      Icon: CalendarIcon,
       imageUrl: '/uploads/destinations/Festival-hoa-da-lat-2025.jpg',
       attendees: '50K+',
     },
@@ -90,7 +89,7 @@ export default function Featured() {
       date: '10/05/2025',
       location: 'Hội An',
       type: 'Ẩm thực',
-      Icon: SparklesIcon,
+      Icon: StarIcon,
       imageUrl: '/uploads/destinations/le-hoi-am-thuc-hoi-an.jpeg',
       attendees: '25K+',
     },
@@ -247,7 +246,7 @@ export default function Featured() {
             {[
               { id: 'tours', label: 'Tour nổi bật', icon: TrophyIcon, color: 'from-orange-500 to-red-500' },
               { id: 'destinations', label: 'Điểm đến trending', icon: StarIcon, color: 'from-yellow-500 to-orange-500' },
-              { id: 'reviews', label: 'Bài viết nổi bật', icon: SparklesIcon, color: 'from-purple-500 to-pink-500' },
+              { id: 'reviews', label: 'Bài viết nổi bật', icon: StarIcon, color: 'from-purple-500 to-pink-500' },
               { id: 'events', label: 'Sự kiện & Lễ hội', icon: CalendarIcon, color: 'from-blue-500 to-purple-500' },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -383,7 +382,7 @@ export default function Featured() {
             <section className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-3xl p-8 md:p-12 border-2 border-purple-100">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-xl">
-                  <SparklesIcon className="h-8 w-8 text-white" />
+                  <StarIcon className="h-8 w-8 text-white" />
                 </div>
                 <div>
                   <h2 className="text-4xl font-bold text-gray-900">Combo Best-Seller</h2>
@@ -543,13 +542,13 @@ export default function Featured() {
           <div className="space-y-12">
             {/* Reviews Snippet Carousel (simple auto-rotate) */}
             <section className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Khách nói gì về TravelGo</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Khách nói gì về TravelHub</h2>
               <ReviewCarousel />
             </section>
             {/* Featured Articles */}
             <section>
               <h2 className="text-4xl font-bold mb-8 flex items-center gap-3">
-                <SparklesIcon className="h-10 w-10 text-purple-500" />
+                <StarIcon className="h-10 w-10 text-purple-500" />
                 Bài viết nổi bật
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -649,14 +648,14 @@ export default function Featured() {
           </div>
         </section>
 
-            {/* TravelGo Stories Gallery */}
+            {/* TravelHub Stories Gallery */}
             <section className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 rounded-3xl p-8 md:p-12 border-2 border-pink-100">
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center shadow-xl">
                   <PhotoIcon className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-4xl font-bold text-gray-900">Góc ảnh TravelGo</h2>
+                  <h2 className="text-4xl font-bold text-gray-900">Góc ảnh TravelHub</h2>
                   <p className="text-gray-600 mt-1">Bộ sưu tập ảnh đẹp của khách hàng</p>
                 </div>
               </div>
@@ -674,7 +673,7 @@ export default function Featured() {
                   <div key={i} className="aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-transform">
                     <img
                       src={src}
-                      alt={`TravelGo photo ${i + 1}`}
+                      alt={`TravelHub photo ${i + 1}`}
                       className="w-full h-full object-cover"
                       loading="lazy"
                       onError={(e)=>{ (e.target as HTMLImageElement).style.display='none'; (e.currentTarget.parentElement as HTMLElement).classList.add('bg-gradient-to-br','from-blue-400','via-purple-500','to-pink-500','flex','items-center','justify-center'); (e.currentTarget.parentElement as HTMLElement).textContent='📷'; }}

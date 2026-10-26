@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { 
   TrophyIcon,
-  SparklesIcon,
   ClockIcon,
   GiftIcon,
   ArrowTrendingUpIcon,
@@ -80,7 +79,7 @@ export default function LoyaltyPage() {
       'Platinum': { 
         color: 'from-cyan-500 to-blue-600', 
         bgGradient: 'from-cyan-50 to-blue-50',
-        icon: SparklesIcon,
+        icon: GiftIcon,
         nextTier: 'Diamond',
         pointsToNext: 10000
       },
@@ -230,7 +229,7 @@ export default function LoyaltyPage() {
                         disabled
                         className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg transition-all opacity-50 cursor-not-allowed"
                       >
-                        <SparklesIcon className="w-5 h-5" />
+                        <GiftIcon className="w-5 h-5" />
                         Đổi 500 điểm lấy voucher 50k (Sắp ra mắt)
                       </button>
                     </div>

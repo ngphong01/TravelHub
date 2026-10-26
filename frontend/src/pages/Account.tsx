@@ -14,8 +14,23 @@ import {
   HeartIcon,
   StarIcon,
   CalendarDaysIcon,
-  SparklesIcon
+  TicketIcon,
+  SparklesIcon,
+  IdentificationIcon,
+  PhoneIcon,
+  MapPinIcon,
+  QrCodeIcon,
+  ArrowRightIcon,
+  CameraIcon,
+  CreditCardIcon,
+  TagIcon,
+  CheckIcon,
+  ArrowTopRightOnSquareIcon,
+  ClockIcon,
+  GiftIcon,
+  BoltIcon
 } from "@heroicons/react/24/outline";
+import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 import AccountSidebar from "../components/AccountSidebar";
 import AvatarSelectorModal from "../components/AvatarSelectorModal";
 
@@ -44,6 +59,12 @@ export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'profile' | 'trips' | 'vouchers' | 'security'>('profile');
+  const [phone, setPhone] = useState('0868 156 027');
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [idCard, setIdCard] = useState('001295******');
+  const [isEditingIdCard, setIsEditingIdCard] = useState(false);
+  const [copiedVoucher, setCopiedVoucher] = useState<string | null>(null);
 
   // Handle token from URL query params (OAuth callback)
   useEffect(() => {
@@ -295,126 +316,273 @@ function InlineNameEditor({ current, onSaved }: { current: string; onSaved: (nam
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Hero Section - Enhanced */}
-        <div className="relative overflow-hidden rounded-3xl mb-8 shadow-2xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iYSIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVHJhbnNmb3JtPSJyb3RhdGUoNDUpIj48cGF0aCBkPSJNLTEwIDMwaDYwdjJoLTYweiIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIuMDUiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjYSkiLz48L3N2Zz4=')] opacity-30" />
-          
-          <div className="relative p-8 md:p-10">
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-              {/* Avatar Section with Upload */}
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
-                <div className="relative">
-                  {isImageAvatar ? (
-                    <img
-                      key={fullAvatarUrl} // Thêm key để force re-render khi avatar thay đổi
-                      src={fullAvatarUrl || '/default-avatar.png'}
-                      alt={displayName}
-                      className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-white shadow-2xl transition-opacity duration-200"
-                      onError={(e) => {
-                        console.error('❌ Avatar image failed to load:', fullAvatarUrl);
-                        (e.target as HTMLImageElement).src = '/default-avatar.png';
-                      }}
-                      onLoad={() => {
-                        console.log('✅ Avatar image loaded successfully:', fullAvatarUrl);
-                      }}
-                      loading="eager"
-                    />
-                  ) : (
-                    <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-white to-gray-100 flex items-center justify-center text-indigo-600 text-4xl font-bold border-4 border-white shadow-2xl">
-                      {initial}
-                    </div>
-                  )}
-                      <input
-                    id="avatar-file-hero" 
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          const form = new FormData();
-                          form.append('file', file);
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8">
+      <div className="container mx-auto px-4 max-w-7xl">
+        {/* Hero Section - Traveler Passport (Ocean Navy & Gold VIP) */}
+        <div className="relative overflow-hidden rounded-3xl mb-8 shadow-xl border border-slate-800 bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950 text-white">
+          {/* Subtle Map / Compass Grid Texture */}
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#3b82f6_1.5px,transparent_1.5px)] [background-size:20px_20px]" />
+          <div className="absolute -right-20 -top-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute right-1/3 -bottom-20 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative p-6 sm:p-8 lg:p-10">
+            <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8">
+              {/* Left: Avatar & Traveler Profile */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+                {/* Avatar with Single Clean Edit Button & Gold VIP Badge */}
+                <div className="relative flex-shrink-0">
+                  <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl overflow-hidden ring-4 ring-blue-500/30 shadow-2xl bg-slate-800">
+                    {isImageAvatar ? (
+                      <img
+                        key={fullAvatarUrl}
+                        src={fullAvatarUrl || '/default-avatar.png'}
+                        alt={displayName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/default-avatar.png';
+                        }}
+                        loading="eager"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-blue-700 to-indigo-900 flex items-center justify-center text-white text-4xl font-extrabold">
+                        {initial}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Gold VIP Member Crown Badge */}
+                  <div className="absolute -top-2.5 -left-2.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-[10px] tracking-wider uppercase px-2 py-0.5 rounded-full shadow-lg border border-amber-200 flex items-center gap-1">
+                    <span>👑</span>
+                    <span>VIP ELITE</span>
+                  </div>
+
+                  {/* Hidden File Input for Avatar */}
+                  <input
+                    id="avatar-file-hero"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const form = new FormData();
+                      form.append('file', file);
                       const token = localStorage.getItem('tg_token');
                       const res = await fetch('/api/account/avatar', {
                         method: 'POST',
                         body: form,
                         credentials: 'include',
-                        headers: token ? { Authorization: `Bearer ${token}` } as any : undefined,
+                        headers: token ? ({ Authorization: `Bearer ${token}` } as any) : undefined,
                       });
-                          const json = await res.json();
+                      const json = await res.json();
                       if (json?.success && json?.url) {
                         const base = (process.env.REACT_APP_BACKEND_URL || window.location.origin).replace(/\/$/, '');
                         const full = json.url.startsWith('http') ? json.url : `${base}${json.url}`;
-                        setUser((prev) => prev ? { ...prev, picture: full } as any : prev);
-                          } else {
-                        alert(json?.error || 'Upload failed');
-                          }
-                        }}
-                      />
-                      {/* Upload Avatar Button */}
-                      <button 
-                    onClick={() => (document.getElementById('avatar-file-hero') as HTMLInputElement)?.click()}
-                    className="absolute -bottom-2 -right-2 w-10 h-10 bg-white hover:bg-gray-50 text-indigo-600 rounded-full border-2 border-indigo-100 shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
-                    title="Upload ảnh đại diện"
-                      >
-                    <PhotoIcon className="w-5 h-5" />
-                      </button>
-                      {/* Generate Avatar Button */}
-                      <button 
-                    onClick={() => setShowAvatarModal(true)}
-                    className="absolute -bottom-2 -left-2 w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
-                    title="Chọn avatar ngẫu nhiên"
-                      >
-                    <SparklesIcon className="w-5 h-5" />
-                      </button>
-                    </div>
+                        setUser((prev) => (prev ? ({ ...prev, picture: full } as any) : prev));
+                      } else {
+                        alert(json?.error || 'Upload ảnh thất bại');
+                      }
+                    }}
+                  />
+
+                  {/* Single Clean Camera Button */}
+                  <div className="absolute -bottom-2 -right-2 flex items-center gap-1">
+                    <button
+                      onClick={() => (document.getElementById('avatar-file-hero') as HTMLInputElement)?.click()}
+                      className="w-9 h-9 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-lg border-2 border-slate-900 flex items-center justify-center transition-transform hover:scale-110"
+                      title="Tải ảnh đại diện mới"
+                    >
+                      <CameraIcon className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setShowAvatarModal(true)}
+                      className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl shadow-lg border-2 border-slate-900 flex items-center justify-center transition-transform hover:scale-110"
+                      title="Chọn avatar có sẵn"
+                    >
+                      <PhotoIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Traveler Basic Metadata */}
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                      {displayName}
+                    </h1>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                      <CheckBadgeIcon className="w-3.5 h-3.5 text-blue-400" />
+                      Du khách đã xác thực
+                    </span>
                   </div>
 
-              {/* User Info */}
-              <div className="flex-1 text-center md:text-left">
-                <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                  <h1 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg">{displayName}</h1>
-                  <CheckBadgeIcon className="w-7 h-7 text-blue-300" />
-                </div>
-                <p className="text-white/90 text-lg mb-4 font-medium">{user.email}</p>
-                
-                {/* Badges */}
-                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-white/20 backdrop-blur-sm border border-white/30 text-white shadow-lg">
-                    <ShieldCheckIcon className="w-4 h-4" />
-                    Email đã xác thực
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-white/20 backdrop-blur-sm border border-white/30 text-white shadow-lg">
-                    <UserIcon className="w-4 h-4" />
-                    {user.settings && (user.settings as any).loyaltyRank ? `Thành viên ${(user.settings as any).loyaltyRank}` : 'Thành viên'}
-                  </span>
-                  {(user as any).createdAt && (
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold bg-white/20 backdrop-blur-sm border border-white/30 text-white shadow-lg">
-                      <CalendarIcon className="w-4 h-4" />
-                      Tham gia {new Date((user as any).createdAt).toLocaleDateString('vi-VN')}
+                  <p className="text-slate-400 text-sm font-medium flex items-center justify-center sm:justify-start gap-2">
+                    <span>{user.email}</span>
+                    <span>•</span>
+                    <span className="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-300 font-mono">
+                      Mã TV: #TH-{(user.id || '8924').toString().padStart(5, '0')}
                     </span>
-                  )}
-                      </div>
-                    </div>
+                  </p>
 
-              {/* Quick Actions - Hero */}
-              <div className="hidden lg:flex gap-3">
-                    <Link 
-                  to="/account/settings"
-                  className="p-3 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl border border-white/30 transition-all duration-200 group"
-                  title="Cài đặt"
-                    >
-                  <Cog6ToothIcon className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-300" />
-                    </Link>
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1 text-xs">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700/80">
+                      <ShieldCheckIcon className="w-3.5 h-3.5 text-emerald-400" />
+                      Email bảo mật 100%
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700/80">
+                      <CalendarIcon className="w-3.5 h-3.5 text-blue-400" />
+                      Gia nhập {new Date((user as any).createdAt || '2025-12-17').toLocaleDateString('vi-VN')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Loyalty Status Card (TravelHub Priority Pass) */}
+              <div className="w-full lg:w-96 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-900/90 to-blue-950/80 border border-blue-500/20 backdrop-blur-md shadow-inner">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-sm">
+                      👑
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-amber-300 uppercase tracking-wider">HẠNG THÀNH VIÊN VÀNG</p>
+                      <p className="text-[11px] text-slate-400">TravelHub Priority Member</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-black text-amber-300 bg-amber-400/10 px-2.5 py-1 rounded-lg border border-amber-400/30">
+                    1.250 Xu
+                  </span>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="space-y-1.5 my-3">
+                  <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-gradient-to-r from-amber-400 to-yellow-300 h-full rounded-full transition-all duration-500"
+                      style={{ width: '62%' }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-slate-400">
+                    <span>1.250 điểm hiện có</span>
+                    <span className="text-amber-300 font-semibold">Mục tiêu: 2.000 điểm</span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-300 leading-relaxed border-t border-slate-800/80 pt-2 flex items-center gap-1.5">
+                  <SparklesIcon className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span>
+                    Tích lũy thêm <strong>750 điểm</strong> để lên hạng <strong>Bạch Kim</strong> (Giảm thêm 15% tất cả tour).
+                  </span>
+                </p>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Travel Quick Stats Bar (4 Chỉ Số Du Lịch Cốt Lõi) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {/* Stat 1: Bookings */}
+          <button
+            onClick={() => setActiveTab('trips')}
+            className={`p-5 rounded-2xl border text-left transition-all group ${
+              activeTab === 'trips'
+                ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-400 hover:shadow-md'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                activeTab === 'trips' ? 'bg-white/20 text-white' : 'bg-blue-50 dark:bg-blue-950/50 text-blue-600'
+              }`}>
+                <TicketIcon className="w-5 h-5" />
+              </div>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                activeTab === 'trips' ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+              }`}>
+                1 Sắp đi
+              </span>
+            </div>
+            <div className={`text-2xl font-black ${activeTab === 'trips' ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+              01 Tour
+            </div>
+            <p className={`text-xs mt-1 ${activeTab === 'trips' ? 'text-blue-100' : 'text-slate-500 dark:text-slate-400'}`}>
+              Xem vé điện tử & E-Ticket →
+            </p>
+          </button>
+
+          {/* Stat 2: TravelPoints */}
+          <button
+            onClick={() => setActiveTab('vouchers')}
+            className={`p-5 rounded-2xl border text-left transition-all group ${
+              activeTab === 'vouchers'
+                ? 'bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-amber-400 hover:shadow-md'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                activeTab === 'vouchers' ? 'bg-white/20 text-white' : 'bg-amber-50 dark:bg-amber-950/50 text-amber-600'
+              }`}>
+                <SparklesIcon className="w-5 h-5" />
+              </div>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                activeTab === 'vouchers' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+              }`}>
+                ≈ 125.000₫
+              </span>
+            </div>
+            <div className={`text-2xl font-black ${activeTab === 'vouchers' ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+              1.250 Xu
+            </div>
+            <p className={`text-xs mt-1 ${activeTab === 'vouchers' ? 'text-amber-100' : 'text-slate-500 dark:text-slate-400'}`}>
+              Quy đổi giảm trừ thanh toán →
+            </p>
+          </button>
+
+          {/* Stat 3: Vouchers */}
+          <button
+            onClick={() => setActiveTab('vouchers')}
+            className="p-5 rounded-2xl border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-400 hover:shadow-md text-left transition-all group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 flex items-center justify-center">
+                <TagIcon className="w-5 h-5" />
+              </div>
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                Sẵn sàng
+              </span>
+            </div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white">
+              04 Mã
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Giảm tới 200.000₫ tour VIP →
+            </p>
+          </button>
+
+          {/* Stat 4: Wishlist */}
+          <Link
+            to="/account/wishlist"
+            className="p-5 rounded-2xl border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-rose-400 hover:shadow-md text-left transition-all group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 flex items-center justify-center">
+                <HeartIcon className="w-5 h-5" />
+              </div>
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                Đã lưu
+              </span>
+            </div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white">
+              05 Mục
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Tour & Khách sạn quan tâm →
+            </p>
+          </Link>
+        </div>
+
+        {/* Dashboard Main Grid: Sidebar + Interactive Content */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1">
@@ -423,211 +591,473 @@ function InlineNameEditor({ current, onSaved }: { current: string; onSaved: (nam
             </div>
           </div>
 
-          {/* Main Content */}
+          {/* Main Content Area */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Profile Information Card */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <UserIcon className="w-6 h-6" />
-                  Thông tin cá nhân
-                </h2>
-              </div>
-              
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Name Field */}
-                  <div className="group relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200 hover:border-indigo-300 transition-all duration-200 hover:shadow-md">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
-                        <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                          <UserIcon className="h-5 w-5 text-indigo-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Tên hiển thị</p>
-                          <p className="font-semibold text-gray-900 text-lg truncate">{displayName}</p>
-                        </div>
+            {/* Interactive Tab Navigation Bar */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                  activeTab === 'profile'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                <UserIcon className="w-4 h-4" />
+                Hồ Sơ & Giấy Tờ Du Khách
+              </button>
+
+              <button
+                onClick={() => setActiveTab('trips')}
+                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                  activeTab === 'trips'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                <TicketIcon className="w-4 h-4" />
+                Chuyến Đi Sắp Tới (1)
+              </button>
+
+              <button
+                onClick={() => setActiveTab('vouchers')}
+                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                  activeTab === 'vouchers'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                <GiftIcon className="w-4 h-4" />
+                Kho Voucher & Điểm Thưởng (4)
+              </button>
+
+              <button
+                onClick={() => setActiveTab('security')}
+                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+                  activeTab === 'security'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                <KeyIcon className="w-4 h-4" />
+                Bảo Mật & Cài Đặt
+              </button>
+            </div>
+
+            {/* TAB 1: PROFILE & TRAVEL DOCUMENTS */}
+            {activeTab === 'profile' && (
+              <div className="space-y-6">
+                {/* Card 1: Basic Information */}
+                <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <div className="flex items-center justify-between mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center font-bold">
+                        <UserIcon className="w-5 h-5" />
                       </div>
-                      <InlineNameEditor current={displayName} onSaved={(name)=>setUser(prev=> prev ? ({...prev, name} as any): prev)} />
+                      <div>
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Thông Tin Cá Nhân</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Dùng để liên hệ xác nhận chuyến đi và nhận hỗ trợ</p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Email Field */}
-                  <div className="group relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200 hover:border-green-300 transition-all duration-200 hover:shadow-md">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
-                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                          <EnvelopeIcon className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Email</p>
-                          <p className="font-semibold text-gray-900 truncate">{user.email}</p>
-                        </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Name */}
+                    <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between">
+                      <div className="min-w-0 flex-1">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                          Họ và tên
+                        </span>
+                        <span className="font-bold text-slate-900 dark:text-white text-base truncate block">
+                          {displayName}
+                        </span>
                       </div>
-                      <span className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-full">
-                        <CheckBadgeIcon className="w-4 h-4" />
+                      <InlineNameEditor
+                        current={displayName}
+                        onSaved={(name) => setUser((prev) => (prev ? ({ ...prev, name } as any) : prev))}
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between">
+                      <div className="min-w-0 flex-1">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                          Địa chỉ Email
+                        </span>
+                        <span className="font-semibold text-slate-900 dark:text-white text-sm truncate block">
+                          {user.email}
+                        </span>
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full">
+                        <CheckIcon className="w-3 h-3 stroke-[3]" />
                         Đã xác thực
                       </span>
                     </div>
-                  </div>
 
-                  {/* Join Date */}
-                  <div className="group relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200 hover:border-purple-300 transition-all duration-200 hover:shadow-md">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                        <CalendarDaysIcon className="h-5 w-5 text-purple-600" />
+                    {/* Phone */}
+                    <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between">
+                      <div className="min-w-0 flex-1">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                          Số điện thoại (Nhận SMS Tour)
+                        </span>
+                        {isEditingPhone ? (
+                          <div className="flex items-center gap-2 mt-1">
+                            <input
+                              type="text"
+                              value={phone}
+                              onChange={(e) => setPhone(e.target.value)}
+                              className="px-2 py-1 text-xs border rounded-lg dark:bg-slate-900 dark:border-slate-700 font-bold"
+                            />
+                            <button
+                              onClick={() => setIsEditingPhone(false)}
+                              className="px-2.5 py-1 text-xs bg-blue-600 text-white rounded-lg font-bold"
+                            >
+                              Lưu
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="font-bold text-slate-900 dark:text-white text-sm">
+                            {phone}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Ngày tham gia</p>
-                        <p className="font-semibold text-gray-900">
-                          {(user as any).createdAt 
-                            ? new Date((user as any).createdAt).toLocaleDateString('vi-VN', { 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric' 
-                              })
-                            : (user as any).loginTime 
-                            ? new Date((user as any).loginTime).toLocaleDateString('vi-VN', { 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric' 
-                              })
-                            : '—'
-                          }
+                      {!isEditingPhone && (
+                        <button
+                          onClick={() => setIsEditingPhone(true)}
+                          className="text-blue-600 hover:text-blue-700 text-xs font-semibold px-2 py-1 hover:bg-blue-50 rounded"
+                        >
+                          Sửa
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Join Date */}
+                    <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                        Trạng thái & Ngày tham gia
+                      </span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                          Đang hoạt động
+                        </span>
+                        <span className="text-slate-400">•</span>
+                        <span className="text-xs text-slate-600 dark:text-slate-400">
+                          {new Date((user as any).createdAt || '2025-12-17').toLocaleDateString('vi-VN')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card 2: Traveler Passport & Autofill (Klook / Traveloka Signature Feature) */}
+                <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 flex items-center justify-center font-bold">
+                        <IdentificationIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Giấy Tờ Tùy Thân & Khai Báo Du Lịch</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Lưu an toàn để tự động điền (Autofill) khi đặt tour và làm thủ tục cảng vụ
                         </p>
                       </div>
-                      </div>
                     </div>
-
-                  {/* Account Status */}
-                  <div className="group relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200 hover:border-blue-300 transition-all duration-200 hover:shadow-md">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                        <ShieldCheckIcon className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Trạng thái tài khoản</p>
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-full">
-                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                            Đang hoạt động
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
+                      <ShieldCheckIcon className="w-3.5 h-3.5" />
+                      Mã hóa SSL 256-Bit
                     </span>
                   </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* ID Card / Passport */}
+                    <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between">
+                      <div className="min-w-0 flex-1">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                          Số CCCD / Hộ chiếu
+                        </span>
+                        {isEditingIdCard ? (
+                          <div className="flex items-center gap-2 mt-1">
+                            <input
+                              type="text"
+                              value={idCard}
+                              onChange={(e) => setIdCard(e.target.value)}
+                              className="px-2 py-1 text-xs border rounded-lg dark:bg-slate-900 dark:border-slate-700 font-bold"
+                            />
+                            <button
+                              onClick={() => setIsEditingIdCard(false)}
+                              className="px-2.5 py-1 text-xs bg-blue-600 text-white rounded-lg font-bold"
+                            >
+                              Lưu
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="font-mono font-bold text-slate-900 dark:text-white text-sm">
+                            {idCard}
+                          </span>
+                        )}
+                      </div>
+                      {!isEditingIdCard && (
+                        <button
+                          onClick={() => setIsEditingIdCard(true)}
+                          className="text-blue-600 hover:text-blue-700 text-xs font-semibold px-2 py-1 hover:bg-blue-50 rounded"
+                        >
+                          Cập nhật
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Nationality */}
+                    <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                        Quốc tịch
+                      </span>
+                      <span className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
+                        <span>🇻🇳</span>
+                        <span>Việt Nam (Vietnam)</span>
+                      </span>
+                    </div>
+
+                    {/* Pickup Address */}
+                    <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                        Điểm đón mặc định
+                      </span>
+                      <span className="font-semibold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
+                        <MapPinIcon className="w-4 h-4 text-rose-500" />
+                        <span>Hà Nội (Khu vực Phố Cổ / Nhà Hát Lớn)</span>
+                      </span>
+                    </div>
+
+                    {/* Special Notes */}
+                    <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/60">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+                        Ghi chú phục vụ đặc biệt
+                      </span>
+                      <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                        Ăn hải sản, ưu tiên cabin tầng cao ngắm cảnh vịnh.
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* TAB 2: UPCOMING TRIPS & E-TICKET */}
+            {activeTab === 'trips' && (
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center font-bold">
+                      <TicketIcon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-slate-900 dark:text-white">Chuyến Đi Đã Đặt</h2>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Vé điện tử và hướng dẫn khởi hành cho hành trình sắp tới</p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/tours"
+                    className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                  >
+                    <span>+ Đặt tour mới</span>
+                  </Link>
                 </div>
-              </div>
-            </div>
 
-            {/* Security & Settings Card */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-4">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <KeyIcon className="w-6 h-6" />
-                  Bảo mật & Cài đặt
-                </h2>
-          </div>
-
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Password */}
-                <Link
-                  to="/account/password"
-                    className="group bg-gradient-to-br from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 rounded-xl p-5 border border-orange-200 hover:border-orange-300 transition-all duration-200 hover:shadow-lg transform hover:-translate-y-1"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-orange-100 group-hover:bg-orange-200 flex items-center justify-center transition-colors">
-                          <KeyIcon className="h-5 w-5 text-orange-600" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-0.5">Mật khẩu</p>
-                          <p className="font-semibold text-gray-900">Đổi mật khẩu</p>
-                        </div>
-                      </div>
-                      <svg className="w-5 h-5 text-orange-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                </Link>
-
-                  {/* Settings */}
-                <Link
-                  to="/account/settings"
-                    className="group bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-xl p-5 border border-blue-200 hover:border-blue-300 transition-all duration-200 hover:shadow-lg transform hover:-translate-y-1"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center transition-colors">
-                          <Cog6ToothIcon className="h-5 w-5 text-blue-600 group-hover:rotate-90 transition-transform duration-300" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-0.5">Tùy chỉnh</p>
-                          <p className="font-semibold text-gray-900">Cài đặt tài khoản</p>
-                        </div>
-                      </div>
-                      <svg className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                </Link>
-              </div>
-              </div>
-            </div>
-
-            {/* Stats Card */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-teal-500 to-cyan-600 px-6 py-4">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <StarIcon className="w-6 h-6" />
-                  Thống kê hoạt động
-                </h2>
-              </div>
-              
-              <div className="p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {/* Reviews */}
-                  <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-5 border border-yellow-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center">
-                        <StarIcon className="h-5 w-5 text-yellow-600" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">0</p>
+                {/* E-Ticket Preview Card */}
+                <div className="rounded-3xl border-2 border-blue-200 dark:border-slate-700 overflow-hidden bg-gradient-to-br from-white via-blue-50/20 to-white dark:from-slate-900 dark:to-slate-900 shadow-md">
+                  <div className="p-5 sm:p-6 flex flex-col md:flex-row gap-5 items-start md:items-center justify-between">
+                    <div className="flex gap-4 items-center">
+                      <img
+                        src="/uploads/tours/halong-bay-karsts.jpg"
+                        alt="Hạ Long Cruise"
+                        className="w-20 h-20 rounded-2xl object-cover shadow-sm flex-shrink-0"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/placeholder.jpg';
+                        }}
+                      />
+                      <div className="space-y-1">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300">
+                          <CheckIcon className="w-3 h-3 stroke-[3]" />
+                          Đã xác nhận & Giữ chỗ
+                        </span>
+                        <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white leading-snug">
+                          Du thuyền Hạ Long 3N2Đ VIP – Chuẩn 5 Sao Quốc Tế
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                          <ClockIcon className="w-3.5 h-3.5 text-blue-500" />
+                          <span>Khởi hành: <strong>Thứ 6, tuần tới (08:00 AM)</strong></span>
+                          <span>•</span>
+                          <span>2 Người lớn</span>
+                        </p>
                       </div>
                     </div>
-                    <p className="text-sm font-semibold text-gray-600">Đánh giá</p>
+
+                    <div className="flex flex-wrap md:flex-col items-end gap-2 w-full md:w-auto">
+                      <span className="text-xs font-mono text-slate-400">Mã đơn: #TH-HL8924</span>
+                      <div className="flex gap-2 w-full md:w-auto">
+                        <Link
+                          to="/tours/du-thuyen-ha-long-3n2d-vip"
+                          className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5"
+                        >
+                          <QrCodeIcon className="w-4 h-4" />
+                          <span>Xem Vé E-Ticket</span>
+                        </Link>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Bookings */}
-                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                        <CalendarDaysIcon className="h-5 w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">0</p>
-                      </div>
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-4 border-t border-blue-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-300">
+                    <div className="flex items-center gap-2">
+                      <MapPinIcon className="w-4 h-4 text-rose-500" />
+                      <span>Xe Limousine đón tại: <strong>Nhà Hát Lớn Hà Nội (07:45 AM)</strong></span>
                     </div>
-                    <p className="text-sm font-semibold text-gray-600">Đặt chỗ</p>
-            </div>
-
-                  {/* Favorites */}
-                  <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-5 border border-pink-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center">
-                        <HeartIcon className="h-5 w-5 text-pink-600" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">0</p>
-                      </div>
-                </div>
-                    <p className="text-sm font-semibold text-gray-600">Yêu thích</p>
-                </div>
+                    <div className="text-blue-600 dark:text-blue-400 font-semibold">
+                      Hotline điều hành tour: 0868 156 027 (24/7)
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* TAB 3: VOUCHERS & TRAVELPOINTS */}
+            {activeTab === 'vouchers' && (
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 flex items-center justify-center font-bold">
+                      <GiftIcon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-slate-900 dark:text-white">Kho Voucher & Ưu Đãi Độc Quyền</h2>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Các mã giảm giá áp dụng trực tiếp khi thanh toán tour</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    {
+                      code: 'HALONG200K',
+                      discount: 'GIẢM 200.000₫',
+                      title: 'Tour Du Thuyền Hạ Long & Lan Hạ 5 Sao',
+                      expiry: 'Hạn dùng: 31/12/2026',
+                      minSpend: 'Đơn từ 2.000.000₫',
+                      tag: 'VIP Choice',
+                    },
+                    {
+                      code: 'WEEKEND15',
+                      discount: 'GIẢM 15%',
+                      title: 'Tour Cuối Tuần Sapa / Đà Nẵng / Phú Quốc',
+                      expiry: 'Hạn dùng: 15/11/2026',
+                      minSpend: 'Tối đa giảm 300.000₫',
+                      tag: 'Bán chạy',
+                    },
+                    {
+                      code: 'FREELIMO',
+                      discount: 'TẶNG XE LIMOUSINE',
+                      title: 'Nâng cấp xe đưa đón Limousine Dcar cao cấp',
+                      expiry: 'Hạn dùng: 30/11/2026',
+                      minSpend: 'Áp dụng tour trọn gói',
+                      tag: 'Đặc quyền',
+                    },
+                    {
+                      code: 'WELCOME100',
+                      discount: 'GIẢM 100.000₫',
+                      title: 'Voucher chào mừng thành viên mới',
+                      expiry: 'Hạn dùng: Vô thời hạn',
+                      minSpend: 'Đơn từ 1.000.000₫',
+                      tag: 'Tân thủ',
+                    },
+                  ].map((v) => (
+                    <div
+                      key={v.code}
+                      className="p-5 rounded-2xl border-2 border-dashed border-amber-300 dark:border-amber-700/60 bg-gradient-to-br from-amber-50/50 to-white dark:from-slate-900 dark:to-slate-900 flex flex-col justify-between gap-4"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-black text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full">
+                            {v.tag}
+                          </span>
+                          <span className="text-[11px] text-slate-400">{v.expiry}</span>
+                        </div>
+                        <h4 className="text-lg font-black text-slate-900 dark:text-white text-amber-600 dark:text-amber-400">
+                          {v.discount}
+                        </h4>
+                        <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-1">{v.title}</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">{v.minSpend}</p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-3 border-t border-amber-200/60 dark:border-slate-800">
+                        <span className="font-mono font-bold text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700">
+                          {v.code}
+                        </span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(v.code);
+                            setCopiedVoucher(v.code);
+                            setTimeout(() => setCopiedVoucher(null), 2000);
+                          }}
+                          className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 transition-colors shadow-sm"
+                        >
+                          {copiedVoucher === v.code ? '✓ Đã sao chép' : 'Sao chép mã'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: SECURITY & SETTINGS */}
+            {activeTab === 'security' && (
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center font-bold">
+                    <KeyIcon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white">Trung Tâm Bảo Mật & Đăng Nhập</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Bảo vệ thông tin tài khoản và giao dịch du lịch của bạn</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Link
+                    to="/account/password"
+                    className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 hover:border-blue-400 hover:bg-blue-50/30 transition-all flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center">
+                        <KeyIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">Đổi Mật Khẩu Đăng Nhập</h4>
+                        <p className="text-xs text-slate-500">Cập nhật định kỳ để bảo vệ tài khoản</p>
+                      </div>
+                    </div>
+                    <ArrowRightIcon className="w-4 h-4 text-slate-400 group-hover:translate-x-1 group-hover:text-blue-600 transition-all" />
+                  </Link>
+
+                  <Link
+                    to="/account/settings"
+                    className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 hover:border-blue-400 hover:bg-blue-50/30 transition-all flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center">
+                        <Cog6ToothIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">Cài Đặt & Thông Báo</h4>
+                        <p className="text-xs text-slate-500">Tùy chỉnh SMS, Email và bảo mật 2 lớp</p>
+                      </div>
+                    </div>
+                    <ArrowRightIcon className="w-4 h-4 text-slate-400 group-hover:translate-x-1 group-hover:text-blue-600 transition-all" />
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -640,7 +1070,7 @@ function InlineNameEditor({ current, onSaved }: { current: string; onSaved: (nam
           userId={parseInt(user.id)}
           currentAvatar={fullAvatarUrl || undefined}
           onAvatarChange={(newAvatarUrl) => {
-            setUser((prev) => prev ? { ...prev, picture: newAvatarUrl, avatarUrl: newAvatarUrl } as any : prev);
+            setUser((prev) => (prev ? ({ ...prev, picture: newAvatarUrl, avatarUrl: newAvatarUrl } as any) : prev));
           }}
         />
       )}

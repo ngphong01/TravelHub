@@ -23,7 +23,7 @@ export default function CheckoutSuccess() {
           <div className="px-8 py-6 space-y-4">
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <p className="text-green-800 text-sm text-center">
-                Cảm ơn bạn đã đặt tour với TravelGo! 
+                Cảm ơn bạn đã đặt tour với TravelHub! 
                 Chúng tôi đã gửi email xác nhận đến địa chỉ email của bạn.
               </p>
             </div>

@@ -78,8 +78,7 @@ export default function CheckInSection({ checkIns }: CheckInSectionProps) {
   const getDestinationImage = (destinationName: string): string => {
     // Nếu chưa có data từ API, dùng ảnh theo tên điểm đến trên Unsplash
     if (!destinationsData || !Array.isArray(destinationsData)) {
-      const searchQuery = encodeURIComponent(destinationName);
-      return `https://source.unsplash.com/featured/800x600/?${searchQuery},travel`;
+      return '/uploads/avatars/ha-long4.jpg';
     }
 
     // Tìm destination trong database theo tên
@@ -96,9 +95,8 @@ export default function CheckInSection({ checkIns }: CheckInSectionProps) {
       }
     }
 
-    // Fallback cuối: dùng ảnh theo tên điểm đến trên Unsplash
-    const searchQuery = encodeURIComponent(destinationName);
-    return `https://source.unsplash.com/featured/800x600/?${searchQuery},travel`;
+    // Fallback: dùng ảnh Hạ Long chuẩn mực
+    return '/uploads/avatars/ha-long4.jpg';
   };
 
   // Danh sách tên điểm đến phổ biến
@@ -187,7 +185,7 @@ export default function CheckInSection({ checkIns }: CheckInSectionProps) {
                     alt={checkIn.destination}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800';
+                      (e.target as HTMLImageElement).src = '/uploads/avatars/ha-long4.jpg';
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

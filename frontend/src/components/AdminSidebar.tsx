@@ -10,9 +10,12 @@ import {
   ChartBarIcon,
   Cog6ToothIcon,
   ChatBubbleLeftRightIcon,
-  SparklesIcon,
+  ShieldCheckIcon,
   BuildingOfficeIcon,
-  BuildingStorefrontIcon
+  BuildingStorefrontIcon,
+  Bars3Icon,
+  PhotoIcon,
+  TagIcon
 } from "@heroicons/react/24/outline";
 
 const navigation = [
@@ -23,6 +26,30 @@ const navigation = [
     color: "from-blue-500 to-cyan-500",
     bgColor: "bg-blue-50",
     textColor: "text-blue-700",
+  },
+  {
+    name: "Quản lý Menu",
+    href: "/admin/menu",
+    icon: Bars3Icon,
+    color: "from-blue-500 to-indigo-500",
+    bgColor: "bg-blue-50",
+    textColor: "text-blue-700",
+  },
+  {
+    name: "Quản lý Banner",
+    href: "/admin/banners",
+    icon: PhotoIcon,
+    color: "from-pink-500 to-rose-500",
+    bgColor: "bg-pink-50",
+    textColor: "text-pink-700",
+  },
+  {
+    name: "Quản lý Sales",
+    href: "/admin/promo",
+    icon: TagIcon,
+    color: "from-amber-500 to-orange-500",
+    bgColor: "bg-amber-50",
+    textColor: "text-amber-700",
   },
   {
     name: "Quản lý Tour",
@@ -165,17 +192,17 @@ export default function AdminSidebar() {
           <div className="w-10 h-10 rounded-xl shadow-lg overflow-hidden bg-white">
             <img
               src="/uploads/avatars/travelgo-admin.png"
-              alt="TravelGo Logo"
+              alt="TravelHub Logo"
               className="w-full h-full object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = "https://png.pngtree.com/png-clipart/20250314/original/pngtree-travel-go-logo-blue-and-yellow-design-png-image_20197838.png";
+                target.src = "/uploads/avatars/travelgo-logo.png";
               }}
             />
           </div>
           <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">
-              TravelGo
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+              TravelHub
             </h1>
             <p className="text-xs text-gray-500 font-medium">Admin Panel</p>
           </div>
@@ -225,10 +252,10 @@ export default function AdminSidebar() {
         
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200/50">
-          <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
+          <div className="px-4 py-3 bg-blue-50 rounded-xl border border-blue-100">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                <SparklesIcon className="h-4 w-4 text-white" />
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <ShieldCheckIcon className="h-4 w-4 text-white" />
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-800">Premium Features</p>

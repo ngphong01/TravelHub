@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChartBarIcon, SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, ArrowTrendingUpIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 interface RevenueInsightsProps {
@@ -65,8 +65,8 @@ export default function RevenueInsights({
             <ChartBarIcon className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-gray-800">Phân tích Doanh thu AI</h3>
-            <p className="text-sm text-gray-600">Insights thông minh từ AI</p>
+            <h3 className="font-bold text-lg text-gray-800">Phân tích Xu hướng & Doanh thu</h3>
+            <p className="text-sm text-gray-600">Báo cáo doanh số và hiệu suất bán tour</p>
           </div>
         </div>
         <button
@@ -81,8 +81,8 @@ export default function RevenueInsights({
             </>
           ) : (
             <>
-              <SparklesIcon className="h-5 w-5" />
-              <span>Phân tích AI</span>
+              <ArrowTrendingUpIcon className="h-5 w-5" />
+              <span>Phân tích doanh thu</span>
             </>
           )}
         </button>

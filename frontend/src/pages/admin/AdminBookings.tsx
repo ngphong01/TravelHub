@@ -17,7 +17,8 @@ import {
   XCircleIcon,
   EyeIcon,
   ArrowTrendingUpIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import BookingInsights from '../../components/admin/BookingInsights';
 
@@ -112,6 +113,32 @@ export default function AdminBookings() {
     updateStatusMutation.mutate({ bookingId, status: newStatus });
   };
 
+  const handleExportCSV = async () => {
+    try {
+      toast.loading('Đang chuẩn bị file Excel/CSV...', { id: 'export-bookings' });
+      const token = localStorage.getItem('tg_token');
+      const res = await fetch('/api/export/bookings', {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Không thể xuất dữ liệu đơn đặt chỗ');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `danh-sach-dat-tour-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('Đã tải xuống file CSV (mở tốt trên Excel)!', { id: 'export-bookings' });
+    } catch (err: any) {
+      toast.error(err?.message || 'Lỗi khi xuất file', { id: 'export-bookings' });
+    }
+  };
+
   const total = data?.total || 0;
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
@@ -155,6 +182,14 @@ export default function AdminBookings() {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleExportCSV}
+                className="px-5 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all font-semibold shadow-lg hover:shadow-xl flex items-center gap-2"
+              >
+                <ArrowDownTrayIcon className="h-5 w-5" />
+                Xuất Excel / CSV
+              </button>
               <button className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all font-semibold shadow-lg hover:shadow-xl flex items-center gap-2">
                 <FunnelIcon className="h-5 w-5" />
                 Bộ lọc

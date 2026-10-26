@@ -19,12 +19,12 @@ export default function PublicLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           {/* Logo with gradient icon */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">TG</span>
+            <div className="w-10 h-10 rounded-lg bg-[#003580] flex items-center justify-center shadow-md">
+              <span className="text-white font-black text-lg">TH</span>
             </div>
             <span className="font-bold text-lg sm:text-xl tracking-tight">
-              <span className="text-blue-600">Travel</span>
-              <span className="text-purple-600">Go</span>
+              <span className="text-[#003580]">Travel</span>
+              <span className="text-amber-500 font-extrabold">Hub</span>
             </span>
           </Link>
 
@@ -225,7 +225,7 @@ export default function PublicLayout() {
                       href="mailto:phong@triennguyen.com"
                     >
                       phong@triennguyen.com
-                    </a>ư
+                    </a>
                   </li>
                   <li className="flex items-center gap-2">
                     <PhoneIcon className="w-4 h-4 text-blue-400 flex-shrink-0" />
@@ -249,7 +249,7 @@ export default function PublicLayout() {
           <div className="border-t border-gray-700/50 pt-4 pb-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-xs text-gray-400 text-center sm:text-left">
-                © {new Date().getFullYear()} <span className="text-blue-400">TravelGo</span>. All rights reserved.
+                © {new Date().getFullYear()} <span className="text-blue-400">TravelHub</span>. All rights reserved.
               </div>
               <div className="flex items-center gap-4 text-xs text-gray-400">
                 <Link to="/about" className="hover:text-blue-400 transition-colors whitespace-nowrap">Chính sách</Link>

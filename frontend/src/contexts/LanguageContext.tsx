@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import i18n from '../i18n/config';
 
 type Language = 'vi' | 'en';
 
@@ -33,7 +34,7 @@ const translations: Record<Language, Record<string, string>> = {
     'search.button': 'Tìm kiếm',
 
     // Home
-    'home.hero.title': 'Khám Phá Thế Giới Cùng TravelGo',
+    'home.hero.title': 'Khám Phá Thế Giới Cùng TravelHub',
     'home.hero.subtitle': 'Hơn 1000+ điểm đến tuyệt vời đang chờ bạn',
     'home.hero.cta': 'Khám phá ngay',
     'home.featured.title': 'Điểm đến nổi bật',
@@ -91,7 +92,7 @@ const translations: Record<Language, Record<string, string>> = {
     'restaurant.selectTime': 'Chọn giờ',
 
     // Footer
-    'footer.about': 'Về TravelGo',
+    'footer.about': 'Về TravelHub',
     'footer.description': 'Nền tảng du lịch hàng đầu Việt Nam',
     'footer.quickLinks': 'Liên kết nhanh',
     'footer.support': 'Hỗ trợ',
@@ -99,7 +100,7 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.newsletter': 'Đăng ký nhận tin',
     'footer.newsletterPlaceholder': 'Email của bạn',
     'footer.subscribe': 'Đăng ký',
-    'footer.copyright': '© 2024 TravelGo. All rights reserved.',
+    'footer.copyright': '© 2026 TravelHub. All rights reserved.',
 
     // Language
     'language.select': 'Chọn ngôn ngữ',
@@ -125,7 +126,7 @@ const translations: Record<Language, Record<string, string>> = {
     'search.button': 'Search',
 
     // Home
-    'home.hero.title': 'Explore the World with TravelGo',
+    'home.hero.title': 'Explore the World with TravelHub',
     'home.hero.subtitle': 'Over 1000+ amazing destinations await you',
     'home.hero.cta': 'Explore Now',
     'home.featured.title': 'Featured Destinations',
@@ -183,7 +184,7 @@ const translations: Record<Language, Record<string, string>> = {
     'restaurant.selectTime': 'Select Time',
 
     // Footer
-    'footer.about': 'About TravelGo',
+    'footer.about': 'About TravelHub',
     'footer.description': 'Leading travel platform in Vietnam',
     'footer.quickLinks': 'Quick Links',
     'footer.support': 'Support',
@@ -191,7 +192,7 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.newsletter': 'Subscribe to Newsletter',
     'footer.newsletterPlaceholder': 'Your email',
     'footer.subscribe': 'Subscribe',
-    'footer.copyright': '© 2024 TravelGo. All rights reserved.',
+    'footer.copyright': '© 2026 TravelHub. All rights reserved.',
 
     // Language
     'language.select': 'Select Language',
@@ -205,11 +206,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     return (saved === 'vi' || saved === 'en') ? saved : 'vi';
   });
 
-  // 🔥 CRITICAL: Lắng nghe languageChanged event từ react-i18next
+  const lastDispatchedRef = useRef<string>(language);
+
+  // Lắng nghe languageChanged event từ react-i18next
   useEffect(() => {
     const handleLanguageChange = (event: CustomEvent) => {
       const newLang = event.detail as Language;
-      if (newLang === 'vi' || newLang === 'en') {
+      if ((newLang === 'vi' || newLang === 'en') && newLang !== language) {
+        lastDispatchedRef.current = newLang;
         setLanguageState(newLang);
       }
     };
@@ -218,7 +222,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     return () => {
       window.removeEventListener('languageChanged', handleLanguageChange as EventListener);
     };
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     // Save to both localStorage keys for compatibility
@@ -226,8 +230,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('language', language);
     // Update HTML lang attribute
     document.documentElement.lang = language;
-    // Trigger custom event for other contexts to sync
-    window.dispatchEvent(new CustomEvent('languageChanged', { detail: language }));
+    // Sync with react-i18next if different
+    if (i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
+    // Only trigger event if not already dispatched from an event to prevent ping-pong loop
+    if (lastDispatchedRef.current !== language) {
+      lastDispatchedRef.current = language;
+      window.dispatchEvent(new CustomEvent('languageChanged', { detail: language }));
+    }
   }, [language]);
 
   const setLanguage = (lang: Language) => {
@@ -248,7 +259,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    const saved = (typeof window !== 'undefined' && (localStorage.getItem('travelgo:language') || localStorage.getItem('language'))) as Language || 'vi';
+    const currentLang: Language = (saved === 'vi' || saved === 'en') ? saved : 'vi';
+    return {
+      language: currentLang,
+      setLanguage: (lang: Language) => {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('travelgo:language', lang);
+          localStorage.setItem('language', lang);
+          document.documentElement.lang = lang;
+          window.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));
+        }
+      },
+      t: (key: string) => translations[currentLang]?.[key] || key,
+    };
   }
   return context;
 }

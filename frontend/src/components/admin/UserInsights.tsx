@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UsersIcon, SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { UsersIcon, UserPlusIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 interface UserInsightsProps {
@@ -68,8 +68,8 @@ export default function UserInsights({
             <UsersIcon className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-gray-800">Phân tích Người dùng AI</h3>
-            <p className="text-sm text-gray-600">User behavior insights</p>
+            <h3 className="font-bold text-lg text-gray-800">Phân tích Hành vi & Tệp Khách hàng</h3>
+            <p className="text-sm text-gray-600">Thống kê mức độ tương tác & tệp khách hàng tiềm năng</p>
           </div>
         </div>
         <button
@@ -84,8 +84,8 @@ export default function UserInsights({
             </>
           ) : (
             <>
-              <SparklesIcon className="h-5 w-5" />
-              <span>Phân tích AI</span>
+              <UserPlusIcon className="h-5 w-5" />
+              <span>Phân tích khách hàng</span>
             </>
           )}
         </button>

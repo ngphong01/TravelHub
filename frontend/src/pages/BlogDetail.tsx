@@ -70,9 +70,12 @@ export default function BlogDetail() {
           {blog.featuredImage && (
             <div className="relative h-96 overflow-hidden">
               <img
-                src={blog.featuredImage}
+                src={blog.featuredImage || '/uploads/blogs/blog-healing-vietnam.jpg'}
                 alt={blog.title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/uploads/blogs/blog-healing-vietnam.jpg';
+                }}
               />
             </div>
           )}
@@ -114,7 +117,7 @@ export default function BlogDetail() {
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">{blog.author}</div>
-                  <div className="text-sm text-gray-600">TravelGo Team</div>
+                  <div className="text-sm text-gray-600">TravelHub Editorial Team</div>
                 </div>
               </div>
             )}

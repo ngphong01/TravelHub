@@ -2,6 +2,7 @@ import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nProvider } from './i18n/I18nProvider';
+import { I18nProvider as ContextI18nProvider } from './contexts/I18nContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 // Keep LanguageProvider for backward compatibility during migration
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -34,12 +35,17 @@ const BlogDetail = lazy(() => import('./pages/BlogDetail'));
 const Categories = lazy(() => import('./pages/Categories'));
 const Featured = lazy(() => import('./pages/Featured'));
 const Stories = lazy(() => import('./pages/Stories'));
+const StoryDetail = lazy(() => import('./pages/StoryDetail'));
 const Deals = lazy(() => import('./pages/Deals'));
 const PromoCodes = lazy(() => import('./pages/PromoCodes'));
 const Blog = lazy(() => import('./pages/Blog'));
 const Contact = lazy(() => import('./pages/Contact'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const PaymentMethods = lazy(() => import('./pages/PaymentMethods'));
+const ChatbotPage = lazy(() => import('./pages/ChatbotPage'));
 const FeaturedStories = lazy(() => import('./pages/FeaturedStories'));
 const About = lazy(() => import('./pages/About'));
+const AdminMenu = lazy(() => import('./pages/admin/AdminMenu'));
 const SignIn = lazy(() => import('./pages/auth/SignIn'));
 const SignUp = lazy(() => import('./pages/auth/SignUp'));
 const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
@@ -52,6 +58,10 @@ const Checkout = lazy(() => import('./pages/checkout/Checkout'));
 const PayPalSuccess = lazy(() => import('./pages/checkout/PayPalSuccess'));
 const PayPalCancel = lazy(() => import('./pages/checkout/PayPalCancel'));
 const Orders = lazy(() => import('./pages/Orders'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Tours = lazy(() => import('./pages/Tours'));
+const TravelPlanner = lazy(() => import('./pages/TravelPlanner'));
+import { CartProvider } from './contexts/CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AccountLayout from './layouts/AccountLayout';
 import AccountPage from './pages/Account';
@@ -84,17 +94,18 @@ import AdminPromoCodes from './pages/admin/AdminPromoCodes';
 import AdminBlogs from './pages/admin/AdminBlogs';
 import AdminBanners from './pages/admin/AdminBanners';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminChat from './pages/admin/AdminChat';
 
 // Simple placeholder pages
 
-// Create a QueryClient instance
+// Create a QueryClient instance with performance-optimized caching
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
-      staleTime: 0, // Always fetch fresh data
-      gcTime: 0, // Don't cache
+      staleTime: 3 * 60 * 1000, // 3 minutes fresh cache to prevent continuous re-fetching and UI lag
+      gcTime: 10 * 60 * 1000, // Keep in memory for 10 minutes
     },
   },
 });
@@ -202,6 +213,11 @@ function AppContent() {
               <Stories />
             </Suspense>
           } />
+          <Route path="/stories/:slug" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <StoryDetail />
+            </Suspense>
+          } />
           <Route path="/featured-stories" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <FeaturedStories />
@@ -217,6 +233,11 @@ function AppContent() {
               <PromoCodes />
             </Suspense>
           } />
+          <Route path="/planner" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <TravelPlanner />
+            </Suspense>
+          } />
           <Route path="/about" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <About />
@@ -225,6 +246,21 @@ function AppContent() {
           <Route path="/contact" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <Contact />
+            </Suspense>
+          } />
+          <Route path="/faq" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <FAQ />
+            </Suspense>
+          } />
+          <Route path="/payment-methods" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <PaymentMethods />
+            </Suspense>
+          } />
+          <Route path="/chatbot" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <ChatbotPage />
             </Suspense>
           } />
           <Route path="/signin" element={
@@ -285,6 +321,32 @@ function AppContent() {
           <Route path="/orders" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <Orders />
+            </Suspense>
+          } />
+          <Route path="/cart" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Cart />
+            </Suspense>
+          } />
+          <Route path="/tours" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Tours />
+            </Suspense>
+          } />
+          <Route path="/tours/:slug" element={<TourDetail />} />
+          <Route path="/restaurants/:slug" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <RestaurantDetail />
+            </Suspense>
+          } />
+          <Route path="/destinations/:slug" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <DestinationDetail />
+            </Suspense>
+          } />
+          <Route path="/hotels/:slug" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <HotelDetail />
             </Suspense>
           } />
           
@@ -349,6 +411,11 @@ function AppContent() {
               <Stories />
             </Suspense>
           } />
+          <Route path="/:lang/stories/:slug" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <StoryDetail />
+            </Suspense>
+          } />
           <Route path="/:lang/featured-stories" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <FeaturedStories />
@@ -364,6 +431,11 @@ function AppContent() {
               <PromoCodes />
             </Suspense>
           } />
+          <Route path="/:lang/planner" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <TravelPlanner />
+            </Suspense>
+          } />
           <Route path="/:lang/about" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <About />
@@ -372,6 +444,21 @@ function AppContent() {
           <Route path="/:lang/contact" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <Contact />
+            </Suspense>
+          } />
+          <Route path="/:lang/faq" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <FAQ />
+            </Suspense>
+          } />
+          <Route path="/:lang/payment-methods" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <PaymentMethods />
+            </Suspense>
+          } />
+          <Route path="/:lang/chatbot" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <ChatbotPage />
             </Suspense>
           } />
           <Route path="/:lang/signin" element={
@@ -392,6 +479,16 @@ function AppContent() {
           <Route path="/:lang/orders" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <Orders />
+            </Suspense>
+          } />
+          <Route path="/:lang/cart" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Cart />
+            </Suspense>
+          } />
+          <Route path="/:lang/tours" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Tours />
             </Suspense>
           } />
           
@@ -447,35 +544,19 @@ function AppContent() {
             <Route path="/admin/promo" element={<AdminPromoCodes />} />
             <Route path="/admin/blogs" element={<AdminBlogs />} />
             <Route path="/admin/banners" element={<AdminBanners />} />
+            <Route path="/admin/menu" element={<AdminMenu />} />
+            <Route path="/admin/chat" element={<AdminChat />} />
                   <Route path="/admin/settings" element={<AdminSettings />} />
             </Route>
           </Route>
         </Routes>
       </main>
       {!isAuthPage && !isAdminPage && <Footer />}
-      {/* Chỉ hiển thị TravelGoChatbot (chatbot mới đẹp hơn), ẩn LiveChat cũ */}
+      {/* Trợ lý AI du lịch TravelHub (Duy nhất 1 nút nổi gọn gàng góc phải) */}
       {!isAuthPage && !isAdminPage && <TravelGoChatbot />}
-      {/* Analytics & Marketing */}
+      {/* Analytics */}
       <GoogleAnalytics measurementId={process.env.REACT_APP_GA_MEASUREMENT_ID} />
       <FacebookPixel pixelId={process.env.REACT_APP_FB_PIXEL_ID} />
-      {/* Third-party integrations */}
-      <ZaloOA oaId={process.env.REACT_APP_ZALO_OA_ID} />
-      <TawkTo 
-        propertyId={process.env.REACT_APP_TAWKTO_PROPERTY_ID} 
-        widgetId={process.env.REACT_APP_TAWKTO_WIDGET_ID} 
-      />
-      {/* Promo Popup */}
-      {!isAuthPage && !isAdminPage && (
-        <PromoPopup
-          title="🎉 Ưu đãi đặc biệt!"
-          message="Nhận ngay ưu đãi hấp dẫn cho chuyến du lịch của bạn"
-          discount="Giảm 20%"
-          code="TRAVEL20"
-          linkUrl="/deals"
-          linkText="Xem ngay"
-          showDays={7}
-        />
-      )}
     </div>
   );
 }
@@ -485,13 +566,17 @@ function App(): JSX.Element {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <I18nProvider>
-          <LanguageProvider>
-            <ThemeProvider>
-              <Router>
-                <AppContent />
-              </Router>
-            </ThemeProvider>
-          </LanguageProvider>
+          <ContextI18nProvider>
+            <LanguageProvider>
+              <ThemeProvider>
+                <CartProvider>
+                  <Router>
+                    <AppContent />
+                  </Router>
+                </CartProvider>
+              </ThemeProvider>
+            </LanguageProvider>
+          </ContextI18nProvider>
         </I18nProvider>
       </QueryClientProvider>
     </HelmetProvider>

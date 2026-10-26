@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ClipboardDocumentListIcon, SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ClipboardDocumentListIcon, ClipboardDocumentCheckIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 interface BookingInsightsProps {
@@ -74,8 +74,8 @@ export default function BookingInsights({
             <ClipboardDocumentListIcon className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-gray-800">Phân tích Booking AI</h3>
-            <p className="text-sm text-gray-600">Insights thông minh về đơn đặt chỗ</p>
+            <h3 className="font-bold text-lg text-gray-800">Báo cáo Hiệu suất Đặt chỗ</h3>
+            <p className="text-sm text-gray-600">Thống kê xu hướng đơn đặt tour & tỷ lệ xử lý</p>
           </div>
         </div>
         <button
@@ -90,8 +90,8 @@ export default function BookingInsights({
             </>
           ) : (
             <>
-              <SparklesIcon className="h-5 w-5" />
-              <span>Phân tích AI</span>
+              <ClipboardDocumentCheckIcon className="h-5 w-5" />
+              <span>Phân tích đặt chỗ</span>
             </>
           )}
         </button>

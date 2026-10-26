@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StarIcon, SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { StarIcon, HandThumbUpIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 interface ReviewAnalysisProps {
@@ -67,8 +67,8 @@ export default function ReviewAnalysis({
             <StarIcon className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-gray-800">Phân tích Đánh giá AI</h3>
-            <p className="text-sm text-gray-600">Sentiment analysis & insights</p>
+            <h3 className="font-bold text-lg text-gray-800">Tổng hợp Đánh giá & Mức độ Hài lòng</h3>
+            <p className="text-sm text-gray-600">Phân tích phản hồi khách hàng & chất lượng tour</p>
           </div>
         </div>
         <button
@@ -83,8 +83,8 @@ export default function ReviewAnalysis({
             </>
           ) : (
             <>
-              <SparklesIcon className="h-5 w-5" />
-              <span>Phân tích AI</span>
+              <HandThumbUpIcon className="h-5 w-5" />
+              <span>Tổng hợp đánh giá</span>
             </>
           )}
         </button>

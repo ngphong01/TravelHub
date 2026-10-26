@@ -37,7 +37,7 @@ export default function Stories() {
     {
       id: 101,
       rating: 5,
-      comment: 'Tour Đà Lạt của TravelGo thật sự tuyệt vời! Hướng dẫn viên nhiệt tình, lịch trình hợp lý, và cảnh đẹp không thể chê. Nhất định sẽ quay lại!',
+      comment: 'Tour Đà Lạt của TravelHub thật sự tuyệt vời! Hướng dẫn viên nhiệt tình, lịch trình hợp lý, và cảnh đẹp không thể chê. Nhất định sẽ quay lại!',
       user: { name: 'Nguyễn Minh Anh', email: 'nguyenminhanh@gmail.com', avatarUrl: '/uploads/avatars/da-lat.jpg' },
       destination: { name: 'Đà Lạt' },
       createdAt: '2025-01-20T10:00:00Z',
@@ -61,7 +61,7 @@ export default function Stories() {
     {
       id: 104,
       rating: 5,
-      comment: 'Sapa vào mùa lúa chín là tuyệt vời nhất! Ruộng bậc thang vàng óng, không khí trong lành, người dân thân thiện. Cảm ơn TravelGo!',
+      comment: 'Sapa vào mùa lúa chín là tuyệt vời nhất! Ruộng bậc thang vàng óng, không khí trong lành, người dân thân thiện. Cảm ơn TravelHub!',
       user: { name: 'Phạm Thị Mai', email: 'phamthimai@gmail.com', avatarUrl: '/uploads/avatars/sapa.jpg' },
       destination: { name: 'Sapa' },
       createdAt: '2025-01-12T16:45:00Z',
@@ -93,7 +93,7 @@ export default function Stories() {
     {
       id: 108,
       rating: 5,
-      comment: 'Đà Nẵng - thành phố đáng sống! Bà Nà Hills, Cầu Vàng, biển đẹp. Dịch vụ của TravelGo rất chuyên nghiệp!',
+      comment: 'Đà Nẵng - thành phố đáng sống! Bà Nà Hills, Cầu Vàng, biển đẹp. Dịch vụ của TravelHub rất chuyên nghiệp!',
       user: { name: 'Bùi Thị Hoa', email: 'buithihoa@gmail.com', avatarUrl: '/uploads/avatars/da-nang.png' },
       destination: { name: 'Đà Nẵng' },
       createdAt: '2025-01-03T15:10:00Z',
@@ -246,7 +246,7 @@ export default function Stories() {
       date: '22/01/2025',
       category: 'Review',
       imageUrl: '/uploads/destinations/Combo Hà Nội - Hạ Long.jpg',
-      content: 'Chuyến đi Đà Nẵng của gia đình tôi thật sự tuyệt vời! Bà Nà Hills, Cầu Vàng, biển Mỹ Khê... Tất cả đều đẹp như mơ. TravelGo đã tổ chức rất chuyên nghiệp!',
+      content: 'Chuyến đi Đà Nẵng của gia đình tôi thật sự tuyệt vời! Bà Nà Hills, Cầu Vàng, biển Mỹ Khê... Tất cả đều đẹp như mơ. TravelHub đã tổ chức rất chuyên nghiệp!',
       likes: 1856,
       views: 4500,
     },
@@ -259,7 +259,7 @@ export default function Stories() {
       date: '19/01/2025',
       category: 'Chia sẻ',
       imageUrl: '/uploads/destinations/Hội An - Đà Nẵng.jpg',
-      content: 'Tour Hội An của TravelGo đã vượt quá mong đợi của chúng tôi. Đội ngũ hướng dẫn viên chuyên nghiệp, lịch trình hợp lý. Phố cổ về đêm lung linh, ẩm thực ngon tuyệt!',
+      content: 'Tour Hội An của TravelHub đã vượt quá mong đợi của chúng tôi. Đội ngũ hướng dẫn viên chuyên nghiệp, lịch trình hợp lý. Phố cổ về đêm lung linh, ẩm thực ngon tuyệt!',
       likes: 1408,
       views: 2100,
     },
@@ -298,7 +298,7 @@ export default function Stories() {
       date: '13/01/2025',
       category: 'Chia sẻ',
       imageUrl: '/uploads/destinations/Sapa Trekking 2N1Đ.jpg',
-      content: 'Trekking ở Sapa thật sự là một trải nghiệm tuyệt vời! Ruộng bậc thang, người dân thân thiện, không khí trong lành. Cảm ơn TravelGo đã tổ chức tour tuyệt vời!',
+      content: 'Trekking ở Sapa thật sự là một trải nghiệm tuyệt vời! Ruộng bậc thang, người dân thân thiện, không khí trong lành. Cảm ơn TravelHub đã tổ chức tour tuyệt vời!',
       likes: 1680,
       views: 2900,
     },
@@ -337,7 +337,7 @@ export default function Stories() {
       date: '07/01/2025',
       category: 'Review',
       imageUrl: '/uploads/destinations/combo-da-nang-hoi-an.jpg',
-      content: 'Huế là thành phố của lịch sử. Lăng tẩm, đền đài, ẩm thực cung đình... Tất cả đều tuyệt vời. Tour một ngày của TravelGo rất đầy đủ!',
+      content: 'Huế là thành phố của lịch sử. Lăng tẩm, đền đài, ẩm thực cung đình... Tất cả đều tuyệt vời. Tour một ngày của TravelHub rất đầy đủ!',
       likes: 1450,
       views: 2400,
     },
@@ -622,7 +622,7 @@ export default function Stories() {
           <div className="text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-6 py-2.5 mb-6">
               <BookOpenIcon className="h-6 w-6" />
-              <span className="font-semibold">TravelGo Stories</span>
+              <span className="font-semibold">TravelHub Stories</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
               Câu chuyện du lịch

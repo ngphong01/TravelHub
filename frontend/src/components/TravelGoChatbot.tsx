@@ -3,7 +3,6 @@ import {
   ChatBubbleLeftRightIcon,
   XMarkIcon,
   PaperAirplaneIcon,
-  SparklesIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import { useSimpleAuth } from '../lib/use-simple-auth';
@@ -21,8 +20,8 @@ export default function TravelGoChatbot() {
   const user = authData?.user || null;
   
   // Bot info
-  const botName = 'Bredan';
-  const botAvatar = '/uploads/avatars/bredan-avatar.png'; // Logo bot, fallback nếu không có
+  const botName = 'Tư vấn viên TravelHub';
+  const botAvatar = '/uploads/avatars/support-avatar.png';
   
   // User info
   const userName = user?.name || user?.email?.split('@')[0] || 'Khách';
@@ -43,11 +42,11 @@ export default function TravelGoChatbot() {
   const userAvatarUrl = getUserAvatarUrl();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [aiProvider, setAiProvider] = useState<'gemini' | 'anthropic'>('gemini'); // Chọn AI provider
+  const aiProvider = 'gemini';
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: `Xin chào! Tôi là ${botName}, AI Assistant của TravelGo. Tôi có thể giúp bạn tìm hiểu về các điểm đến, đặt chỗ, hoặc trả lời bất kỳ câu hỏi nào về du lịch. Bạn cần hỗ trợ gì?`,
+      text: `Xin chào! Tôi là ${botName}. Tôi luôn sẵn sàng hỗ trợ quý khách thông tin tour, lịch trình, kiểm tra tình trạng đặt chỗ, voucher hoặc hướng dẫn thanh toán. Quý khách cần hỗ trợ gì ạ?`,
       isUser: false,
       timestamp: new Date(),
     },
@@ -85,7 +84,7 @@ export default function TravelGoChatbot() {
     // Add typing indicator
     const typingMessage: Message = {
       id: `typing-${Date.now()}`,
-      text: 'Đang suy nghĩ...',
+      text: 'Đang kết nối & phản hồi...',
       isUser: false,
       timestamp: new Date(),
       isTyping: true,
@@ -174,7 +173,7 @@ export default function TravelGoChatbot() {
       setMessages([
         {
           id: '1',
-          text: `Xin chào! Tôi là ${botName}, AI Assistant của TravelGo. Tôi có thể giúp bạn tìm hiểu về các điểm đến, đặt chỗ, hoặc trả lời bất kỳ câu hỏi nào về du lịch. Bạn cần hỗ trợ gì?`,
+          text: `Xin chào! Tôi là ${botName}. Tôi luôn sẵn sàng hỗ trợ quý khách thông tin tour, lịch trình, kiểm tra tình trạng đặt chỗ, voucher hoặc hướng dẫn thanh toán. Quý khách cần hỗ trợ gì ạ?`,
           isUser: false,
           timestamp: new Date(),
         },
@@ -199,9 +198,7 @@ export default function TravelGoChatbot() {
         aria-label="Mở chatbot"
       >
         <ChatBubbleLeftRightIcon className="h-6 w-6 group-hover:scale-110 transition-transform" />
-        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
-          AI
-        </span>
+        <span className="absolute -top-1 -right-1 bg-emerald-500 border-2 border-white rounded-full w-3 h-3" aria-hidden="true" />
       </button>
     );
   }
@@ -216,13 +213,13 @@ export default function TravelGoChatbot() {
             alt={botName}
             className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
             onError={(e) => {
-              // Fallback nếu không có avatar
-              (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0Rjc1RjUiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+';
+              // Fallback logo TravelHub
+              (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIyMCIgZmlsbD0iIzI1NjNFQiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0Ij5USDwvdGV4dD48L3N2Zz4=';
             }}
           />
           <div>
             <h3 className="font-bold text-lg">{botName}</h3>
-            <p className="text-xs text-blue-100">AI đang trực tuyến</p>
+            <p className="text-xs text-blue-100">Hỗ trợ trực tuyến 24/7</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -348,23 +345,9 @@ export default function TravelGoChatbot() {
             )}
           </button>
         </div>
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center gap-2">
-            <label className="text-xs text-gray-500">AI Provider:</label>
-            <select
-              value={aiProvider}
-              onChange={(e) => setAiProvider(e.target.value as 'gemini' | 'anthropic')}
-              className="text-xs border border-gray-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-              disabled={isLoading}
-            >
-              <option value="gemini">Gemini</option>
-              <option value="anthropic">Anthropic</option>
-            </select>
-          </div>
-          <p className="text-xs text-gray-500">
-            Powered by {aiProvider === 'anthropic' ? 'Anthropic Claude' : 'Google Gemini AI'}
-          </p>
-        </div>
+        <p className="text-xs text-gray-500 mt-2 text-center">
+          TravelGo Assistant hỗ trợ thông tin điểm đến và đặt chỗ.
+        </p>
       </div>
     </div>
   );

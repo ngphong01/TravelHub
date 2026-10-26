@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CurrencyDollarIcon, SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { CurrencyDollarIcon, CreditCardIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 interface PaymentInsightsProps {
@@ -73,8 +73,8 @@ export default function PaymentInsights({
             <CurrencyDollarIcon className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-gray-800">Phân tích Thanh toán AI</h3>
-            <p className="text-sm text-gray-600">Payment trends & insights</p>
+            <h3 className="font-bold text-lg text-gray-800">Phân tích Dòng tiền & Giao dịch</h3>
+            <p className="text-sm text-gray-600">Thống kê doanh thu thanh toán & tỷ lệ thành công</p>
           </div>
         </div>
         <button
@@ -89,8 +89,8 @@ export default function PaymentInsights({
             </>
           ) : (
             <>
-              <SparklesIcon className="h-5 w-5" />
-              <span>Phân tích AI</span>
+              <CreditCardIcon className="h-5 w-5" />
+              <span>Phân tích giao dịch</span>
             </>
           )}
         </button>

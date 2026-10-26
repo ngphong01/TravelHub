@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MagnifyingGlassIcon, SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 interface SmartSearchProps {
@@ -7,7 +7,7 @@ interface SmartSearchProps {
   placeholder?: string;
 }
 
-export default function SmartSearch({ onSearch, placeholder = 'Tìm kiếm thông minh...' }: SmartSearchProps) {
+export default function SmartSearch({ onSearch, placeholder = 'Tìm kiếm nâng cao...' }: SmartSearchProps) {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
@@ -79,8 +79,8 @@ export default function SmartSearch({ onSearch, placeholder = 'Tìm kiếm thôn
             </>
           ) : (
             <>
-              <SparklesIcon className="h-5 w-5" />
-              <span>Tìm kiếm AI</span>
+              <MagnifyingGlassIcon className="h-5 w-5" />
+              <span>Tìm kiếm</span>
             </>
           )}
         </button>

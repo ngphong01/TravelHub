@@ -21,6 +21,7 @@ import {
   TrophyIcon,
   StarIcon,
   ExclamationTriangleIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
 import UserInsights from '../../components/admin/UserInsights';
 import toast from 'react-hot-toast';
@@ -188,6 +189,32 @@ export default function AdminUsers() {
     }
   };
 
+  const handleExportCSV = async () => {
+    try {
+      toast.loading('Đang xuất danh sách người dùng...', { id: 'export-users' });
+      const token = localStorage.getItem('tg_token');
+      const res = await fetch('/api/export/users', {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Không thể xuất danh sách người dùng');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `danh-sach-nguoi-dung-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('Đã tải xuống file CSV người dùng!', { id: 'export-users' });
+    } catch (err: any) {
+      toast.error(err?.message || 'Lỗi khi xuất file', { id: 'export-users' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-3 md:p-4 lg:p-6">
       <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
@@ -205,10 +232,20 @@ export default function AdminUsers() {
                 <p className="text-gray-600 mt-1 text-sm md:text-base hidden sm:block">Theo dõi và quản lý tất cả người dùng trong hệ thống</p>
               </div>
             </div>
-            <button className="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all font-semibold shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-              <UserPlusIcon className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="text-sm md:text-base">Thêm người dùng</span>
-            </button>
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <button 
+                type="button"
+                onClick={handleExportCSV}
+                className="w-full sm:w-auto px-4 md:px-5 py-2 md:py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all font-semibold shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+              >
+                <ArrowDownTrayIcon className="h-4 w-4 md:h-5 md:w-5" />
+                <span className="text-sm md:text-base">Xuất Excel / CSV</span>
+              </button>
+              <button className="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all font-semibold shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                <UserPlusIcon className="h-4 w-4 md:h-5 md:w-5" />
+                <span className="text-sm md:text-base">Thêm người dùng</span>
+              </button>
+            </div>
           </div>
         </div>
 

@@ -19,7 +19,8 @@ import {
   ChevronRightIcon,
   MagnifyingGlassIcon,
   FunnelIcon,
-  SparklesIcon,
+  PlusCircleIcon,
+  AdjustmentsHorizontalIcon,
 } from '@heroicons/react/24/outline';
 import GenerateTourDescription from '../../components/admin/GenerateTourDescription';
 import SmartSearch from '../../components/admin/SmartSearch';
@@ -274,7 +275,7 @@ export default function AdminDestinations() {
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <SparklesIcon className="h-6 w-6 text-blue-500" />
+                <PlusCircleIcon className="h-6 w-6 text-blue-500" />
                 Tạo Điểm Đến Mới
               </h3>
               <button
@@ -512,8 +513,8 @@ export default function AdminDestinations() {
                     : 'bg-white text-gray-600 hover:bg-gray-50 border-2 border-gray-200'
                 }`}
               >
-                <SparklesIcon className="h-4 w-4" />
-                Tìm kiếm AI
+                <AdjustmentsHorizontalIcon className="h-4 w-4" />
+                Tìm kiếm nâng cao
               </button>
             </div>
 

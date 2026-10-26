@@ -8,13 +8,21 @@ import Skeleton from '../components/Skeleton';
 import { getDestinationImageUrl } from '../utils/imageHelper';
 import { UserAPI } from '../utils/api';
 import { addToWishlist, getUserWishlist, removeFromWishlist } from '../services/wishlist';
+import SEOHead from '../components/SEOHead';
+import TravelAnimatedBackground from '../components/TravelAnimatedBackground';
 import { 
   MapPinIcon, 
   MagnifyingGlassIcon, 
   XMarkIcon,
   FunnelIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  CalendarDaysIcon,
+  DocumentTextIcon,
+  TrashIcon,
+  TicketIcon,
+  TruckIcon,
+  PaperAirplaneIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { HeartIcon } from '@heroicons/react/24/outline';
@@ -48,8 +56,8 @@ const TOUR_TYPE_OPTIONS = [
 ] as const;
 
 const TRANSPORT_OPTIONS = [
-  { value: 'car', label: 'Xe', icon: '🚗' },
-  { value: 'airplane', label: 'Máy bay', icon: '✈️' },
+  { value: 'car', label: 'Xe ô tô', Icon: TruckIcon },
+  { value: 'airplane', label: 'Máy bay', Icon: PaperAirplaneIcon },
 ] as const;
 
 const DEPARTURE_POINTS = [
@@ -208,8 +216,8 @@ const FilterButton = ({ isActive, onClick, children, className = '' }: FilterBut
     className={`
       px-3 py-1.5 text-sm rounded-lg border-2 font-medium transition-all
       ${isActive
-        ? 'bg-blue-600 border-blue-600 text-white'
-        : 'bg-white border-gray-200 text-gray-600 hover:border-blue-400'
+        ? 'bg-cyan-600 border-cyan-600 text-white shadow-sm'
+        : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:border-cyan-400 dark:hover:border-cyan-500'
       }
       ${className}
     `}
@@ -233,11 +241,11 @@ const DestinationCard = ({ destination }: DestinationCardProps) => {
   return (
     <Link
       to={`/destinations/${destination.slug}`}
-      className="group relative overflow-hidden bg-white rounded-xl shadow-lg hover:shadow-2xl 
-                 transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
+      className="group relative overflow-hidden bg-white dark:bg-slate-900 rounded-2xl shadow-md hover:shadow-2xl 
+                 transition-all duration-300 transform hover:-translate-y-1.5 border border-gray-100 dark:border-slate-800"
     >
       {/* Image Container */}
-      <div className="relative h-40 sm:h-48 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 overflow-hidden">
+      <div className="relative h-40 sm:h-48 bg-gradient-to-br from-cyan-500 via-teal-500 to-indigo-600 overflow-hidden">
         {hasValidImage && fullImageUrl && (
           <img
             src={fullImageUrl}
@@ -252,7 +260,7 @@ const DestinationCard = ({ destination }: DestinationCardProps) => {
         )}
         
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10" />
         
         {/* Placeholder Icon */}
         {!hasValidImage && (
@@ -263,34 +271,35 @@ const DestinationCard = ({ destination }: DestinationCardProps) => {
         
         {/* Featured Badge */}
         {destination.featured && (
-          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-yellow-400 text-yellow-900 
-                          px-2 py-0.5 sm:py-1 rounded-full text-xs font-bold z-20">
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-amber-400 text-amber-950 
+                          px-2 py-0.5 sm:py-1 rounded-full text-xs font-bold z-20 shadow-md">
             ⭐ Nổi bật
           </div>
         )}
       </div>
       
       {/* Content */}
-      <div className="p-3 sm:p-4">
-        <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1 sm:mb-2 line-clamp-2 
-                       group-hover:text-blue-600 transition-colors">
+      <div className="p-3.5 sm:p-4">
+        <h3 className="font-bold text-base sm:text-lg text-gray-900 dark:text-white mb-1 sm:mb-2 line-clamp-2 
+                       group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
           {destination.name}
         </h3>
         
         {destination.country && (
-          <p className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-2">
-            📍 {destination.country}
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mb-1 sm:mb-2 flex items-center gap-1">
+            <MapPinIcon className="w-3.5 h-3.5 text-cyan-500 flex-shrink-0" />
+            {destination.country}
           </p>
         )}
         
         {destination.price && destination.price > 0 && (
-          <div className="text-base sm:text-lg font-bold text-blue-600">
+          <div className="text-base sm:text-lg font-bold text-cyan-600 dark:text-cyan-400">
             Từ {formatPrice(destination.price)} đ
           </div>
         )}
         
         {destination.description && (
-          <p className="text-xs sm:text-sm text-gray-600 mt-2 line-clamp-2 hidden sm:block">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-slate-300 mt-2 line-clamp-2 hidden sm:block">
             {destination.description}
           </p>
         )}
@@ -321,12 +330,12 @@ const TourCard = ({ tour, isLiked, onToggleLike, searchTerm }: TourCardProps) =>
   const isEconomical = tourPrice < 5_000_000;
 
   return (
-    <div className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-all group">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-xl transition-all group">
       {/* Mobile Layout: Stacked */}
       <div className="flex flex-col sm:flex-row">
         {/* Image Section */}
         <div className="relative w-full sm:w-48 md:w-56 lg:w-72 flex-shrink-0">
-          <div className="aspect-[16/9] sm:aspect-[4/3] bg-gradient-to-br from-blue-400 to-purple-500">
+          <div className="aspect-[16/9] sm:aspect-[4/3] bg-gradient-to-br from-cyan-500 to-indigo-600">
             {fullImageUrl && (
               <img 
                 src={fullImageUrl} 
@@ -345,71 +354,71 @@ const TourCard = ({ tour, isLiked, onToggleLike, searchTerm }: TourCardProps) =>
             onClick={(e) => { e.preventDefault(); onToggleLike(); }}
             aria-label={isLiked ? 'Bỏ yêu thích' : 'Thêm yêu thích'}
             className="absolute top-2 left-2 sm:top-3 sm:left-3 w-8 h-8 sm:w-9 sm:h-9 
-                       bg-white/90 rounded-full flex items-center justify-center 
+                       bg-white/90 dark:bg-slate-900/90 rounded-full flex items-center justify-center 
                        shadow-lg hover:scale-110 transition-transform"
           >
             {isLiked 
               ? <HeartIconSolid className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" /> 
-              : <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+              : <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-slate-400" />
             }
           </button>
           
           {/* Economy Badge */}
           {isEconomical && (
             <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 
-                            bg-green-500 text-white px-2 py-0.5 sm:py-1 
-                            rounded text-xs font-bold">
+                            bg-emerald-500 text-white px-2 py-0.5 sm:py-1 
+                            rounded-lg text-xs font-bold shadow-sm">
               Tiết kiệm
             </div>
           )}
         </div>
 
         {/* Content Section */}
-        <div className="flex-1 p-3 sm:p-4 flex flex-col min-w-0">
+        <div className="flex-1 p-3.5 sm:p-5 flex flex-col min-w-0">
           {/* Tour Title */}
           <Link to={`/tours/${tour.slug || tour.id}`}>
-            <h3 className="text-base sm:text-lg font-bold text-blue-600 hover:text-blue-700 
-                           mb-2 sm:mb-3 line-clamp-2">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 
+                           mb-2 sm:mb-3 line-clamp-2 transition-colors">
               {highlightSearchTerm(tour.name, searchTerm)}
             </h3>
           </Link>
 
           {/* Tour Details Grid */}
           <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm mb-2 sm:mb-3">
-            <div className="flex items-center gap-1 sm:gap-2">
-              <span className="flex-shrink-0">📋</span>
-              <span className="text-gray-500 hidden xs:inline">Mã:</span>
-              <span className="font-semibold truncate">{tourCode}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <DocumentTextIcon className="w-4 h-4 text-gray-400 dark:text-slate-500 flex-shrink-0" />
+              <span className="text-gray-500 dark:text-slate-400 hidden xs:inline">Mã:</span>
+              <span className="font-semibold text-gray-700 dark:text-slate-200 truncate">{tourCode}</span>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <span className="flex-shrink-0">📍</span>
-              <span className="text-gray-500 hidden xs:inline">Khởi hành:</span>
-              <span className="font-semibold text-blue-600 truncate">{departurePoint}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <MapPinIcon className="w-4 h-4 text-cyan-500 flex-shrink-0" />
+              <span className="text-gray-500 dark:text-slate-400 hidden xs:inline">Khởi hành:</span>
+              <span className="font-semibold text-cyan-600 dark:text-cyan-400 truncate">{departurePoint}</span>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <span className="flex-shrink-0">📅</span>
-              <span className="text-gray-500 hidden xs:inline">Thời gian:</span>
-              <span className="font-semibold">{duration}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <CalendarDaysIcon className="w-4 h-4 text-gray-400 dark:text-slate-500 flex-shrink-0" />
+              <span className="text-gray-500 dark:text-slate-400 hidden xs:inline">Thời gian:</span>
+              <span className="font-semibold text-gray-700 dark:text-slate-200">{duration}</span>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <span className="flex-shrink-0">🚗</span>
-              <span className="text-gray-500 hidden xs:inline">Phương tiện:</span>
-              <span className="font-semibold">{transport}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <TruckIcon className="w-4 h-4 text-gray-400 dark:text-slate-500 flex-shrink-0" />
+              <span className="text-gray-500 dark:text-slate-400 hidden xs:inline">Phương tiện:</span>
+              <span className="font-semibold text-gray-700 dark:text-slate-200">{transport}</span>
             </div>
           </div>
 
           {/* Price and CTA */}
-          <div className="flex items-end justify-between mt-auto pt-2 sm:pt-3 border-t">
+          <div className="flex items-end justify-between mt-auto pt-2 sm:pt-3 border-t border-gray-100 dark:border-slate-800">
             <div>
-              <span className="text-xs sm:text-sm text-gray-500">Giá từ:</span>
-              <div className="text-xl sm:text-2xl font-bold text-red-500">
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">Giá từ:</span>
+              <div className="text-xl sm:text-2xl font-bold text-red-500 dark:text-red-400">
                 {formatPrice(tourPrice)} <span className="text-sm sm:text-base">đ</span>
               </div>
             </div>
             <Link 
               to={`/tours/${tour.slug || tour.id}`}
-              className="px-3 sm:px-5 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg 
-                         font-semibold hover:bg-blue-700 transition-colors text-sm sm:text-base"
+              className="px-3.5 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-cyan-600 to-teal-600 text-white rounded-xl 
+                         font-semibold hover:from-cyan-700 hover:to-teal-700 shadow-sm transition-all text-sm sm:text-base"
             >
               <span className="hidden sm:inline">Xem chi tiết</span>
               <span className="sm:hidden">Chi tiết</span>
@@ -720,19 +729,46 @@ export default function Destinations() {
   const isLoading = currentViewMode === 'destinations' ? isLoadingDestinations : isLoadingTours;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+      <SEOHead
+        title="Khám Phá Điểm Đến Du Lịch - TravelHub"
+        description="Khám phá hàng trăm điểm đến hấp dẫn và tour du lịch trọn gói trong và ngoài nước cùng TravelHub."
+        keywords="điểm đến du lịch, tour du lịch, khám phá việt nam, du lịch thế giới, travelhub"
+      />
+
+      {/* Hero Header with Animated Background */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-slate-950 via-cyan-950 to-teal-950 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-cyan-800/30">
+        <TravelAnimatedBackground
+          className="z-0 opacity-40"
+          intensity="vibrant"
+          showDrifters={true}
+        />
+        <div className="max-w-7xl mx-auto relative z-10 text-center space-y-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md text-cyan-300 text-xs font-semibold border border-white/15">
+            <MapPinIcon className="w-4 h-4 text-cyan-400" />
+            Khám Phá Danh Thắng & Kỳ Quan
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-cyan-100 to-teal-200 bg-clip-text text-transparent">
+            Điểm Đến & Trải Nghiệm Hấp Dẫn
+          </h1>
+          <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto">
+            Tìm kiếm hành trình trong mơ của bạn từ bãi biển nhiệt đới, núi non hùng vĩ đến những di sản văn hoá trường tồn.
+          </p>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
         
         {/* Mobile Filter Toggle Button */}
         <button
           onClick={() => setIsMobileSidebarOpen(true)}
-          className="lg:hidden mb-4 flex items-center gap-2 px-4 py-2.5 bg-white rounded-lg 
-                     shadow-sm border border-gray-200 text-gray-700 font-medium w-full justify-center"
+          className="lg:hidden mb-4 flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 rounded-xl 
+                     shadow-sm border border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-200 font-medium w-full justify-center"
         >
-          <FunnelIcon className="w-5 h-5" />
+          <FunnelIcon className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
           <span>Bộ lọc tìm kiếm</span>
           {hasActiveFilters && (
-            <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
+            <span className="bg-cyan-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">
               Đang lọc
             </span>
           )}
@@ -758,15 +794,15 @@ export default function Destinations() {
             transform transition-transform duration-300 ease-in-out
             ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}>
-            <div className="h-full lg:h-auto bg-white border border-gray-200 rounded-none lg:rounded-lg 
+            <div className="h-full lg:h-auto bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-none lg:rounded-2xl 
                             lg:sticky lg:top-4 shadow-xl lg:shadow-sm overflow-y-auto">
               
               {/* Sidebar Header */}
-              <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                <h2 className="text-sm font-bold text-gray-800 uppercase">Bộ lọc tìm kiếm</h2>
+              <div className="bg-gray-50 dark:bg-slate-850 px-4 py-3 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-gray-800 dark:text-white uppercase">Bộ lọc tìm kiếm</h2>
                 <button 
                   onClick={() => setIsMobileSidebarOpen(false)}
-                  className="lg:hidden p-1 hover:bg-gray-200 rounded"
+                  className="lg:hidden p-1 hover:bg-gray-200 dark:hover:bg-slate-800 text-gray-500 rounded"
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
@@ -775,7 +811,7 @@ export default function Destinations() {
               <div className="p-4 space-y-5">
                 {/* Search Input */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">
                     Tìm kiếm
                   </label>
                   <form onSubmit={handleSearchSubmit} className="relative">
@@ -784,8 +820,8 @@ export default function Destinations() {
                       value={searchInputValue}
                       onChange={(e) => setSearchInputValue(e.target.value)}
                       placeholder="Nhập tên tour, điểm đến..."
-                      className="w-full pl-4 pr-16 py-2.5 border-2 border-gray-200 rounded-lg 
-                                 text-sm focus:outline-none focus:border-blue-500"
+                      className="w-full pl-4 pr-16 py-2.5 border-2 border-gray-200 dark:border-slate-700 rounded-xl 
+                                 text-sm focus:outline-none focus:border-cyan-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                     />
                     <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                       {searchInputValue && (
@@ -937,7 +973,7 @@ export default function Destinations() {
                         )}
                         className="flex items-center gap-1.5"
                       >
-                        <span>{option.icon}</span>
+                        <option.Icon className="w-4 h-4 flex-shrink-0" />
                         {option.label}
                       </FilterButton>
                     ))}
@@ -949,9 +985,10 @@ export default function Destinations() {
                   <button
                     onClick={handleClearAllFilters}
                     className="w-full px-4 py-2 text-sm text-red-600 hover:text-red-700 
-                               hover:bg-red-50 rounded-lg border-2 border-red-200 font-medium"
+                               hover:bg-red-50 rounded-lg border-2 border-red-200 font-medium flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    🗑️ Xóa bộ lọc
+                    <TrashIcon className="w-4 h-4" />
+                    Xóa tất cả bộ lọc
                   </button>
                 )}
               </div>
@@ -963,50 +1000,52 @@ export default function Destinations() {
           {/* ============================================ */}
           <div className="flex-1 min-w-0">
             {/* View Mode Tabs */}
-            <div className="mb-4 sm:mb-5 bg-white rounded-lg p-1 shadow-sm border inline-flex">
+            <div className="mb-4 sm:mb-5 bg-white dark:bg-slate-900 rounded-xl p-1 shadow-sm border border-gray-200 dark:border-slate-800 inline-flex">
               <button
                 onClick={() => handleViewModeChange('destinations')}
                 className={`
-                  px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all
+                  px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5
                   ${currentViewMode === 'destinations'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                    ? 'bg-cyan-600 text-white shadow-md'
+                    : 'text-gray-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-gray-50 dark:hover:bg-slate-800'
                   }
                 `}
               >
-                📍 Điểm đến ({allDestinationsList.length})
+                <MapPinIcon className="w-4 h-4" />
+                Điểm đến ({allDestinationsList.length})
               </button>
               <button
                 onClick={() => handleViewModeChange('tours')}
                 className={`
-                  px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all
+                  px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all flex items-center gap-1.5
                   ${currentViewMode === 'tours'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                    ? 'bg-cyan-600 text-white shadow-md'
+                    : 'text-gray-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-gray-50 dark:hover:bg-slate-800'
                   }
                 `}
               >
-                🎫 Tour ({toursResponse?.total || 0})
+                <TicketIcon className="w-4 h-4" />
+                Tour ({toursResponse?.total || 0})
               </button>
             </div>
 
             {/* Results Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-5 
-                            bg-white rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 shadow-sm border">
+                            bg-white dark:bg-slate-900 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 shadow-sm border border-gray-200 dark:border-slate-800">
               <div className="text-sm sm:text-base">
                 {isLoading ? (
-                  <span className="text-gray-500">Đang tìm kiếm...</span>
+                  <span className="text-gray-500 dark:text-slate-400">Đang tìm kiếm...</span>
                 ) : toursError ? (
                   <span className="text-red-500">Có lỗi xảy ra</span>
                 ) : (
-                  <span className="text-gray-700">
+                  <span className="text-gray-700 dark:text-slate-200">
                     Tìm thấy{' '}
-                    <span className="text-blue-600 font-bold text-base sm:text-lg">
+                    <span className="text-cyan-600 dark:text-cyan-400 font-bold text-base sm:text-lg">
                       {totalItems}
                     </span>{' '}
                     {currentViewMode === 'destinations' ? 'điểm đến' : 'tour'}
                     {filters.searchQuery && (
-                      <span className="text-gray-500"> cho "{filters.searchQuery}"</span>
+                      <span className="text-gray-500 dark:text-slate-400"> cho "{filters.searchQuery}"</span>
                     )}
                   </span>
                 )}
@@ -1016,8 +1055,8 @@ export default function Destinations() {
               <select
                 value={filters.sortBy}
                 onChange={(e) => updateURLFilter('sort', e.target.value)}
-                className="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm 
-                           focus:outline-none focus:border-blue-500 bg-white"
+                className="px-3 py-2 border-2 border-gray-200 dark:border-slate-700 rounded-xl text-sm 
+                           focus:outline-none focus:border-cyan-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
               >
                 <option value="all">Mặc định</option>
                 {currentViewMode === 'tours' && (

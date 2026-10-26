@@ -14,7 +14,7 @@ interface PromoPopupProps {
 }
 
 export default function PromoPopup({
-  title = '🎉 Ưu đãi đặc biệt!',
+  title = 'Ưu đãi đặc biệt',
   message = 'Nhận ngay ưu đãi hấp dẫn cho chuyến du lịch của bạn',
   discount,
   code,

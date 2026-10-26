@@ -227,13 +227,17 @@ export default function OptimizedNavBar() {
         <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg overflow-hidden shadow">
             <img 
-              src="https://png.pngtree.com/png-vector/20250112/ourmid/pngtree-travel-go-logo-blue-and-yellow-design-png-image_15159391.png"
-              alt="TravelGo Logo"
+              src="/uploads/avatars/travelgo-admin.png"
+              alt="TravelHub Logo"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "/uploads/avatars/travelgo-logo.png";
+              }}
               className="w-full h-full object-cover"
             />
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">
-            TravelGo
+          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+            TravelHub
           </span>
         </Link>
 

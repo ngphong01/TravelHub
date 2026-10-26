@@ -171,7 +171,7 @@ export default function PayPalSuccessPage() {
         {!loading && (
           <p className="mt-6 text-center text-xs text-gray-500">
             Nếu có thắc mắc về giao dịch, vui lòng liên hệ hỗ trợ khách hàng
-            hoặc gửi email đến support@travelgo.vn.
+            hoặc gửi email đến support@travelhub.vn.
           </p>
         )}
       </div>

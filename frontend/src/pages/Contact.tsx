@@ -333,7 +333,7 @@ export default function Contact() {
           <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-bold mb-4">Văn phòng chính</h2>
-              <MapEmbed query="TravelGo Vietnam" className="mb-4" />
+              <MapEmbed query="Học viện Công nghệ Bưu chính Viễn thông, Hà Đông, Hà Nội" className="mb-4" />
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <MapPinIcon className="h-5 w-5 text-blue-600 mt-0.5" />

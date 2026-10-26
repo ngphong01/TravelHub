@@ -1,16 +1,38 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from "react";
-import { MapPinIcon, TagIcon, ChatBubbleLeftRightIcon, InformationCircleIcon, EnvelopeIcon, CreditCardIcon, StarIcon, UserCircleIcon, ArrowRightOnRectangleIcon, ShieldCheckIcon, BuildingOfficeIcon, BuildingStorefrontIcon, ChevronDownIcon, SparklesIcon, FireIcon } from "@heroicons/react/24/outline";
+import { 
+  MapPinIcon, 
+  TagIcon, 
+  ChatBubbleLeftRightIcon, 
+  InformationCircleIcon, 
+  EnvelopeIcon, 
+  CreditCardIcon, 
+  StarIcon, 
+  UserCircleIcon, 
+  ArrowRightOnRectangleIcon, 
+  ShieldCheckIcon, 
+  BuildingOfficeIcon, 
+  BuildingStorefrontIcon, 
+  ChevronDownIcon, 
+  FireIcon, 
+  ShoppingBagIcon,
+  QuestionMarkCircleIcon,
+  SparklesIcon
+} from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid, FireIcon as FireIconSolid } from "@heroicons/react/24/solid";
 import { useSimpleAuth } from '../lib/use-simple-auth';
+import { useCart } from '../contexts/CartContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getFeaturedDestinations } from '../services/destination';
 import { getDestinationImageUrl } from '../utils/imageHelper';
+import CartSlideDrawer from './CartSlideDrawer';
+import TravelHubLogo from './TravelHubLogo';
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
+  const [showCartDrawer, setShowCartDrawer] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showServicesMenu, setShowServicesMenu] = useState(false);
   const [showExploreMenu, setShowExploreMenu] = useState(false);
@@ -22,6 +44,7 @@ export default function NavBar() {
   const exploreTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const supportTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { data, status } = useSimpleAuth() as any;
+  const { totalCount } = useCart();
   const { t } = useTranslation('header');
   
   // Fetch featured destinations for explore menu
@@ -82,38 +105,18 @@ export default function NavBar() {
   const item = (href: string, label: string, Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>) => (
     <Link 
       to={href} 
-      className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:via-purple-500 hover:to-pink-500 transition-all duration-150 group overflow-hidden whitespace-nowrap"
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-white/90 hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap"
     >
-      {Icon && <Icon className="h-3.5 w-3.5 group-hover:scale-105 transition-transform duration-150 flex-shrink-0" aria-hidden="true" />}
-      <span className="relative z-10">{label}</span>
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-10 transition-opacity duration-150"></div>
+      {Icon && <Icon className="h-4 w-4 text-white/70 group-hover:text-white transition-colors flex-shrink-0" aria-hidden="true" />}
+      <span>{label}</span>
     </Link>
   );
 
   return (
-    <header className="w-full bg-white/80 backdrop-blur-2xl border-b border-gray-200/50 sticky top-0 z-50 shadow-md shadow-gray-100/50 transition-all duration-300 hover:bg-white/95">
+    <header className="w-full bg-[#003580] text-white border-b border-blue-900 sticky top-0 z-50 shadow-md transition-all duration-300">
     <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative">
-            <div className="w-9 h-9 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105 overflow-hidden">
-              <img 
-                src="/uploads/avatars/travelgo-admin.png"
-                alt="TravelGo Logo"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
-          </div>
-          <div>
-            <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:via-teal-400 group-hover:to-sky-400 transition-all duration-300">
-              TravelGo
-            </h1>
-            <p className="text-[10px] text-gray-500 group-hover:text-gray-600 transition-colors duration-300 leading-tight">
-              {t('tagline')}
-            </p>
-          </div>
-        </Link>
+        <TravelHubLogo variant="light" size="md" asLink={true} />
 
         {/* Navigation */}
         <nav className="hidden lg:flex items-center gap-1">
@@ -149,12 +152,11 @@ export default function NavBar() {
           >
             <button
               onClick={() => setShowExploreMenu(!showExploreMenu)}
-              className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:via-purple-500 hover:to-pink-500 transition-all duration-150 group overflow-hidden whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-white/90 hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap"
             >
-              <SparklesIcon className="h-3.5 w-3.5 group-hover:scale-105 transition-transform duration-150 flex-shrink-0" />
-              <span className="relative z-10">{t('explore')}</span>
+              <MapPinIcon className="h-4 w-4 flex-shrink-0" />
+              <span>{t('explore')}</span>
               <ChevronDownIcon className={`h-3.5 w-3.5 transition-transform duration-150 ${showExploreMenu ? 'rotate-180' : ''}`} />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-10 transition-opacity duration-150"></div>
             </button>
             
             {showExploreMenu && (
@@ -324,31 +326,44 @@ export default function NavBar() {
           >
             <button
               onClick={() => setShowServicesMenu(!showServicesMenu)}
-              className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:via-purple-500 hover:to-pink-500 transition-all duration-150 group overflow-hidden whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-white/90 hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap"
             >
-              <BuildingOfficeIcon className="h-3.5 w-3.5 group-hover:scale-105 transition-transform duration-150 flex-shrink-0" />
-              <span className="relative z-10">Dịch vụ</span>
+              <BuildingOfficeIcon className="h-4 w-4 flex-shrink-0" />
+              <span>Dịch vụ</span>
               <ChevronDownIcon className={`h-3.5 w-3.5 transition-transform duration-150 ${showServicesMenu ? 'rotate-180' : ''}`} />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-10 transition-opacity duration-150"></div>
             </button>
             
             {showServicesMenu && (
               <div
-                className="absolute top-full left-0 mt-1.5 w-52 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-[100] pointer-events-auto"
+                className="absolute top-full left-0 mt-1.5 w-52 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden z-[100] pointer-events-auto"
                 onClick={(e) => e.stopPropagation()}
               >
+                <Link
+                  to="/tours"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowServicesMenu(false);
+                  }}
+                  className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-blue-50 transition-colors group cursor-pointer"
+                >
+                  <MapPinIcon className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">Tours du lịch</p>
+                    <p className="text-[11px] text-slate-500 leading-tight">Khám phá các tour trọn gói</p>
+                  </div>
+                </Link>
                 <Link
                   to="/hotels"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowServicesMenu(false);
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-colors group cursor-pointer"
+                  className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-blue-50 transition-colors group border-t border-slate-100 cursor-pointer"
                 >
-                  <BuildingOfficeIcon className="h-4 w-4 text-blue-600 group-hover:scale-110 transition-transform flex-shrink-0" />
+                  <BuildingOfficeIcon className="h-4 w-4 text-blue-600 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-sm text-gray-900">Khách sạn</p>
-                    <p className="text-[11px] text-gray-600 leading-tight">Tìm khách sạn phù hợp</p>
+                    <p className="font-semibold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">Khách sạn</p>
+                    <p className="text-[11px] text-slate-500 leading-tight">Tìm khách sạn phù hợp</p>
                   </div>
                 </Link>
                 <Link
@@ -357,12 +372,12 @@ export default function NavBar() {
                     e.stopPropagation();
                     setShowServicesMenu(false);
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 transition-colors group border-t border-gray-100 cursor-pointer"
+                  className="flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-blue-50 transition-colors group border-t border-slate-100 cursor-pointer"
                 >
-                  <BuildingStorefrontIcon className="h-4 w-4 text-orange-600 group-hover:scale-110 transition-transform flex-shrink-0" />
+                  <BuildingStorefrontIcon className="h-4 w-4 text-blue-600 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-sm text-gray-900">Nhà hàng</p>
-                    <p className="text-[11px] text-gray-600 leading-tight">Khám phá ẩm thực</p>
+                    <p className="font-semibold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">Nhà hàng & Ẩm thực</p>
+                    <p className="text-[11px] text-slate-500 leading-tight">Khám phá ẩm thực 3 miền</p>
                   </div>
                 </Link>
               </div>
@@ -371,6 +386,15 @@ export default function NavBar() {
 
           {/* Ưu đãi - Standalone */}
           {item("/deals", "Ưu đãi", TagIcon)}
+
+          {/* Lập kế hoạch chuyến đi */}
+          <Link
+            to="/planner"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-white bg-white/15 hover:bg-white/25 transition-colors duration-150 border border-white/20 whitespace-nowrap"
+          >
+            <MapPinIcon className="h-4 w-4 flex-shrink-0" />
+            <span>Lập kế hoạch</span>
+          </Link>
 
           {/* Hỗ trợ Dropdown */}
           <div 
@@ -404,12 +428,11 @@ export default function NavBar() {
           >
             <button
               onClick={() => setShowSupportMenu(!showSupportMenu)}
-              className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:via-purple-500 hover:to-pink-500 transition-all duration-150 group overflow-hidden whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-white/90 hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap"
             >
-              <InformationCircleIcon className="h-3.5 w-3.5 group-hover:scale-105 transition-transform duration-150 flex-shrink-0" />
-              <span className="relative z-10">Hỗ trợ</span>
+              <InformationCircleIcon className="h-4 w-4 flex-shrink-0" />
+              <span>Hỗ trợ</span>
               <ChevronDownIcon className={`h-3.5 w-3.5 transition-transform duration-150 ${showSupportMenu ? 'rotate-180' : ''}`} />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-10 transition-opacity duration-150"></div>
             </button>
             
             {showSupportMenu && (
@@ -423,12 +446,54 @@ export default function NavBar() {
                     e.stopPropagation();
                     setShowSupportMenu(false);
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 transition-colors group cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-blue-50 transition-colors group cursor-pointer"
                 >
-                  <InformationCircleIcon className="h-4 w-4 text-indigo-600 group-hover:scale-110 transition-transform flex-shrink-0" />
+                  <InformationCircleIcon className="h-4 w-4 text-blue-600 group-hover:scale-105 transition-transform flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-sm text-gray-900">Giới thiệu</p>
-                    <p className="text-[11px] text-gray-600 leading-tight">Về TravelGo</p>
+                    <p className="font-semibold text-sm text-gray-900 group-hover:text-blue-600 transition-colors">Giới thiệu</p>
+                    <p className="text-[11px] text-gray-500 leading-tight">Về TravelHub</p>
+                  </div>
+                </Link>
+                <Link
+                  to="/faq"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSupportMenu(false);
+                  }}
+                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-blue-50 transition-colors group border-t border-gray-100 cursor-pointer"
+                >
+                  <QuestionMarkCircleIcon className="h-4 w-4 text-blue-600 group-hover:scale-105 transition-transform flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm text-gray-900 group-hover:text-blue-600 transition-colors">Giải đáp thắc mắc</p>
+                    <p className="text-[11px] text-gray-500 leading-tight">Câu hỏi thường gặp (FAQ)</p>
+                  </div>
+                </Link>
+                <Link
+                  to="/payment-methods"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSupportMenu(false);
+                  }}
+                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-blue-50 transition-colors group border-t border-gray-100 cursor-pointer"
+                >
+                  <CreditCardIcon className="h-4 w-4 text-blue-600 group-hover:scale-105 transition-transform flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm text-gray-900 group-hover:text-blue-600 transition-colors">Hình thức thanh toán</p>
+                    <p className="text-[11px] text-gray-500 leading-tight">VietQR, Thẻ, MoMo, PayPal</p>
+                  </div>
+                </Link>
+                <Link
+                  to="/chatbot"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSupportMenu(false);
+                  }}
+                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-blue-50 transition-colors group border-t border-gray-100 cursor-pointer"
+                >
+                  <SparklesIcon className="h-4 w-4 text-blue-600 group-hover:scale-105 transition-transform flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm text-gray-900 group-hover:text-blue-600 transition-colors">Trợ lý du lịch AI</p>
+                    <p className="text-[11px] text-gray-500 leading-tight">Hỏi đáp & gợi ý 24/7</p>
                   </div>
                 </Link>
                 <Link
@@ -437,12 +502,12 @@ export default function NavBar() {
                     e.stopPropagation();
                     setShowSupportMenu(false);
                   }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-colors group border-t border-gray-100 cursor-pointer"
+                  className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-blue-50 transition-colors group border-t border-gray-100 cursor-pointer"
                 >
-                  <EnvelopeIcon className="h-4 w-4 text-teal-600 group-hover:scale-110 transition-transform flex-shrink-0" />
+                  <EnvelopeIcon className="h-4 w-4 text-blue-600 group-hover:scale-105 transition-transform flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-sm text-gray-900">Liên hệ</p>
-                    <p className="text-[11px] text-gray-600 leading-tight">Hỗ trợ khách hàng</p>
+                    <p className="font-semibold text-sm text-gray-900 group-hover:text-blue-600 transition-colors">Liên hệ</p>
+                    <p className="text-[11px] text-gray-500 leading-tight">Hỗ trợ khách hàng</p>
                   </div>
                 </Link>
               </div>
@@ -451,23 +516,38 @@ export default function NavBar() {
         </nav>
 
         {/* Auth Area */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <Link 
             to="/orders" 
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all duration-150 whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors whitespace-nowrap"
           >
-            <CreditCardIcon className="h-3.5 w-3.5 flex-shrink-0" />
+            <CreditCardIcon className="h-4 w-4 flex-shrink-0" />
             <span className="whitespace-nowrap">Đặt chỗ</span>
           </Link>
           
           {/* 🔥 CRITICAL: Language Switcher - Hiển thị luôn, bất kể đã đăng nhập hay chưa */}
           <LanguageSwitcher />
+
+          {/* Cart Icon Button - Opens CartSlideDrawer */}
+          <button
+            type="button"
+            onClick={() => setShowCartDrawer(true)}
+            className="relative p-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors flex items-center justify-center cursor-pointer"
+            title="Xem nhanh giỏ hàng"
+          >
+            <ShoppingBagIcon className="w-5 h-5" />
+            {totalCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-amber-400 text-slate-950 text-[10px] font-black rounded-full flex items-center justify-center shadow-sm">
+                {totalCount > 99 ? '99+' : totalCount}
+              </span>
+            )}
+          </button>
           
           {user ? (
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 rounded-lg transition-all duration-150 shadow-md hover:shadow-lg whitespace-nowrap"
+                className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-white hover:bg-white/10 border border-white/20 rounded-lg transition-colors shadow-sm whitespace-nowrap"
               >
                 <img 
                   src={user.image ? (user.image.startsWith('http') ? user.image : (user.image.startsWith('/uploads') ? user.image : `/uploads/avatars/${user.image}`)) : '/default-avatar.png'} 
@@ -480,11 +560,11 @@ export default function NavBar() {
                 <span className="hidden sm:inline flex items-center gap-1">
                   {user.name || user.email.split('@')[0]}
                   {user.role === 'ADMIN' && (
-                    <ShieldCheckIcon className="w-3.5 h-3.5 text-blue-600" title="Admin đã xác minh" />
+                    <ShieldCheckIcon className="w-3.5 h-3.5 text-amber-400" title="Admin đã xác minh" />
                   )}
                 </span>
                 {user.role === 'ADMIN' && (
-                  <span className="px-1 py-0.5 text-[9px] bg-teal-100 text-teal-700 rounded font-semibold">ADMIN</span>
+                  <span className="px-1 py-0.5 text-[9px] bg-amber-400 text-slate-950 rounded font-bold">ADMIN</span>
                 )}
               </button>
               
@@ -516,7 +596,7 @@ export default function NavBar() {
                     <Link
                       to="/admin/dashboard"
                       onClick={() => setShowUserMenu(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-teal-700 hover:bg-teal-50 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 transition-colors"
                     >
                       <StarIcon className="h-4 w-4" />
                       Quản trị
@@ -536,7 +616,7 @@ export default function NavBar() {
           ) : (
             <Link 
               to="/signin" 
-              className="px-2.5 py-1 text-xs font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 rounded-lg transition-all duration-150 shadow-md hover:shadow-lg whitespace-nowrap"
+              className="px-3.5 py-1.5 text-xs sm:text-sm font-bold text-[#003580] bg-white hover:bg-blue-50 rounded-lg shadow-sm transition-all whitespace-nowrap"
             >
               Đăng nhập
             </Link>
@@ -562,10 +642,10 @@ export default function NavBar() {
             <div className="relative">
               <button
                 onClick={() => setShowExploreMenu(!showExploreMenu)}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:via-purple-500 hover:to-pink-500 transition-all duration-150"
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150"
               >
                 <div className="flex items-center gap-2">
-                  <SparklesIcon className="h-4 w-4" />
+                  <MapPinIcon className="h-4 w-4" />
                   <span>Khám phá</span>
                 </div>
                 <ChevronDownIcon className={`h-4 w-4 transition-transform duration-150 ${showExploreMenu ? 'rotate-180' : ''}`} />
@@ -671,7 +751,9 @@ export default function NavBar() {
               )}
             </div>
 
+            {item("/planner", "Lập kế hoạch chuyến đi", MapPinIcon)}
             {item("/deals", "Ưu đãi", TagIcon)}
+            {item("/cart", `Giỏ hàng (${totalCount})`, ShoppingBagIcon)}
 
             {/* Hỗ trợ Dropdown Mobile */}
             <div className="relative">
@@ -739,6 +821,12 @@ export default function NavBar() {
           onClick={() => setShowUserMenu(false)}
         />
       )}
+
+      {/* Cart Slide-over Drawer */}
+      <CartSlideDrawer
+        isOpen={showCartDrawer}
+        onClose={() => setShowCartDrawer(false)}
+      />
     </header>
   );
 }

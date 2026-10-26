@@ -165,7 +165,7 @@ export default function AdminBlogs() {
                           <div className="text-xs text-gray-500">{blog.slug}</div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-700">{blog.author || 'TravelGo Team'}</div>
+                          <div className="text-sm text-gray-700">{blog.author || 'TravelHub Team'}</div>
                         </td>
                         <td className="px-6 py-4">
                           <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">

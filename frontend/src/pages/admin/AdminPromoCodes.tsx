@@ -13,7 +13,6 @@ import {
   XMarkIcon,
   CalendarIcon,
   CurrencyDollarIcon,
-  SparklesIcon,
 } from '@heroicons/react/24/outline';
 
 type PageResult = { items: any[]; total: number; page: number; pageSize: number };

@@ -3,6 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getHotelsPaged } from '../services/hotel';
 import Skeleton from '../components/Skeleton';
+import SEOHead from '../components/SEOHead';
+import TravelAnimatedBackground from '../components/TravelAnimatedBackground';
 import {
   MapPinIcon,
   StarIcon,
@@ -66,30 +68,36 @@ export default function Hotels() {
   const hasActiveFilters = filters.city || filters.minPrice || filters.maxPrice;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-cyan-500 via-teal-500 to-sky-500 text-white">
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-yellow-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
-                Khách sạn & Resort
-              </span>
+    <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 transition-colors">
+      <SEOHead
+        title="Khách sạn & Chỗ nghỉ - TravelHub"
+        description="Đặt phòng khách sạn, resort cao cấp với giá ưu đãi tốt nhất trên toàn quốc cùng TravelHub."
+      />
+
+      {/* Hero Section (Booking.com Royal Navy Blue) */}
+      <section className="relative overflow-hidden bg-[#003580] text-white">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
+          <div className="text-center mb-8">
+            <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 backdrop-blur-md mb-3 inline-block border border-white/20">
+              Nghỉ dưỡng đẳng cấp
+            </span>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black mb-3 leading-tight tracking-tight">
+              Khách sạn & Resort Hàng Đầu
             </h1>
-            <p className="text-xl sm:text-2xl text-white/90 max-w-3xl mx-auto mb-10">
-              Tìm kiếm khách sạn phù hợp với nhu cầu của bạn
+            <p className="text-base sm:text-lg text-blue-100 max-w-2xl mx-auto mb-8 font-normal">
+              Khám phá không gian lưu trú sang trọng, view biển đắt giá và dịch vụ chuẩn mực.
             </p>
 
             {/* Search Bar */}
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-3xl mx-auto bg-amber-400 p-1 sm:p-1.5 rounded-2xl shadow-2xl">
               <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400" />
+                <MagnifyingGlassIcon className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
                   value={filters.search || ''}
                   onChange={(e) => handleFilterChange('q', e.target.value)}
-                  placeholder="Tìm kiếm khách sạn (tên, địa chỉ, thành phố...)"
-                  className="w-full pl-14 pr-6 py-5 text-lg text-gray-900 rounded-2xl focus:outline-none focus:ring-4 focus:ring-white/50 shadow-2xl"
+                  placeholder="Tìm theo tên khách sạn, địa chỉ, thành phố..."
+                  className="w-full pl-12 pr-6 py-3.5 text-base text-gray-900 dark:text-white bg-white dark:bg-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm"
                 />
               </div>
             </div>
@@ -98,70 +106,69 @@ export default function Hotels() {
       </section>
 
       {/* Filters & Results */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Filters Bar */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-200/80 dark:border-slate-800 p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Thành phố</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 mb-2">Thành phố</label>
               <input
                 type="text"
                 value={filters.city || ''}
                 onChange={(e) => handleFilterChange('city', e.target.value)}
-                placeholder="VD: Hà Nội, Đà Nẵng"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="VD: Hà Nội, Đà Nẵng, Phú Quốc"
+                className="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-600 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Giá tối thiểu (VND)</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 mb-2">Giá tối thiểu (VND)</label>
               <input
                 type="number"
                 value={filters.minPrice || ''}
                 onChange={(e) => handleFilterChange('minPrice', e.target.value ? parseInt(e.target.value) : undefined)}
                 placeholder="0"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-600 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Giá tối đa (VND)</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 mb-2">Giá tối đa (VND)</label>
               <input
                 type="number"
                 value={filters.maxPrice || ''}
                 onChange={(e) => handleFilterChange('maxPrice', e.target.value ? parseInt(e.target.value) : undefined)}
                 placeholder="Không giới hạn"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-600 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Sắp xếp</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 mb-2">Sắp xếp theo</label>
               <select
                 value={filters.sort || 'created_desc'}
                 onChange={(e) => handleFilterChange('sort', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-600 focus:outline-none"
               >
                 <option value="created_desc">Mới nhất</option>
+                <option value="price_asc">Giá: Thấp đến Cao</option>
+                <option value="price_desc">Giá: Cao đến Thấp</option>
+                <option value="rating_desc">Đánh giá cao nhất</option>
                 <option value="name_asc">Tên A-Z</option>
-                <option value="name_desc">Tên Z-A</option>
-                <option value="price_asc">Giá tăng dần</option>
-                <option value="price_desc">Giá giảm dần</option>
-                <option value="rating_desc">Đánh giá cao</option>
               </select>
             </div>
           </div>
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="mt-4 text-blue-600 hover:text-blue-800 font-semibold"
+              className="mt-4 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
             >
-              Xóa bộ lọc
+              ✕ Xóa toàn bộ bộ lọc
             </button>
           )}
         </div>
 
         {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-gray-600">
-            Tìm thấy <span className="font-bold text-blue-600">{total}</span> khách sạn
+        <div className="mb-6 flex items-center justify-between">
+          <p className="text-sm text-gray-600 dark:text-slate-400">
+            Tìm thấy <strong className="text-blue-600 dark:text-blue-400 font-bold">{total}</strong> khách sạn phù hợp
           </p>
         </div>
 
@@ -169,65 +176,76 @@ export default function Hotels() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-80" />
+              <Skeleton key={i} className="h-96 rounded-2xl" />
             ))}
           </div>
         ) : hotels.length === 0 ? (
-          <div className="text-center py-20">
-            <BuildingOfficeIcon className="h-24 w-24 text-gray-300 mx-auto mb-4" />
-            <p className="text-xl text-gray-600">Không tìm thấy khách sạn nào</p>
+          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-gray-200 dark:border-slate-800">
+            <BuildingOfficeIcon className="h-20 w-20 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
+            <p className="text-lg font-bold text-gray-800 dark:text-slate-200 mb-2">Không tìm thấy khách sạn nào</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">Hãy thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc giá.</p>
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition shadow-sm"
+            >
+              Đặt lại bộ lọc
+            </button>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
               {hotels.map((hotel) => (
                 <Link
                   key={hotel.id}
                   to={`/hotels/${hotel.slug}`}
-                  className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                  className="group bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
                 >
-                  <div className="relative h-48 overflow-hidden">
+                  <div className="relative h-52 overflow-hidden bg-gray-100 dark:bg-slate-800">
                     <img
                       src={hotel.image && hotel.image.startsWith('http') ? hotel.image : (hotel.image && hotel.image.startsWith('/uploads') ? hotel.image : `/uploads/destinations/${hotel.image}`) || '/placeholder-hotel.jpg'}
                       alt={hotel.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/placeholder-hotel.jpg';
                       }}
                     />
                     {hotel.featured && (
-                      <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold">
+                      <div className="absolute top-3.5 left-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
                         Nổi bật
                       </div>
                     )}
                     {hotel.rating && (
-                      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1">
-                        <StarIconSolid className="h-4 w-4 text-yellow-400" />
-                        <span className="text-sm font-bold">{hotel.rating.toFixed(1)}</span>
+                      <div className="absolute bottom-3.5 left-3.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                        <StarIconSolid className="h-3.5 w-3.5 text-amber-400" />
+                        <span className="text-xs font-bold text-gray-900 dark:text-white">{hotel.rating.toFixed(1)}</span>
                       </div>
                     )}
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                      {hotel.name}
-                    </h3>
-                    {hotel.address && (
-                      <div className="flex items-center gap-2 text-gray-600 mb-3">
-                        <MapPinIcon className="h-4 w-4" />
-                        <span className="text-sm">{hotel.address}</span>
-                      </div>
-                    )}
-                    {hotel.city && (
-                      <p className="text-sm text-gray-500 mb-3">{hotel.city}, {hotel.country || 'Việt Nam'}</p>
-                    )}
-                    {hotel.pricePerNight && (
-                      <div className="flex items-center justify-between mt-4">
-                        <div>
-                          <p className="text-2xl font-bold text-blue-600">
-                            {hotel.pricePerNight.toLocaleString('vi-VN')} VND
-                          </p>
-                          <p className="text-xs text-gray-500">/ đêm</p>
+                  <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                        {hotel.name}
+                      </h3>
+                      {hotel.address && (
+                        <div className="flex items-center gap-1.5 text-gray-500 dark:text-slate-400 text-xs mb-2">
+                          <MapPinIcon className="h-3.5 w-3.5 flex-shrink-0 text-blue-600" />
+                          <span className="line-clamp-1">{hotel.address}</span>
                         </div>
+                      )}
+                      {hotel.city && (
+                        <p className="text-xs text-gray-400 dark:text-slate-500 mb-3">{hotel.city}, {hotel.country || 'Việt Nam'}</p>
+                      )}
+                    </div>
+
+                    {hotel.pricePerNight && (
+                      <div className="pt-3 border-t border-gray-100 dark:border-slate-800 flex items-baseline justify-between">
+                        <div>
+                          <span className="text-[10px] text-gray-400 uppercase tracking-wider block">Chỉ từ</span>
+                          <span className="text-xl font-extrabold text-blue-600 dark:text-blue-400">
+                            {hotel.pricePerNight.toLocaleString('vi-VN')} đ
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-500 dark:text-slate-400">/ đêm</span>
                       </div>
                     )}
                   </div>
@@ -237,23 +255,23 @@ export default function Hotels() {
 
             {/* Pagination */}
             {total > pageSize && (
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center items-center gap-3">
                 <button
                   onClick={() => setSearchParams({ ...Object.fromEntries(searchParams), page: String(page - 1) })}
                   disabled={page === 1}
-                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+                  className="px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700 transition text-sm font-semibold"
                 >
-                  Trước
+                  Trang trước
                 </button>
-                <span className="px-4 py-2 text-gray-700">
+                <span className="text-sm font-medium text-gray-600 dark:text-slate-400">
                   Trang {page} / {Math.ceil(total / pageSize)}
                 </span>
                 <button
                   onClick={() => setSearchParams({ ...Object.fromEntries(searchParams), page: String(page + 1) })}
                   disabled={page >= Math.ceil(total / pageSize)}
-                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+                  className="px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-700 transition text-sm font-semibold"
                 >
-                  Sau
+                  Trang sau
                 </button>
               </div>
             )}

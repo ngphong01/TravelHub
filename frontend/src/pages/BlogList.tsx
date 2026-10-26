@@ -42,21 +42,38 @@ export default function BlogList() {
   return (
     <>
       <SEOHead
-        title="Blog Du Lịch"
-        description="Khám phá những câu chuyện và mẹo du lịch hay nhất từ TravelGo"
-        keywords="du lịch, blog, travel tips, điểm đến, mẹo du lịch"
+        title="Cẩm Nang Du Lịch & Trải Nghiệm - TravelHub"
+        description="Khám phá những câu chuyện, văn hóa bản địa, ẩm thực và mẹo du lịch hữu ích nhất từ TravelHub."
+        keywords="du lịch, blog, travel tips, điểm đến, mẹo du lịch, ẩm thực, cẩm nang"
         url={`${window.location.origin}/blog`}
         type="website"
       />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Blog Du Lịch
-          </h1>
-          <p className="text-gray-600 text-lg">Khám phá những câu chuyện và mẹo du lịch hay nhất</p>
-        </div>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
+        {/* Magazine Hero Banner - Lonely Planet Style */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-blue-950 text-white py-14 sm:py-20 border-b border-white/10">
+          <div className="absolute inset-0 opacity-15 pointer-events-none">
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 2px 2px, white 1.5px, transparent 0)',
+                backgroundSize: '36px 36px',
+              }}
+            />
+          </div>
+          <div className="relative max-w-4xl mx-auto px-4 text-center">
+            <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/10 border border-white/20 text-indigo-200 mb-4 inline-block">
+              Cẩm Nang Văn Hóa & Hành Trình
+            </span>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black mb-4 tracking-tight leading-tight">
+              Tạp Chí Du Lịch <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-teal-300">TravelHub</span>
+            </h1>
+            <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
+              Truyền cảm hứng xê dịch qua những góc nhìn chân thực, hướng dẫn sinh tồn, cẩm nang ẩm thực và văn hóa 63 tỉnh thành Việt Nam.
+            </p>
+          </div>
+        </section>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {/* Filters */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8 border border-white/20">
@@ -120,9 +137,12 @@ export default function BlogList() {
                     {blog.featuredImage && (
                       <div className="relative h-48 overflow-hidden">
                         <img
-                          src={blog.featuredImage}
+                          src={blog.featuredImage || '/uploads/blogs/blog-healing-vietnam.jpg'}
                           alt={blog.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/uploads/blogs/blog-healing-vietnam.jpg';
+                          }}
                         />
                       </div>
                     )}

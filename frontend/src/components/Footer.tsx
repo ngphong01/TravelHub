@@ -7,6 +7,7 @@ import {
   HeartIcon,
   BuildingOfficeIcon
 } from '@heroicons/react/24/outline';
+import TravelHubLogo from './TravelHubLogo';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -19,18 +20,9 @@ export default function Footer() {
           
           {/* Brand Section */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2.5 mb-4 group">
-              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow">
-                <img 
-                  src="/uploads/avatars/travelgo-admin.png"
-                  alt="TravelGo Logo"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                TravelGo
-              </span>
-            </Link>
+            <div className="mb-4">
+              <TravelHubLogo variant="light" size="md" asLink={true} />
+            </div>
             <p className="text-gray-400 text-xs leading-relaxed mb-4">
               Nền tảng du lịch hàng đầu giúp bạn khám phá những điểm đến tuyệt vời trên khắp thế giới. 
               Đặt chỗ nhanh chóng, giá cả hợp lý và trải nghiệm không thể quên.
@@ -87,12 +79,12 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-base font-bold mb-4 text-blue-400">Điều hướng</h3>
-            <ul className="space-y-2">
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">Khám phá</h3>
+            <ul className="space-y-2.5">
               <li>
                 <Link 
                   to="/destinations" 
-                  className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 group"
+                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
                 >
                   <MapPinIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
                   <span>Điểm đến</span>
@@ -100,42 +92,38 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  to="/categories" 
-                  className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 group"
+                  to="/hotels" 
+                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
                 >
-                  <GlobeAltIcon className="w-4 h-4 group-hover:text-teal-400 transition-colors" />
-                  <span>Danh mục</span>
+                  <BuildingOfficeIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
+                  <span>Khách sạn & Resort</span>
                 </Link>
               </li>
               <li>
                 <Link 
-                  to="/featured" 
-                  className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 group"
+                  to="/tours" 
+                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
                 >
-                  <HeartIcon className="w-4 h-4 group-hover:text-pink-400 transition-colors" />
-                  <span>Nổi bật</span>
+                  <GlobeAltIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
+                  <span>Tours du lịch</span>
                 </Link>
               </li>
               <li>
                 <Link 
-                  to="/deals" 
-                  className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 group"
+                  to="/restaurants" 
+                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
                 >
-                  <svg className="w-4 h-4 group-hover:text-yellow-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Ưu đãi</span>
+                  <GlobeAltIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
+                  <span>Ẩm thực & Nhà hàng</span>
                 </Link>
               </li>
               <li>
                 <Link 
                   to="/stories" 
-                  className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 group"
+                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
                 >
-                  <svg className="w-4 h-4 group-hover:text-green-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                  <span>Câu chuyện</span>
+                  <HeartIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
+                  <span>Cẩm nang du lịch</span>
                 </Link>
               </li>
             </ul>
@@ -143,62 +131,54 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="text-base font-bold mb-4 text-teal-400">Hỗ trợ</h3>
-            <ul className="space-y-2">
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">Hỗ trợ & Dịch vụ</h3>
+            <ul className="space-y-2.5">
               <li>
                 <Link 
                   to="/about" 
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-slate-400 hover:text-white transition-colors text-xs block"
                 >
-                  Giới thiệu
+                  Giới thiệu TravelHub
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/faq" 
+                  className="text-slate-400 hover:text-white transition-colors text-xs block"
+                >
+                  Giải đáp thắc mắc (FAQ)
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/payment-methods" 
+                  className="text-slate-400 hover:text-white transition-colors text-xs block"
+                >
+                  Hình thức thanh toán
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/chatbot" 
+                  className="text-slate-400 hover:text-white transition-colors text-xs block"
+                >
+                  Trợ lý du lịch AI (24/7)
                 </Link>
               </li>
               <li>
                 <Link 
                   to="/contact" 
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-slate-400 hover:text-white transition-colors text-xs block"
                 >
-                  Liên hệ
+                  Liên hệ & Khiếu nại
                 </Link>
-              </li>
-              <li>
-                <a 
-                  href="#faq" 
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Câu hỏi thường gặp
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="#terms" 
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Điều khoản sử dụng
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="#privacy" 
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Chính sách bảo mật
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="#refund" 
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Chính sách hoàn tiền
-                </a>
               </li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-base font-bold mb-4 text-pink-400">Liên hệ</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-white">Liên hệ</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
                 <BuildingOfficeIcon className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />

@@ -96,17 +96,17 @@ export default function SignUpPage() {
               <div className="w-14 h-14 rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 bg-white p-2">
                 <img
                   src="/uploads/avatars/travelgo-admin.png"
-                  alt="TravelGo Logo"
+                  alt="TravelHub Logo"
                   className="w-full h-full object-contain"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
-                    (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">TG</div>';
+                    (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">TH</div>';
                   }}
                 />
               </div>
               <div className="text-left">
                 <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  TravelGo
+                  TravelHub
                 </h1>
                 <p className="text-xs text-gray-500">Khám phá thế giới</p>
               </div>
@@ -215,17 +215,17 @@ export default function SignUpPage() {
             <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105 bg-white p-2">
               <img
                 src="/uploads/avatars/travelgo-admin.png"
-                alt="TravelGo Logo"
+                alt="TravelHub Logo"
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
-                  (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">TG</div>';
+                  (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">TH</div>';
                 }}
               />
             </div>
             <div className="text-left">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                TravelGo
+                TravelHub
               </h1>
               <p className="text-xs text-gray-500">Khám phá thế giới</p>
             </div>

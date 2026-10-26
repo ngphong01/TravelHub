@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getBlogs } from '../services/blog';
-import { BookOpenIcon, CalendarDaysIcon, EyeIcon, SparklesIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, CalendarDaysIcon, EyeIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Skeleton from '../components/Skeleton';
 import SEOHead from '../components/SEOHead';
 
@@ -29,24 +29,24 @@ export default function Blog() {
   return (
     <>
       <SEOHead
-        title="Blog Du Lịch - Chia Sẻ Kinh Nghiệm"
-        description="Khám phá những bài viết, tips và chia sẻ kinh nghiệm du lịch từ TravelGo"
+        title="Blog Du Lịch & Cẩm Nang - TravelHub"
+        description="Khám phá những bài viết, tips và chia sẻ kinh nghiệm du lịch từ TravelHub"
         url="/blog"
       />
 
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white py-20">
+        <section className="bg-blue-700 text-white py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full font-semibold mb-6">
-              <SparklesIcon className="h-5 w-5" />
-              <span>Blog được AI tự động viết</span>
+              <BookOpenIcon className="h-5 w-5" />
+              <span>Cẩm nang du lịch TravelHub</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-extrabold mb-6">
-              📝 Blog Du Lịch TravelGo
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 tracking-tight">
+              Blog Du Lịch & Cẩm Nang
             </h1>
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
-              Khám phá những bài viết SEO-optimized được AI viết mỗi ngày
+              Khám phá kinh nghiệm, điểm đến và gợi ý hành trình cho chuyến đi của bạn
             </p>
           </div>
         </section>
@@ -59,7 +59,7 @@ export default function Blog() {
               onClick={() => setCategory(undefined)}
               className={`px-6 py-3 rounded-full font-semibold transition-all ${
                 !category
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                  ? 'bg-blue-600 text-white shadow-lg'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
               }`}
             >
@@ -71,7 +71,7 @@ export default function Blog() {
                 onClick={() => setCategory(cat)}
                 className={`px-6 py-3 rounded-full font-semibold transition-all ${
                   category === cat
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                    ? 'bg-blue-600 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -209,7 +209,7 @@ export default function Blog() {
             <div className="text-center py-20">
               <BookOpenIcon className="h-20 w-20 text-gray-400 mx-auto mb-4" />
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Chưa có bài viết nào</h3>
-              <p className="text-gray-600">AI sẽ tự động tạo blog posts mỗi 5 phút</p>
+              <p className="text-gray-600">Hãy quay lại sau để khám phá những cẩm nang du lịch mới.</p>
             </div>
           )}
         </div>

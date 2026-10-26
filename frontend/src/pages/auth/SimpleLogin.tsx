@@ -72,7 +72,7 @@ export default function SimpleLogin() {
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">
-                TravelGo
+                TravelHub
               </h1>
               <p className="text-sm text-gray-500">Đăng nhập để khám phá thế giới</p>
             </div>

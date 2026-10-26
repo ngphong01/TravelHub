@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import i18n from '../i18n/config';
 
 type Language = 'vi' | 'en';
 
@@ -56,20 +57,30 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return (saved === 'vi' || saved === 'en') ? saved : 'vi';
   });
 
+  const lastDispatchedRef = useRef<string>(language);
+
   useEffect(() => {
     // Save to both localStorage keys for compatibility
     localStorage.setItem('travelgo:language', language);
     localStorage.setItem('language', language);
     // Update document language attribute
     document.documentElement.lang = language;
-    // Trigger custom event for other contexts to sync
-    window.dispatchEvent(new CustomEvent('languageChanged', { detail: language }));
+    // Sync with react-i18next if different
+    if (i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
+    // Only dispatch if not already received from event
+    if (lastDispatchedRef.current !== language) {
+      lastDispatchedRef.current = language;
+      window.dispatchEvent(new CustomEvent('languageChanged', { detail: language }));
+    }
   }, [language]);
 
   // Listen for language changes from other contexts
   useEffect(() => {
     const handleLanguageChange = (event: CustomEvent) => {
-      if (event.detail !== language) {
+      if (event.detail && event.detail !== language) {
+        lastDispatchedRef.current = event.detail;
         setLanguageState(event.detail);
       }
     };
@@ -100,7 +111,21 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useI18n = () => {
   const context = useContext(I18nContext);
   if (!context) {
-    throw new Error('useI18n must be used within I18nProvider');
+    // Safe fallback when used outside of I18nProvider
+    const saved = (typeof window !== 'undefined' && (localStorage.getItem('travelgo:language') || localStorage.getItem('language'))) as Language || 'vi';
+    const currentLang: Language = (saved === 'vi' || saved === 'en') ? saved : 'vi';
+    return {
+      language: currentLang,
+      setLanguage: (lang: Language) => {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('travelgo:language', lang);
+          localStorage.setItem('language', lang);
+          document.documentElement.lang = lang;
+          window.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));
+        }
+      },
+      t: (key: string) => translations[key]?.[currentLang] || translations[key]?.vi || key,
+    };
   }
   return context;
 };

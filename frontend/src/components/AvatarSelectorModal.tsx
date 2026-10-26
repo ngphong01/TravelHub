@@ -1,6 +1,6 @@
 // frontend/src/components/AvatarSelectorModal.tsx
 import { useState, useEffect } from 'react';
-import { XMarkIcon, SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 interface AvatarSelectorModalProps {
   isOpen: boolean;
@@ -145,9 +145,9 @@ export default function AvatarSelectorModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden animate-fadeIn">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex items-center justify-between p-6 border-b bg-blue-50">
           <div className="flex items-center gap-3">
-            <SparklesIcon className="w-8 h-8 text-purple-600" />
+            <ArrowPathIcon className="w-8 h-8 text-blue-600" />
             <div>
               <h2 className="text-2xl font-bold text-gray-800">Chọn Avatar của bạn</h2>
               <p className="text-sm text-gray-600">Chọn một avatar bạn thích hoặc tạo ngẫu nhiên</p>
@@ -171,7 +171,7 @@ export default function AvatarSelectorModal({
               disabled={loading || updating}
               className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold shadow-lg hover:shadow-xl"
             >
-              <SparklesIcon className="w-5 h-5" />
+              <ArrowPathIcon className="w-5 h-5" />
               <span>Tạo Avatar Ngẫu Nhiên</span>
             </button>
 

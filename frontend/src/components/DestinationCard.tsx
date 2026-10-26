@@ -15,7 +15,7 @@ export default function DestinationCard({ d }: { d: Destination }) {
     >
       <div className="relative h-56 w-full overflow-hidden">
         <SmartImage
-          src={d.image || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop"}
+          src={d.image || "/uploads/avatars/ha-long4.jpg"}
           alt={d.name}
           className="object-cover transition-opacity duration-300 group-hover:opacity-90 w-full h-full"
         />

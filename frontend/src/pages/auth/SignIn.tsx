@@ -197,13 +197,13 @@ export default function SignInPage() {
             <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl transform group-hover:scale-110 transition-transform duration-300">
               <img 
                 src="/uploads/avatars/travelgo-admin.png"
-                alt="TravelGo Logo"
+                alt="TravelHub Logo"
                 className="w-full h-full object-cover"
               />
             </div>
             <span className="font-extrabold text-3xl">
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Travel</span>
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Go</span>
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Hub</span>
             </span>
           </Link>
           

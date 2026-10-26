@@ -70,7 +70,16 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within ThemeProvider');
+    const savedTheme = (typeof window !== 'undefined' ? (localStorage.getItem('travelgo:theme') as 'light' | 'dark' | 'auto') : 'light') || 'light';
+    return {
+      theme: savedTheme,
+      setTheme: (t: 'light' | 'dark' | 'auto') => {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('travelgo:theme', t);
+        }
+      },
+      actualTheme: (savedTheme === 'dark' ? 'dark' : 'light') as 'light' | 'dark'
+    };
   }
   return context;
 };

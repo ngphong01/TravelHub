@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PaymentAPI, UserAPI, BookingAPI } from '../../utils/api';
 import { getDestinationBySlug } from '../../services/destination';
 import { getTourById, getTourBySlug } from '../../services/tour';
+import { useCart } from '../../contexts/CartContext';
 import {
   CreditCardIcon,
   BanknotesIcon,
@@ -10,6 +11,10 @@ import {
   CalendarDaysIcon,
   CheckCircleIcon,
   ClipboardDocumentIcon,
+  ShieldCheckIcon,
+  TruckIcon,
+  WifiIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 
 // Types
@@ -69,7 +74,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const generateTransferNote = (): string => {
   const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
   const ts = new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 12);
-  return `TRAVELGO-${ts}-${rand}`;
+  return `TRAVELHUB-${ts}-${rand}`;
 };
 
 const formatCardNumber = (value: string): string =>
@@ -132,12 +137,13 @@ const validateUserEmail = (email: string | undefined): string | null => {
 export default function CheckoutPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { items: cartItems, totalPrice: cartTotalPrice, clearCart } = useCart();
 
   // Form state
   const [amount, setAmount] = useState<string>('');
   const [method, setMethod] = useState<PaymentOption['id']>('credit_card');
   const [guests, setGuests] = useState<number>(1);
-  const [description, setDescription] = useState<string>('Thanh toán tour TravelGo');
+  const [description, setDescription] = useState<string>('Thanh toán tour TravelHub');
   const [transferNote] = useState<string>(generateTransferNote);
   const [coupon, setCoupon] = useState<string>('');
 
@@ -156,6 +162,7 @@ export default function CheckoutPage() {
 
   // Tour booking state
   const [tourId, setTourId] = useState<number | null>(null);
+  const [tourPackage, setTourPackage] = useState<string | null>(null);
   const [bookingDate, setBookingDate] = useState<string | null>(null);
   const [adultsCount, setAdultsCount] = useState<number>(1);
   const [childrenCount, setChildrenCount] = useState<number>(0);
@@ -176,6 +183,29 @@ export default function CheckoutPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
 
+  // Addon services state
+  const [addonInsurance, setAddonInsurance] = useState<boolean>(false);
+  const [addonTransfer, setAddonTransfer] = useState<boolean>(false);
+  const [addonEsim, setAddonEsim] = useState<boolean>(false);
+
+  // Addon prices
+  const addonInsurancePrice = useMemo(
+    () => (addonInsurance ? 50000 * Math.max(1, guests) : 0),
+    [addonInsurance, guests]
+  );
+  const addonTransferPrice = useMemo(
+    () => (addonTransfer ? 150000 : 0),
+    [addonTransfer]
+  );
+  const addonEsimPrice = useMemo(
+    () => (addonEsim ? 80000 : 0),
+    [addonEsim]
+  );
+  const totalAddons = useMemo(
+    () => addonInsurancePrice + addonTransferPrice + addonEsimPrice,
+    [addonInsurancePrice, addonTransferPrice, addonEsimPrice]
+  );
+
   // Calculated values
   const subtotal = useMemo(() => Number(amount || 0), [amount]);
 
@@ -185,12 +215,13 @@ export default function CheckoutPage() {
   );
 
   const finalAmount = useMemo(
-    () => Math.max(0, subtotal - discountAmount),
-    [subtotal, discountAmount]
+    () => Math.max(0, subtotal - discountAmount + totalAddons),
+    [subtotal, discountAmount, totalAddons]
   );
 
   const formattedVnd = useMemo(() => formatCurrency(subtotal), [subtotal]);
   const formattedDiscount = useMemo(() => formatCurrency(discountAmount), [discountAmount]);
+  const formattedAddons = useMemo(() => formatCurrency(totalAddons), [totalAddons]);
   const formattedFinal = useMemo(() => formatCurrency(finalAmount), [finalAmount]);
 
   // QR code generation
@@ -205,7 +236,7 @@ export default function CheckoutPage() {
         ? `https://img.vietqr.io/image/${bank}-${account}-compact2.jpg?amount=${amountNumber}&addInfo=${encodeURIComponent(transferNote)}${accountName ? `&accountName=${encodeURIComponent(accountName)}` : ''}`
         : null;
 
-    const text = `Thanh toan TravelGo\nSo tien: ${formatCurrency(finalAmount)} VND\nNoi dung: ${transferNote}`;
+    const text = `Thanh toan TravelHub\nSo tien: ${formatCurrency(finalAmount)} VND\nNoi dung: ${transferNote}`;
     const generic = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(text)}`;
     const fallback = `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(text)}`;
 
@@ -304,17 +335,22 @@ export default function CheckoutPage() {
 
   // Calculate tour price
   const calculateTourPrice = useCallback(
-    (price: number, adults: number, children: number): number => {
-      const totalPrice = price * adults + price * 0.7 * children;
-      const serviceFee = totalPrice * 0.05;
-      return Math.round(totalPrice + serviceFee);
+    (price: number, adults: number, children: number, pkg?: string | null): number => {
+      let delta = 0;
+      if (pkg === 'vip') delta = 350000;
+      else if (pkg === 'saver') delta = -150000;
+      const adultPrice = Math.max(0, price + delta);
+      const childPrice = Math.round(adultPrice * 0.7);
+      const subtotalPrice = adultPrice * adults + childPrice * children;
+      const discount = subtotalPrice >= 5000000 ? 150000 : (subtotalPrice >= 2000000 ? 80000 : 0);
+      return Math.max(0, subtotalPrice - discount);
     },
     []
   );
 
   // Fetch tour by ID with slug fallback
   const fetchTourData = useCallback(
-    async (tourIdParam: number, tourSlug: string | null, adults: number, children: number) => {
+    async (tourIdParam: number, tourSlug: string | null, adults: number, children: number, pkg?: string | null) => {
       try {
         const tour = await getTourById(tourIdParam);
 
@@ -322,13 +358,14 @@ export default function CheckoutPage() {
         const price = Number(tour?.price || 0);
 
         if (price > 0) {
-          const calculatedAmount = calculateTourPrice(price, adults, children);
+          const calculatedAmount = calculateTourPrice(price, adults, children, pkg);
+          const pkgSuffix = pkg === 'vip' ? ' [Gói VIP]' : pkg === 'saver' ? ' [Gói Tiết kiệm]' : ' [Gói Tiêu chuẩn]';
 
           setBasePrice(price);
           setDestinationId(tour?.destinationId || null);
           setDestinationName(tour?.name || null);
           setDestinationSlug(tourSlug || tour?.slug || null);
-          setDescription(`Thanh toán tour: ${tour.name || 'Tour'}`);
+          setDescription(`Thanh toán tour: ${tour.name || 'Tour'}${pkg ? pkgSuffix : ''}`);
           setGuests(adults + children);
           setAmount(String(calculatedAmount));
         } else {
@@ -344,13 +381,14 @@ export default function CheckoutPage() {
             const price = Number(tour?.price || 0);
 
             if (price > 0) {
-              const calculatedAmount = calculateTourPrice(price, adults, children);
+              const calculatedAmount = calculateTourPrice(price, adults, children, pkg);
+              const pkgSuffix = pkg === 'vip' ? ' [Gói VIP]' : pkg === 'saver' ? ' [Gói Tiết kiệm]' : ' [Gói Tiêu chuẩn]';
 
               setBasePrice(price);
               setDestinationId(tour?.destinationId || null);
               setDestinationName(tour?.name || null);
               setDestinationSlug(tourSlug);
-              setDescription(`Thanh toán tour: ${tour.name || 'Tour'}`);
+              setDescription(`Thanh toán tour: ${tour.name || 'Tour'}${pkg ? pkgSuffix : ''}`);
               setGuests(adults + children);
               setAmount(String(calculatedAmount));
               if (tour?.id) {
@@ -419,6 +457,11 @@ export default function CheckoutPage() {
     const adults = Number(searchParams.get('adults') || '1');
     const children = Number(searchParams.get('children') || '0');
     const date = searchParams.get('date');
+    const qPackage = searchParams.get('package');
+
+    if (qPackage) {
+      setTourPackage(qPackage);
+    }
 
     if (qMethod && ['credit_card', 'paypal', 'bank_qr'].includes(qMethod)) {
       setMethod(qMethod);
@@ -459,6 +502,20 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Cart booking
+    if (searchParams.get('from') === 'cart') {
+      const qDiscount = Number(searchParams.get('discount') || '0');
+      const qCoupon = searchParams.get('coupon') || '';
+      if (qDiscount > 0) setDiscountPercent(qDiscount);
+      if (qCoupon) setCoupon(qCoupon);
+
+      setAmount(String(cartTotalPrice || 0));
+      setBasePrice(cartTotalPrice || 0);
+      setDescription(`Thanh toán giỏ hàng TravelHub (${cartItems.length} dịch vụ)`);
+      setIsLoadingData(false);
+      return;
+    }
+
     // Tour booking by ID
     if (type === 'tour' && qTourId) {
       const id = Number(qTourId);
@@ -467,7 +524,7 @@ export default function CheckoutPage() {
       if (!isNaN(id) && id > 0) {
         setTourId(id);
         setDestinationSlug(tourSlug);
-        fetchTourData(id, tourSlug, adults, children);
+        fetchTourData(id, tourSlug, adults, children, qPackage);
       } else {
         setErrorMsg('ID tour không hợp lệ.');
         setIsLoadingData(false);
@@ -559,6 +616,13 @@ export default function CheckoutPage() {
       // Prepare payment method for backend
       const paymentMethodValue = method === 'bank_qr' ? 'bank_transfer' : method;
 
+      // Prepare addons
+      const selectedAddonNames: string[] = [];
+      if (addonInsurance) selectedAddonNames.push(`Bảo hiểm du lịch 24/7 (${formatCurrency(addonInsurancePrice)}đ)`);
+      if (addonTransfer) selectedAddonNames.push(`Xe đưa đón sân bay (150.000đ)`);
+      if (addonEsim) selectedAddonNames.push(`eSIM 4G (${formatCurrency(addonEsimPrice)}đ)`);
+      const addonNote = selectedAddonNames.length > 0 ? ` [Dịch vụ: ${selectedAddonNames.join(', ')}]` : '';
+
       // Create booking
       let bookingId: number;
 
@@ -576,6 +640,7 @@ export default function CheckoutPage() {
           price: finalAmount,
           totalAmount: finalAmount,
           paymentMethod: paymentMethodValue,
+          addons: selectedAddonNames.length > 0 ? selectedAddonNames : undefined,
         };
 
         if (cardMeta) {
@@ -607,6 +672,7 @@ export default function CheckoutPage() {
           price: finalAmount,
           totalAmount: finalAmount,
           paymentMethod: paymentMethodValue,
+          addons: selectedAddonNames.length > 0 ? selectedAddonNames : undefined,
         };
 
         // Thêm tourId nếu có
@@ -662,6 +728,7 @@ export default function CheckoutPage() {
           price: finalAmount,
           totalAmount: finalAmount,
           paymentMethod: paymentMethodValue,
+          addons: selectedAddonNames.length > 0 ? selectedAddonNames : undefined,
         };
 
         if (destinationId) {
@@ -696,7 +763,7 @@ export default function CheckoutPage() {
         bookingId,
         provider: method,
         amount: finalAmount,
-        note: `${description || 'Thanh toán TravelGo'} | REF:${transferNote}`,
+        note: `${description || 'Thanh toán TravelHub'}${addonNote} | REF:${transferNote}`,
       };
 
       if (cardMeta) {
@@ -720,6 +787,10 @@ export default function CheckoutPage() {
 
       // Notify other components
       window.dispatchEvent(new Event('payment-created'));
+
+      if (searchParams.get('from') === 'cart') {
+        clearCart();
+      }
 
       // Success
       setSuccess(true);
@@ -756,22 +827,22 @@ export default function CheckoutPage() {
 
   // Render card details form
   const renderCardDetails = () => (
-    <div className="border-2 border-blue-100 rounded-2xl p-6 bg-gradient-to-br from-blue-50 to-purple-50 space-y-4">
+    <div className="border-2 border-cyan-100 dark:border-slate-700 rounded-2xl p-6 bg-gradient-to-br from-cyan-50/50 to-blue-50/50 dark:from-slate-800/80 dark:to-slate-800/40 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-semibold text-gray-700">Chi tiết thẻ</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm font-semibold text-gray-700 dark:text-slate-200">Chi tiết thẻ</p>
+          <p className="text-xs text-gray-500 dark:text-slate-400">
             Chúng tôi chỉ lưu 4 số cuối để xác nhận giao dịch.
           </p>
         </div>
-        <span className="px-3 py-1 text-xs font-semibold bg-blue-600 text-white rounded-full">
+        <span className="px-3 py-1 text-xs font-semibold bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-full shadow-sm">
           {detectCardBrand(cardNumber.replace(/\s+/g, ''))}
         </span>
       </div>
 
       <div className="space-y-3">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">
             Tên chủ thẻ
           </label>
           <input
@@ -782,12 +853,12 @@ export default function CheckoutPage() {
             }}
             placeholder="NGUYEN VAN A"
             autoComplete="cc-name"
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">
             Số thẻ
           </label>
           <input
@@ -799,13 +870,13 @@ export default function CheckoutPage() {
             placeholder="1234 5678 9012 3456"
             inputMode="numeric"
             autoComplete="cc-number"
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">
               Ngày hết hạn (MM/YY)
             </label>
             <input
@@ -817,11 +888,11 @@ export default function CheckoutPage() {
               placeholder="08/27"
               inputMode="numeric"
               autoComplete="cc-exp"
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-1">
               CVV
             </label>
             <input
@@ -834,13 +905,13 @@ export default function CheckoutPage() {
               inputMode="numeric"
               autoComplete="cc-csc"
               maxLength={4}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
             />
           </div>
         </div>
 
         {cardError && (
-          <p className="text-sm text-red-600 font-semibold">{cardError}</p>
+          <p className="text-sm text-red-500 font-semibold">{cardError}</p>
         )}
       </div>
     </div>
@@ -848,13 +919,13 @@ export default function CheckoutPage() {
 
   // Render QR code section
   const renderQRSection = () => (
-    <div className="border-2 border-blue-100 rounded-2xl p-6 bg-gradient-to-br from-blue-50 to-purple-50">
-      <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <BanknotesIcon className="w-6 h-6 text-blue-600" />
+    <div className="border-2 border-cyan-100 dark:border-slate-700 rounded-2xl p-6 bg-gradient-to-br from-cyan-50/50 to-teal-50/50 dark:from-slate-800/80 dark:to-slate-800/40">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <BanknotesIcon className="w-6 h-6 text-cyan-500" />
         Quét mã VietQR để thanh toán
       </h3>
 
-      <div className="bg-white rounded-xl p-6 shadow-lg mb-6 flex justify-center">
+      <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-lg mb-6 flex justify-center border border-gray-100 dark:border-slate-700">
         <img
           src={qr.primary}
           alt="VietQR"
@@ -868,11 +939,11 @@ export default function CheckoutPage() {
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">
             Mô tả thanh toán
           </label>
           <input
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -880,24 +951,24 @@ export default function CheckoutPage() {
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-semibold text-gray-700">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300">
               Nội dung chuyển khoản
             </label>
             <button
               type="button"
-              className="text-blue-600 hover:text-blue-700 text-sm font-semibold flex items-center gap-1"
+              className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 text-sm font-semibold flex items-center gap-1 transition-colors"
               onClick={handleCopyTransferNote}
             >
               <ClipboardDocumentIcon className="w-4 h-4" />
               {copied ? 'Đã copy!' : 'Copy'}
             </button>
           </div>
-          <div className="bg-white border-2 border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between">
-            <span className="font-mono text-sm text-gray-800 break-all">
+          <div className="bg-white dark:bg-slate-900 border-2 border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 flex items-center justify-between">
+            <span className="font-mono text-sm text-gray-800 dark:text-cyan-300 break-all">
               {transferNote}
             </span>
             {copied && (
-              <span className="ml-3 text-green-600 text-xs font-semibold flex items-center gap-1">
+              <span className="ml-3 text-emerald-500 text-xs font-semibold flex items-center gap-1">
                 <CheckCircleIcon className="w-4 h-4" />
                 Đã copy
               </span>
@@ -905,19 +976,19 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl px-4 py-3 border-2 border-blue-200">
+        <div className="bg-white dark:bg-slate-900 rounded-xl px-4 py-3 border-2 border-cyan-200 dark:border-cyan-900/60">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-700">
+            <span className="text-sm font-semibold text-gray-700 dark:text-slate-300">
               Số tiền cần chuyển:
             </span>
-            <span className="text-lg font-bold text-blue-600">
+            <span className="text-lg font-bold text-cyan-600 dark:text-cyan-400">
               {formattedFinal} VNĐ
             </span>
           </div>
         </div>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3">
-          <p className="text-xs text-yellow-800">
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl px-4 py-3">
+          <p className="text-xs text-amber-800 dark:text-amber-300">
             ⚠️ <strong>Lưu ý:</strong> Ghi đúng nội dung chuyển khoản và số tiền để
             tự động đối soát. Sau khi chuyển khoản thành công, nhấn "Thanh toán" để
             xác nhận.
@@ -933,15 +1004,15 @@ export default function CheckoutPage() {
 
     return (
       <div className="space-y-2">
-        <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
-          <UserGroupIcon className="w-5 h-5 text-blue-600" />
+        <label className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-slate-200">
+          <UserGroupIcon className="w-5 h-5 text-cyan-500" />
           {isCombo ? 'Số người' : 'Số khách'}
         </label>
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => handleGuestChange(guests - 1)}
-            className="w-12 h-12 rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all font-bold text-gray-700 flex items-center justify-center"
+            className="w-12 h-12 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 transition-all font-bold text-gray-700 dark:text-slate-200 flex items-center justify-center border border-gray-200 dark:border-slate-700"
           >
             −
           </button>
@@ -950,23 +1021,23 @@ export default function CheckoutPage() {
             min={1}
             value={guests}
             onChange={(e) => handleGuestChange(Number(e.target.value || 1))}
-            className="w-24 text-center px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-bold text-lg"
+            className="w-24 text-center px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 font-bold text-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
           />
           <button
             type="button"
             onClick={() => handleGuestChange(guests + 1)}
-            className="w-12 h-12 rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all font-bold text-gray-700 flex items-center justify-center"
+            className="w-12 h-12 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 active:scale-95 transition-all font-bold text-gray-700 dark:text-slate-200 flex items-center justify-center border border-gray-200 dark:border-slate-700"
           >
             +
           </button>
         </div>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-slate-400">
           {isCombo ? (
             'Giá combo đã bao gồm tất cả dịch vụ'
           ) : (
             <>
               Giá cơ bản:{' '}
-              <span className="font-semibold">
+              <span className="font-semibold text-gray-800 dark:text-slate-200">
                 {formatCurrency(basePrice)} VNĐ/người
               </span>
             </>
@@ -975,6 +1046,122 @@ export default function CheckoutPage() {
       </div>
     );
   };
+
+  // Render addon services section
+  const renderAddonServices = () => (
+    <div className="space-y-3 pt-2">
+      <div className="flex items-center justify-between">
+        <label className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-slate-200">
+          <SparklesIcon className="w-5 h-5 text-amber-500" />
+          Dịch vụ tiện ích gợi ý thêm (Tùy chọn)
+        </label>
+        <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400 font-semibold border border-amber-200 dark:border-amber-800">
+          Khuyên dùng
+        </span>
+      </div>
+
+      <div className="space-y-2.5">
+        {/* Insurance */}
+        <label
+          className={`flex items-start gap-3.5 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+            addonInsurance
+              ? 'border-cyan-500 bg-cyan-50/60 dark:bg-cyan-950/30 dark:border-cyan-500 shadow-sm'
+              : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-gray-300 dark:hover:border-slate-700'
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={addonInsurance}
+            onChange={(e) => setAddonInsurance(e.target.checked)}
+            className="mt-1 w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500 dark:bg-slate-800 dark:border-slate-700"
+          />
+          <div className="flex-1 flex items-start justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-1.5 font-semibold text-sm text-gray-900 dark:text-white">
+                <ShieldCheckIcon className="w-4 h-4 text-cyan-500 flex-shrink-0" />
+                Bảo hiểm du lịch An Tâm 24/7
+              </div>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                Bảo hiểm y tế khẩn cấp, mất hành lý & trễ chuyến bay lên đến 200.000.000đ.
+              </p>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <span className="font-bold text-sm text-cyan-600 dark:text-cyan-400">
+                +50.000đ
+              </span>
+              <p className="text-[10px] text-gray-400">/ khách</p>
+            </div>
+          </div>
+        </label>
+
+        {/* Airport Transfer */}
+        <label
+          className={`flex items-start gap-3.5 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+            addonTransfer
+              ? 'border-cyan-500 bg-cyan-50/60 dark:bg-cyan-950/30 dark:border-cyan-500 shadow-sm'
+              : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-gray-300 dark:hover:border-slate-700'
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={addonTransfer}
+            onChange={(e) => setAddonTransfer(e.target.checked)}
+            className="mt-1 w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500 dark:bg-slate-800 dark:border-slate-700"
+          />
+          <div className="flex-1 flex items-start justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-1.5 font-semibold text-sm text-gray-900 dark:text-white">
+                <TruckIcon className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                Xe đưa đón tận nơi (Sân bay - Khách sạn)
+              </div>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                Xe đời mới 7 chỗ điều hòa, đón đúng giờ tại sảnh đến, không lo chờ đợi.
+              </p>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <span className="font-bold text-sm text-cyan-600 dark:text-cyan-400">
+                +150.000đ
+              </span>
+              <p className="text-[10px] text-gray-400">trọn gói</p>
+            </div>
+          </div>
+        </label>
+
+        {/* eSIM 4G */}
+        <label
+          className={`flex items-start gap-3.5 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+            addonEsim
+              ? 'border-cyan-500 bg-cyan-50/60 dark:bg-cyan-950/30 dark:border-cyan-500 shadow-sm'
+              : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-gray-300 dark:hover:border-slate-700'
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={addonEsim}
+            onChange={(e) => setAddonEsim(e.target.checked)}
+            className="mt-1 w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500 dark:bg-slate-800 dark:border-slate-700"
+          />
+          <div className="flex-1 flex items-start justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-1.5 font-semibold text-sm text-gray-900 dark:text-white">
+                <WifiIcon className="w-4 h-4 text-violet-500 flex-shrink-0" />
+                eSIM 4G Tốc độ cao không giới hạn
+              </div>
+              <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                Kích hoạt tức thì qua QR code, sóng căng khắp cả nước không cần đổi SIM vật lý.
+              </p>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <span className="font-bold text-sm text-cyan-600 dark:text-cyan-400">
+                +80.000đ
+              </span>
+              <p className="text-[10px] text-gray-400">/ thiết bị</p>
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+  );
 
   // Render price summary
   const renderPriceSummary = () => {
@@ -988,29 +1175,35 @@ export default function CheckoutPage() {
 
     if (!amount || Number(amount) <= 0) {
       return (
-        <div className="mt-3 text-sm text-gray-500 text-center py-2">
+        <div className="mt-3 text-sm text-gray-500 dark:text-slate-400 text-center py-2">
           Vui lòng nhập số tiền để xem tổng thanh toán
         </div>
       );
     }
 
     return (
-      <div className="mt-3 text-sm">
+      <div className="mt-3 text-sm space-y-1.5">
         <div className="flex items-center justify-between">
-          <span className="text-gray-600">Tạm tính</span>
-          <span className="font-semibold">{formattedVnd} VNĐ</span>
+          <span className="text-gray-600 dark:text-slate-400">Tạm tính</span>
+          <span className="font-semibold text-gray-900 dark:text-white">{formattedVnd} VNĐ</span>
         </div>
+        {totalAddons > 0 && (
+          <div className="flex items-center justify-between text-teal-600 dark:text-teal-400">
+            <span>Dịch vụ tiện ích cộng thêm</span>
+            <span className="font-semibold">+{formattedAddons} VNĐ</span>
+          </div>
+        )}
         {discountPercent > 0 && (
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Giảm giá {discountPercent}%</span>
-            <span className="font-semibold text-green-600">
+            <span className="text-gray-600 dark:text-slate-400">Giảm giá {discountPercent}%</span>
+            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
               − {formattedDiscount} VNĐ
             </span>
           </div>
         )}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-200 mt-2">
-          <span className="font-bold text-gray-900">Cần thanh toán</span>
-          <span className="font-bold text-blue-600 text-lg">
+        <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-slate-700 mt-2">
+          <span className="font-bold text-gray-900 dark:text-white">Cần thanh toán</span>
+          <span className="font-bold text-cyan-600 dark:text-cyan-400 text-lg">
             {formattedFinal} VNĐ
           </span>
         </div>
@@ -1023,12 +1216,26 @@ export default function CheckoutPage() {
     if (!tourId && !destinationId && !isCombo) return null;
 
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-        <h4 className="font-semibold text-blue-800 mb-2">Thông tin đặt tour</h4>
-        <div className="space-y-1 text-sm text-blue-700">
+      <div className="bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-800/60 rounded-xl p-4 mb-4">
+        <h4 className="font-semibold text-cyan-900 dark:text-cyan-200 mb-2">Thông tin đặt tour</h4>
+        <div className="space-y-1.5 text-sm text-cyan-800 dark:text-cyan-300">
           {destinationName && (
             <p>
               Tour: <span className="font-medium">{destinationName}</span>
+            </p>
+          )}
+          {tourPackage && (
+            <p className="flex items-center gap-1.5">
+              Gói dịch vụ:{' '}
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                tourPackage === 'vip'
+                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                  : tourPackage === 'saver'
+                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                  : 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300'
+              }`}>
+                {tourPackage === 'vip' ? '★ Gói Trải Nghiệm VIP' : tourPackage === 'saver' ? 'Gói Tiết Kiệm' : 'Gói Tiêu Chuẩn'}
+              </span>
             </p>
           )}
           {bookingDate && (
@@ -1051,42 +1258,42 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50/20 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-8 px-4 transition-colors">
       <div className="max-w-3xl mx-auto">
         {/* Header Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden mb-6">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 overflow-hidden mb-6 transition-all">
           <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 px-8 py-6 text-white">
             <h1 className="text-3xl font-bold mb-2">
               {isCombo ? 'Thanh toán combo' : 'Thanh toán tour'}
             </h1>
-            <p className="text-blue-100 text-sm">
+            <p className="text-cyan-100 text-sm">
               {isCombo
-                ? 'Thanh toán gói combo du lịch'
-                : 'Điền thông tin và xác nhận thanh toán'}
+                ? 'Thanh toán trọn gói combo du lịch'
+                : 'Điền thông tin và xác nhận đặt dịch vụ'}
             </p>
           </div>
 
           {/* Combo Info */}
           {isCombo && comboTitle && (
-            <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-br from-purple-50 to-pink-50">
+            <div className="px-8 py-6 border-b border-gray-100 dark:border-slate-800 bg-gradient-to-br from-purple-50/60 to-pink-50/60 dark:from-purple-950/20 dark:to-pink-950/20">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
                   <CalendarDaysIcon className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">
                     {comboTitle}
                   </h3>
                   {comboIncludes.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-sm font-semibold text-gray-700">Bao gồm:</p>
+                      <p className="text-sm font-semibold text-gray-700 dark:text-slate-300">Bao gồm:</p>
                       <ul className="space-y-1.5">
                         {comboIncludes.map((item, idx) => (
                           <li
                             key={idx}
-                            className="flex items-start gap-2 text-sm text-gray-600"
+                            className="flex items-start gap-2 text-sm text-gray-600 dark:text-slate-300"
                           >
-                            <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                            <CheckCircleIcon className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                             <span>{item}</span>
                           </li>
                         ))}
@@ -1100,17 +1307,28 @@ export default function CheckoutPage() {
 
           {/* Tour Info */}
           {!isCombo && destinationName && (
-            <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-br from-blue-50 to-cyan-50">
+            <div className="px-8 py-6 border-b border-gray-100 dark:border-slate-800 bg-gradient-to-br from-cyan-50/50 to-blue-50/50 dark:from-cyan-950/20 dark:to-slate-900">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
                   <CalendarDaysIcon className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900">
-                    {destinationName}
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                    <span>{destinationName}</span>
+                    {tourPackage && (
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                        tourPackage === 'vip'
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                          : tourPackage === 'saver'
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300'
+                      }`}>
+                        {tourPackage === 'vip' ? 'Gói VIP' : tourPackage === 'saver' ? 'Gói Tiết kiệm' : 'Gói Tiêu chuẩn'}
+                      </span>
+                    )}
                   </h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {bookingDate && `Ngày: ${bookingDate} • `}
+                  <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
+                    {bookingDate && `Ngày khởi hành: ${bookingDate} • `}
                     {adultsCount} người lớn
                     {childrenCount > 0 && `, ${childrenCount} trẻ em`}
                   </p>
@@ -1121,13 +1339,13 @@ export default function CheckoutPage() {
         </div>
 
         {/* Payment Form Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 overflow-hidden">
           {success && (
-            <div className="px-8 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
-              <div className="flex items-center gap-3 text-green-700">
+            <div className="px-8 py-4 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/40 dark:to-green-950/40 border-b border-green-100 dark:border-green-800/40">
+              <div className="flex items-center gap-3 text-emerald-700 dark:text-emerald-400">
                 <CheckCircleIcon className="w-6 h-6" />
                 <span className="font-semibold">
-                  Thanh toán thành công! Đang chuyển hướng...
+                  Thanh toán thành công! Đang chuyển hướng đến lịch sử đơn hàng...
                 </span>
               </div>
             </div>
@@ -1139,13 +1357,13 @@ export default function CheckoutPage() {
 
             {/* Amount Input */}
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                <BanknotesIcon className="w-5 h-5 text-blue-600" />
+              <label className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-slate-200">
+                <BanknotesIcon className="w-5 h-5 text-cyan-500" />
                 Số tiền (VNĐ)
               </label>
               <div className="relative">
                 <input
-                  className="w-full px-4 py-4 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-4 rounded-xl border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-lg font-semibold transition-all bg-white dark:bg-slate-900 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-slate-800 disabled:cursor-not-allowed"
                   placeholder="Nhập số tiền"
                   type="number"
                   min="0"
@@ -1164,7 +1382,7 @@ export default function CheckoutPage() {
                 {errorMsg && (
                   <div className="absolute right-4 top-1/2 -translate-y-1/2">
                     <span
-                      className="text-blue-600 text-sm"
+                      className="text-cyan-600 text-sm"
                       title="Có thể nhập thủ công"
                     >
                       ✏️
@@ -1173,15 +1391,15 @@ export default function CheckoutPage() {
                 )}
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">
+                <span className="text-gray-500 dark:text-slate-400">
                   {isLoadingData ? (
                     <span className="text-gray-400">Đang tải thông tin tour...</span>
                   ) : amount && Number(amount) > 0 ? (
                     <>
-                      {discountPercent > 0 ? (
+                      {discountPercent > 0 || totalAddons > 0 ? (
                         <>
-                          Tổng:{' '}
-                          <span className="font-bold text-blue-600 text-lg">
+                          Tổng cần trả:{' '}
+                          <span className="font-bold text-cyan-600 dark:text-cyan-400 text-lg">
                             {formattedFinal} VNĐ
                           </span>
                           <span className="text-gray-400 text-xs ml-2 line-through">
@@ -1191,7 +1409,7 @@ export default function CheckoutPage() {
                       ) : (
                         <>
                           Tổng:{' '}
-                          <span className="font-bold text-blue-600 text-lg">
+                          <span className="font-bold text-cyan-600 dark:text-cyan-400 text-lg">
                             {formattedVnd} VNĐ
                           </span>
                         </>
@@ -1216,34 +1434,37 @@ export default function CheckoutPage() {
             {/* Guests Control */}
             {renderGuestsControl()}
 
+            {/* Addon Services Upsell */}
+            {renderAddonServices()}
+
             {/* Payment Method */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                <CreditCardIcon className="w-5 h-5 text-blue-600" />
+            <div className="space-y-3 pt-2">
+              <label className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-slate-200">
+                <CreditCardIcon className="w-5 h-5 text-cyan-500" />
                 Phương thức thanh toán
               </label>
 
               {/* Coupon */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-2">
+              <div className="bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 rounded-xl p-4 mb-2">
                 <div className="flex gap-2">
                   <input
                     value={coupon}
                     onChange={(e) => setCoupon(e.target.value)}
                     placeholder="Nhập mã khuyến mãi (ví dụ: MEMBER10)"
-                    className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
                   />
                   <button
                     type="button"
                     onClick={() => applyCoupon(coupon)}
-                    className="px-4 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                    className="px-5 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-semibold hover:from-cyan-600 hover:to-teal-600 transition-all shadow-sm"
                   >
                     Áp dụng
                   </button>
                 </div>
                 {couponMsg && (
                   <p
-                    className={`mt-2 text-sm ${
-                      discountPercent ? 'text-green-600' : 'text-red-600'
+                    className={`mt-2 text-sm font-medium ${
+                      discountPercent ? 'text-emerald-500' : 'text-red-500'
                     }`}
                   >
                     {couponMsg}
@@ -1263,12 +1484,12 @@ export default function CheckoutPage() {
                         onClick={() => handleMethodChange(option.id)}
                         className={`flex items-center justify-between w-full px-4 py-4 border-2 rounded-2xl transition-all ${
                           selected
-                            ? 'border-blue-500 bg-blue-50 shadow-md'
-                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                            ? 'border-cyan-500 bg-cyan-50/50 dark:bg-cyan-950/30 dark:border-cyan-500 shadow-sm'
+                            : 'border-gray-200 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900'
                         }`}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-14 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200">
+                          <div className="w-14 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-200 dark:border-slate-700 p-1">
                             <img
                               src={option.logo}
                               alt={option.name}
@@ -1276,19 +1497,19 @@ export default function CheckoutPage() {
                             />
                           </div>
                           <div className="text-left">
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-gray-900 dark:text-white">
                               {option.name}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-slate-400">
                               {option.description}
                             </p>
                           </div>
                         </div>
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                             selected
-                              ? 'border-blue-500 bg-blue-500'
-                              : 'border-gray-300 bg-white'
+                              ? 'border-cyan-500 bg-cyan-500'
+                              : 'border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800'
                           }`}
                         >
                           {selected && (
@@ -1310,9 +1531,9 @@ export default function CheckoutPage() {
 
             {/* Error Message */}
             {errorMsg && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-xl px-4 py-3 flex items-start gap-3">
+              <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-900/60 rounded-xl px-4 py-3 flex items-start gap-3">
                 <div className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5">⚠️</div>
-                <p className="text-red-700 text-sm font-medium">{errorMsg}</p>
+                <p className="text-red-700 dark:text-red-400 text-sm font-medium">{errorMsg}</p>
               </div>
             )}
 
@@ -1322,29 +1543,29 @@ export default function CheckoutPage() {
               disabled={submitting || !amount || Number(amount) <= 0}
               className={`w-full px-6 py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all transform ${
                 !amount || Number(amount) <= 0 || submitting
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 hover:from-cyan-600 hover:via-teal-600 hover:to-sky-600 hover:scale-[1.02] active:scale-[0.98]'
+                  ? 'bg-gray-400 dark:bg-slate-700 cursor-not-allowed opacity-75'
+                  : 'bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 hover:from-cyan-600 hover:via-teal-600 hover:to-sky-600 hover:scale-[1.01] active:scale-[0.99] shadow-cyan-500/25'
               }`}
             >
               {submitting ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="animate-spin">⏳</span>
-                  Đang xử lý…
+                  Đang xử lý thanh toán…
                 </span>
               ) : (
-                '💳 Thanh toán ngay'
+                '💳 Xác nhận & Thanh toán ngay'
               )}
             </button>
           </form>
 
           {/* Footer Link */}
-          <div className="px-8 pb-6 border-t border-gray-100 pt-6">
+          <div className="px-8 pb-6 border-t border-gray-100 dark:border-slate-800 pt-6">
             <Link
               to="/account/payments"
-              className="text-blue-600 hover:text-blue-700 font-semibold text-sm flex items-center gap-2 hover:underline"
+              className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 font-semibold text-sm flex items-center gap-2 hover:underline transition-colors"
             >
               <CalendarDaysIcon className="w-4 h-4" />
-              Xem lịch sử thanh toán
+              Xem lịch sử đơn hàng & thanh toán
             </Link>
           </div>
         </div>

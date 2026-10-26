@@ -16,7 +16,8 @@ import {
   CalendarIcon,
   ChartBarIcon,
   BellAlertIcon,
-  SparklesIcon,
+  BoltIcon,
+  TagIcon,
   FireIcon,
   PhotoIcon,
 } from '@heroicons/react/24/outline';
@@ -26,62 +27,73 @@ export default function AdminDashboard() {
   const { data, isLoading } = useAdminSummary(performancePeriod);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl p-4 md:p-6 lg:p-8 border border-white/20">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-2 md:gap-4">
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-500 p-3 md:p-4 rounded-xl md:rounded-2xl shadow-lg flex-shrink-0">
-                <ChartBarIcon className="h-6 w-6 md:h-8 md:w-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Dashboard Tổng Quan
-                </h1>
-                <p className="text-gray-600 mt-1 text-sm md:text-base hidden sm:block">Chào mừng trở lại! Theo dõi hiệu suất hệ thống của bạn</p>
-              </div>
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      {/* Executive Welcome Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-6 md:p-8 shadow-xl border border-slate-800">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-1/3 -mb-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-cyan-300 text-xs font-bold border border-cyan-500/30">
+              <BoltIcon className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Trung Tâm Chỉ Huy & Điều Hành Trực Tiếp</span>
             </div>
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 md:px-6 py-2 md:py-3 rounded-xl border border-blue-200 w-full md:w-auto">
-              <div className="flex items-center gap-2 text-blue-700">
-                <CalendarIcon className="h-4 w-4 md:h-5 md:w-5" />
-                <span className="text-xs md:text-sm font-semibold">
-                  {new Date().toLocaleDateString('vi-VN', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </span>
-              </div>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">
+              Chào mừng trở lại, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Đào Văn Phong</span>!
+            </h1>
+            <p className="text-slate-300 text-xs md:text-sm max-w-2xl leading-relaxed">
+              Toàn bộ dữ liệu doanh thu, lượt đặt tour và tài khoản người dùng đang được giám sát theo thời gian thực.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 bg-slate-800/80 backdrop-blur border border-slate-700/80 px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-200">
+              <CalendarIcon className="h-4 w-4 text-cyan-400" />
+              <span>
+                {new Date().toLocaleDateString('vi-VN', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </span>
             </div>
+            <Link
+              to="/admin/destinations"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-blue-500/25 transition-all hover:scale-105 active:scale-95"
+            >
+              <ChartBarIcon className="h-4 w-4" />
+              <span>Quản lý Tour ngay</span>
+            </Link>
           </div>
         </div>
+      </div>
 
-        {/* Alerts */}
-        {!isLoading && data?.alerts && data.alerts.pendingBookings > 0 && (
-          <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 rounded-2xl p-6 shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="bg-yellow-100 p-3 rounded-xl">
-                <BellAlertIcon className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-yellow-800 mb-1">
-                  Cần xử lý ngay!
-                </h3>
-                <p className="text-yellow-700">
-                  Có <span className="font-bold">{data.alerts.pendingBookings}</span> đơn đặt chỗ đang chờ xác nhận
-                </p>
-              </div>
-              <Link 
-                to="/admin/bookings?status=PENDING" 
-                className="px-6 py-3 bg-yellow-500 text-white rounded-xl hover:bg-yellow-600 transition-all font-semibold shadow-lg hover:shadow-xl"
-              >
-                Xem ngay →
-              </Link>
+      {/* Alerts */}
+      {!isLoading && data?.alerts && data.alerts.pendingBookings > 0 && (
+        <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 rounded-2xl p-5 shadow-sm flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="bg-amber-500 p-2.5 rounded-xl text-white shadow-md shadow-amber-500/30">
+              <BellAlertIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">
+                Có đơn đặt chỗ mới cần xác nhận!
+              </h3>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Hiện có <span className="font-bold text-amber-600">{data.alerts.pendingBookings}</span> đơn tour đang chờ quản trị viên xử lý.
+              </p>
             </div>
           </div>
-        )}
+          <Link 
+            to="/admin/bookings?status=PENDING" 
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs rounded-xl font-bold transition-all shadow-md hover:shadow-lg flex-shrink-0"
+          >
+            Xử lý ngay →
+          </Link>
+        </div>
+      )}
 
         {/* Main Stats Cards */}
         {isLoading && (
@@ -280,7 +292,7 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <SparklesIcon className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
+            <BoltIcon className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
             <h2 className="text-lg md:text-xl font-bold text-gray-900">Thao tác nhanh</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -316,7 +328,7 @@ export default function AdminDashboard() {
               title="Quản lý Mã Giảm Giá"
               description="Tạo và quản lý voucher"
               href="/admin/promo"
-              icon={SparklesIcon}
+              icon={TagIcon}
               gradient="from-purple-500 to-pink-500"
             />
             <QuickActionCard
@@ -336,7 +348,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
 
@@ -352,35 +363,38 @@ interface StatCardProps {
 
 function StatCard({ title, value, icon: Icon, gradient, trend = 'neutral', subtitle, percentage }: StatCardProps) {
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-xl border border-white/20 p-4 md:p-6 hover:shadow-2xl transition-all duration-300 group">
-      <div className="flex items-start justify-between mb-3 md:mb-4">
+    <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200/80 p-5 md:p-6 transition-all duration-300 group hover:-translate-y-1 relative overflow-hidden">
+      {/* Top subtle gradient highlight bar */}
+      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${gradient} opacity-80`} />
+      
+      <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0 pr-2">
-          <p className="text-xs md:text-sm font-semibold text-gray-600 mb-1 md:mb-2 truncate">{title}</p>
-          <p className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 truncate">{value}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 truncate">{title}</p>
+          <p className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight mb-1 truncate">{value}</p>
           {subtitle && (
-            <p className="text-xs text-gray-500 truncate">{subtitle}</p>
+            <p className="text-xs text-slate-500 font-medium truncate">{subtitle}</p>
           )}
         </div>
-        <div className={`bg-gradient-to-br ${gradient} p-3 md:p-4 rounded-xl md:rounded-2xl shadow-lg group-hover:scale-110 transition-transform flex-shrink-0`}>
-          <Icon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7 text-white" />
+        <div className={`bg-gradient-to-br ${gradient} p-3.5 rounded-2xl shadow-md group-hover:scale-110 transition-transform flex-shrink-0 text-white`}>
+          <Icon className="h-6 w-6" />
         </div>
       </div>
       {trend !== 'neutral' && percentage && (
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div className="flex items-center text-xs">
+        <div className="flex items-center justify-between pt-3.5 border-t border-slate-100">
+          <div className="flex items-center text-xs font-bold">
             {trend === 'up' ? (
-              <>
-                <ArrowTrendingUpIcon className="h-4 w-4 text-green-500 mr-1" />
-                <span className="text-green-600 font-semibold">{percentage}</span>
-              </>
+              <div className="flex items-center text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                <ArrowTrendingUpIcon className="h-3.5 w-3.5 mr-1 stroke-2" />
+                <span>{percentage}</span>
+              </div>
             ) : (
-              <>
-                <ArrowTrendingDownIcon className="h-4 w-4 text-red-500 mr-1" />
-                <span className="text-red-600 font-semibold">{percentage}</span>
-              </>
+              <div className="flex items-center text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">
+                <ArrowTrendingDownIcon className="h-3.5 w-3.5 mr-1 stroke-2" />
+                <span>{percentage}</span>
+              </div>
             )}
           </div>
-          <span className="text-xs text-gray-500">so với tháng trước</span>
+          <span className="text-[11px] font-medium text-slate-400">so với tháng trước</span>
         </div>
       )}
     </div>
@@ -399,20 +413,20 @@ function QuickActionCard({ title, description, href, icon: Icon, gradient }: Qui
   return (
     <Link
       to={href}
-      className={`bg-gradient-to-br ${gradient} rounded-2xl p-6 text-white hover:shadow-2xl transition-all duration-300 hover:scale-105 block relative overflow-hidden group`}
+      className={`bg-gradient-to-br ${gradient} rounded-2xl p-5 text-white shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block relative overflow-hidden group`}
     >
       {/* Decorative background */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -mr-16 -mt-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full -ml-12 -mb-12"></div>
+      <div className="absolute inset-0 opacity-15">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -mr-12 -mt-12"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full -ml-8 -mb-8"></div>
       </div>
       
-      <div className="relative">
-        <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl inline-block mb-4 group-hover:scale-110 transition-transform">
-          <Icon className="h-8 w-8" />
+      <div className="relative z-10">
+        <div className="bg-white/20 backdrop-blur-md p-2.5 rounded-xl inline-block mb-3 group-hover:scale-110 transition-transform">
+          <Icon className="h-6 w-6" />
         </div>
-        <h3 className="text-xl font-bold mb-2">{title}</h3>
-        <p className="text-sm text-white/90">{description}</p>
+        <h3 className="text-base font-bold mb-1 tracking-tight">{title}</h3>
+        <p className="text-xs text-white/85 line-clamp-1">{description}</p>
       </div>
     </Link>
   );
@@ -429,15 +443,15 @@ interface MiniStatCardProps {
 
 function MiniStatCard({ title, value, icon: Icon, gradient, subtitle, href }: MiniStatCardProps) {
   const content = (
-    <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 ${href ? 'cursor-pointer hover:scale-105' : ''} group`}>
+    <div className={`bg-white rounded-2xl shadow-sm hover:shadow-lg border border-slate-200/80 p-5 transition-all duration-300 group ${href ? 'cursor-pointer hover:-translate-y-0.5' : ''}`}>
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm font-semibold text-gray-600 mb-2">{title}</p>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
-          {subtitle && <p className="text-xs text-gray-500 mt-2">{subtitle}</p>}
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">{title}</p>
+          <p className="text-2xl font-black text-slate-900 tracking-tight">{value}</p>
+          {subtitle && <p className="text-xs text-slate-400 mt-1 font-medium">{subtitle}</p>}
         </div>
-        <div className={`bg-gradient-to-br ${gradient} p-4 rounded-2xl shadow-lg group-hover:scale-110 transition-transform`}>
-          <Icon className="h-7 w-7 text-white" />
+        <div className={`bg-gradient-to-br ${gradient} p-3 rounded-2xl shadow-md group-hover:scale-110 transition-transform text-white`}>
+          <Icon className="h-6 w-6" />
         </div>
       </div>
     </div>

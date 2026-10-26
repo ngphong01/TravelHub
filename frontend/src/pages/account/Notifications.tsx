@@ -3,7 +3,7 @@ import {
   BellIcon, 
   EnvelopeIcon, 
   StarIcon, 
-  SparklesIcon,
+  TagIcon,
   CheckCircleIcon,
   BellAlertIcon,
   ShieldCheckIcon
@@ -162,7 +162,7 @@ export default function NotificationsPage() {
                   </div>
                   <div>
                     <h1 className="text-3xl font-bold text-white">Cài đặt thông báo</h1>
-                    <p className="text-white/90 mt-1">Quản lý các loại thông báo và email từ TravelGo</p>
+                    <p className="text-white/90 mt-1">Quản lý các loại thông báo và email từ TravelHub</p>
                   </div>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export default function NotificationsPage() {
                   id="promoEmails"
                   title="Ưu đãi & khuyến mãi"
                   desc="Nhận email về mã giảm giá, chương trình ưu đãi đặc biệt và deals hot"
-                  icon={SparklesIcon}
+                  icon={TagIcon}
                   color="border-pink-300"
                 />
                 <Row

@@ -3,324 +3,353 @@ import {
   SunIcon,
   BuildingOffice2Icon,
   GlobeAltIcon,
-  SparklesIcon,
+  BuildingStorefrontIcon,
   BuildingLibraryIcon,
   HeartIcon,
   UsersIcon,
   AdjustmentsHorizontalIcon,
   TrophyIcon,
+  SparklesIcon,
+  ArrowRightIcon,
+  ShieldCheckIcon,
+  TagIcon,
+  PhoneArrowUpRightIcon,
+  UserGroupIcon
 } from "@heroicons/react/24/outline";
+import SEOHead from '../components/SEOHead';
 
 export default function Categories() {
   const categories = [
     { 
       title: "Biển & Resort", 
-      desc: "Bãi biển đẹp, nghỉ dưỡng sang trọng", 
+      desc: "Bãi biển xanh ngọc, resort 5 sao sang trọng và lặn ngắm san hô", 
       href: "/destinations?tags=beach,resort",
       Icon: SunIcon,
-      gradient: "from-blue-400 to-cyan-400",
+      image: "/uploads/tours/phuquoc-white-sand.jpg",
+      gradient: "from-blue-600 to-cyan-500",
       count: "150+ điểm đến",
-      features: ["Bãi biển tuyệt đẹp", "Resort 5 sao", "Hoạt động dưới nước"],
-      popular: ["Phuket", "Bali", "Maldives"]
+      features: ["Bãi biển cát trắng", "Resort chuẩn 5 sao", "Lặn biển & Du thuyền"],
+      popular: ["Phú Quốc", "Nha Trang", "Maldives", "Bali"]
     },
     { 
       title: "Thành phố & Văn hóa", 
-      desc: "Khám phá văn hóa, lịch sử, ẩm thực", 
+      desc: "Khám phá nhịp sống hiện đại, kiến trúc lịch sử và lễ hội bản địa", 
       href: "/destinations?tags=city,culture",
       Icon: BuildingOffice2Icon,
-      gradient: "from-purple-400 to-pink-400",
+      image: "/uploads/avatars/ha-noi.jpg",
+      gradient: "from-purple-600 to-pink-500",
       count: "200+ điểm đến",
-      features: ["Bảo tàng nổi tiếng", "Ẩm thực địa phương", "Kiến trúc cổ kính"],
-      popular: ["Tokyo", "Paris", "Rome"]
+      features: ["Bảo tàng nghệ thuật", "Phố cổ nghìn năm", "Kiến trúc biểu tượng"],
+      popular: ["Tokyo", "Hà Nội", "Paris", "Rome"]
     },
     { 
       title: "Thiên nhiên & Mạo hiểm", 
-      desc: "Núi rừng, trekking, khám phá hoang dã", 
+      desc: "Chinh phục đỉnh núi cao, trekking rừng nguyên sinh và cắm trại", 
       href: "/destinations?tags=nature,adventure",
       Icon: GlobeAltIcon,
-      gradient: "from-green-400 to-emerald-400",
+      image: "/uploads/tours/sapa-fansipan-peak.jpg",
+      gradient: "from-emerald-600 to-teal-500",
       count: "100+ điểm đến",
-      features: ["Trekking", "Leo núi", "Khám phá hoang dã"],
-      popular: ["Nepal", "New Zealand", "Costa Rica"]
+      features: ["Trekking đường dài", "Leo núi mạo hiểm", "Thám hiểm hang động"],
+      popular: ["Hà Giang", "Sapa", "Phong Nha", "New Zealand"]
     },
     { 
       title: "Ẩm thực & Trải nghiệm", 
-      desc: "Khám phá ẩm thực địa phương độc đáo", 
+      desc: "Hành trình vị giác với street food trứ danh và lớp học làm bếp", 
       href: "/destinations?tags=food,experience",
-      Icon: SparklesIcon,
-      gradient: "from-orange-400 to-red-400",
+      Icon: BuildingStorefrontIcon,
+      image: "/uploads/restaurants/pho-batdan.jpg",
+      gradient: "from-amber-600 to-orange-500",
       count: "80+ điểm đến",
-      features: ["Ẩm thực đường phố", "Lớp học nấu ăn", "Thị trường địa phương"],
-      popular: ["Thailand", "Italy", "Japan"]
+      features: ["Food tour chợ đêm", "Lớp học làm bánh & nấu ăn", "Michelin Guide"],
+      popular: ["Huế", "Bangkok", "Đà Nẵng", "Osaka"]
     },
     { 
       title: "Lịch sử & Di sản", 
-      desc: "Khám phá những di tích lịch sử cổ đại", 
+      desc: "Tìm về cội nguồn với các quần thể di sản UNESCO thế giới", 
       href: "/destinations?tags=history,heritage",
       Icon: BuildingLibraryIcon,
-      gradient: "from-amber-400 to-yellow-400",
+      image: "/uploads/tours/hoian-lanterns-night.jpg",
+      gradient: "from-amber-700 to-yellow-600",
       count: "120+ điểm đến",
-      features: ["Di tích cổ đại", "Bảo tàng lịch sử", "Kiến trúc cổ"],
-      popular: ["Egypt", "Greece", "Cambodia"]
+      features: ["Di tích nghìn năm", "Đền đài Angkor", "Lăng tẩm cố đô"],
+      popular: ["Hội An", "Cố đô Huế", "Angkor Wat", "Hy Lạp"]
     },
     { 
       title: "Lãng mạn & Honeymoon", 
-      desc: "Những điểm đến lãng mạn cho cặp đôi", 
+      desc: "Không gian riêng tư, ngắm hoàng hôn rực rỡ bên người thương", 
       href: "/destinations?tags=romantic,honeymoon",
       Icon: HeartIcon,
-      gradient: "from-pink-400 to-rose-400",
+      image: "/uploads/destinations/Tour lãng mạn cho đôi.jpg",
+      gradient: "from-rose-600 to-pink-500",
       count: "60+ điểm đến",
-      features: ["Resort lãng mạn", "Hoàng hôn tuyệt đẹp", "Dịch vụ spa"],
-      popular: ["Maldives", "Santorini", "Bora Bora"]
+      features: ["Villa hướng biển", "Bữa tối nến lãng mạn", "Spa thư giãn đôi"],
+      popular: ["Đà Lạt", "Santorini", "Phú Quốc", "Bora Bora"]
     },
     { 
-      title: "Gia đình & Trẻ em", 
-      desc: "Điểm đến phù hợp cho cả gia đình", 
+      title: "Gia đình & Trẻ nhỏ", 
+      desc: "Các điểm vui chơi an toàn, công viên giải trí và khu nghỉ dưỡng", 
       href: "/destinations?tags=family,kids",
       Icon: UsersIcon,
-      gradient: "from-indigo-400 to-blue-400",
+      image: "/uploads/hotels/danang-beach.jpg",
+      gradient: "from-blue-600 to-indigo-600",
       count: "90+ điểm đến",
-      features: ["Công viên giải trí", "Bãi biển an toàn", "Hoạt động gia đình"],
-      popular: ["Disney", "Singapore", "Australia"]
+      features: ["Công viên nước", "Safari hoang dã", "Phòng Family Suite"],
+      popular: ["VinWonders", "Sun World", "Singapore", "Disneyland"]
     },
     { 
       title: "Tâm linh & Thiền định", 
-      desc: "Tìm kiếm sự bình yên và cân bằng", 
+      desc: "Thanh lọc tâm hồn tại các cổ tự, thiền viện thanh tịnh", 
       href: "/destinations?tags=spiritual,meditation",
       Icon: AdjustmentsHorizontalIcon,
-      gradient: "from-teal-400 to-green-400",
+      image: "/uploads/tours/ninhbinh-ancient-temple.jpg",
+      gradient: "from-teal-600 to-emerald-700",
       count: "40+ điểm đến",
-      features: ["Thiền viện", "Yoga retreat", "Không gian yên tĩnh"],
-      popular: ["India", "Tibet", "Bhutan"]
+      features: ["Khóa tu ngắn ngày", "Yoga trên mây", "Không gian tĩnh lặng"],
+      popular: ["Yên Tử", "Tây Thiên", "Bhangarh", "Bhutan"]
     },
     { 
       title: "Thể thao & Hoạt động", 
-      desc: "Các hoạt động thể thao và giải trí", 
+      desc: "Lướt sóng biển, dù lượn, trượt tuyết và sân golf chuẩn PGA", 
       href: "/destinations?tags=sports,activities",
       Icon: TrophyIcon,
-      gradient: "from-red-400 to-orange-400",
+      image: "/uploads/tours/halong-kayak-cave.jpg",
+      gradient: "from-red-600 to-orange-600",
       count: "70+ điểm đến",
-      features: ["Thể thao mạo hiểm", "Golf", "Trượt tuyết"],
-      popular: ["Switzerland", "New Zealand", "Canada"]
+      features: ["Lướt ván cano", "Dù lượn ngắm đèo", "Trượt tuyết mùa đông"],
+      popular: ["Mũi Né", "Đà Lạt", "Niseko", "Thụy Sĩ"]
     }
   ];
 
   return (
-    <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-cyan-500 via-teal-500 to-sky-500 text-white">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.3'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundRepeat: 'repeat',
-            animation: 'float 20s ease-in-out infinite'
-          }} />
-        </div>
-        <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        
-        <div className="relative z-10 w-full py-16 sm:py-24">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-2 text-sm font-medium text-white mb-6 shadow-lg">
-              <span className="w-2 h-2 bg-yellow-300 rounded-full animate-pulse"></span>
-              Khám phá theo sở thích
+    <>
+      <SEOHead
+        title="Danh Mục Khám Phá Du Lịch Theo Sở Thích - TravelHub"
+        description="Khám phá các tour du lịch được phân loại tinh tế: biển đảo, thiên nhiên, trekking mạo hiểm, nghỉ dưỡng gia đình, tuần trăng mật và ẩm thực."
+        url="/categories"
+      />
+
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+        {/* Hero Section */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-teal-900 via-teal-800 to-slate-900 text-white py-20 lg:py-28">
+          <div className="absolute inset-0 opacity-20 pointer-events-none">
+            <div 
+              className="w-full h-full"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 2px 2px, white 1.5px, transparent 0)',
+                backgroundSize: '36px 36px'
+              }}
+            />
+          </div>
+          <div className="absolute top-10 left-10 w-96 h-96 bg-teal-400/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
+            <div className="inline-flex items-center gap-2 bg-white/10 dark:bg-white/5 border border-white/20 backdrop-blur-md rounded-full px-4 py-2 text-sm font-semibold text-teal-200 mb-6 shadow-sm">
+              <SparklesIcon className="w-4 h-4 text-amber-300 animate-pulse" />
+              <span>Khám Phá Theo Phong Cách Sống & Sở Thích</span>
             </div>
             
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-              <span className="bg-gradient-to-r from-yellow-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
-                Tìm điểm đến
-              </span>
-              <br />
-              <span className="text-white">
-                phù hợp với bạn
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-6">
+              Tìm Điểm Đến <br className="hidden sm:inline" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 via-emerald-200 to-amber-200">
+                Sinh Ra Để Dành Cho Bạn
               </span>
             </h1>
             
-            <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Chọn danh mục yêu thích và khám phá những điểm đến tuyệt vời được gợi ý dành riêng cho bạn
+            <p className="text-lg sm:text-xl text-teal-100/90 max-w-3xl mx-auto leading-relaxed font-light">
+              Dù bạn yêu thích biển xanh cát trắng, đam mê chinh phục đỉnh núi hoang sơ hay tìm kiếm không gian lãng mạn cho kỳ trăng mật.
             </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Categories Section */}
-      <section className="py-16 sm:py-24">
-        <div className="w-full">
+        {/* Categories Grid Section */}
+        <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Danh mục du lịch</h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Mỗi danh mục mang đến những trải nghiệm độc đáo và đáng nhớ
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
+              9 Nhóm Trải Nghiệm Du Lịch Đỉnh Cao
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              Mỗi danh mục được đội ngũ chuyên gia TravelHub tuyển chọn kỹ lưỡng theo từng tiêu chuẩn khắt khe
             </p>
           </div>
           
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((category, index) => (
               <Link 
                 key={index}
                 to={category.href} 
-                className="group relative overflow-hidden rounded-3xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105"
+                className="group relative flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
               >
-                {/* Background Pattern */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-300`} />
-                
-                <div className="relative p-8">
-                  {/* Icon */}
-                  <div className="mb-6 flex items-center justify-center">
-                    {category.Icon && <category.Icon className="h-12 w-12 text-gray-900 dark:text-white" />}
+                {/* Photo Cover Header */}
+                <div className="relative h-56 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                  <img
+                    src={category.image}
+                    alt={category.title}
+                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+
+                  {/* Count Badge on Photo */}
+                  <div className="absolute top-4 right-4 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full text-xs font-semibold text-white border border-white/20">
+                    {category.count}
                   </div>
-                  
-                  {/* Title */}
-                  <h3 className="text-2xl font-bold mb-3 text-center text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {category.title}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-gray-600 dark:text-gray-400 text-center mb-6 leading-relaxed">
-                    {category.desc}
-                  </p>
-                  
-                  {/* Count */}
-                  <div className="text-center mb-6">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                      {category.count}
-                    </span>
-                  </div>
-                  
-                  {/* Features */}
-                  <div className="space-y-2 mb-4">
-                    {category.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Popular Destinations */}
-                  <div className="mb-6">
-                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Điểm đến nổi bật:</div>
-                    <div className="flex flex-wrap gap-1">
-                      {category.popular.map((dest, idx) => (
-                        <span key={idx} className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
-                          {dest}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* CTA */}
-                  <div className="text-center">
-                    <span className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium group-hover:translate-x-1 transition-transform">
-                      Khám phá ngay
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
+
+                  {/* Icon Circle */}
+                  <div className={`absolute bottom-4 left-4 w-12 h-12 rounded-2xl bg-gradient-to-br ${category.gradient} text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+                    <category.Icon className="h-6 w-6 text-white" />
                   </div>
                 </div>
                 
-                {/* Hover Effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {/* Body Content */}
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      {category.title}
+                    </h3>
+                    
+                    <p className="text-slate-600 dark:text-slate-300 text-sm mb-5 leading-relaxed">
+                      {category.desc}
+                    </p>
+                    
+                    {/* Features list */}
+                    <div className="space-y-2 mb-5">
+                      {category.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                          <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                    {/* Popular Destinations Chips */}
+                    <div className="mb-4">
+                      <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                        Điểm đến hot:
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {category.popular.map((dest, idx) => (
+                          <span 
+                            key={idx} 
+                            className="px-2.5 py-1 text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-medium"
+                          >
+                            {dest}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* CTA Link */}
+                    <div className="flex items-center justify-between text-sm font-bold text-teal-600 dark:text-teal-400 pt-2">
+                      <span>Khám phá ngay</span>
+                      <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                    </div>
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Why Choose TravelGo Section */}
-      <section className="py-16 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
-        <div className="w-full">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Tại sao chọn TravelGo?</h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Chúng tôi cam kết mang đến những trải nghiệm du lịch tuyệt vời nhất
-            </p>
-          </div>
-          
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+        {/* Why Choose TravelHub Section */}
+        <section className="py-20 bg-slate-100/70 dark:bg-slate-900/60 border-y border-slate-200 dark:border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/40 px-3 py-1 rounded-full mb-3">
+                <ShieldCheckIcon className="h-4 w-4" />
+                Cam kết từ nền tảng
               </div>
-              <h3 className="text-xl font-semibold mb-2">Đảm bảo chất lượng</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">Tất cả điểm đến đều được kiểm duyệt kỹ lưỡng</p>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-3">
+                Vì Sao Nên Đồng Hành Cùng TravelHub?
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                Chúng tôi mang đến giải pháp du lịch toàn diện với độ an toàn và chất lượng dịch vụ dẫn đầu thị trường.
+              </p>
             </div>
             
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                </svg>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm text-center group hover:-translate-y-1 transition-all">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-teal-500/20 group-hover:scale-110 transition-transform">
+                  <ShieldCheckIcon className="w-7 h-7" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Kiểm duyệt chất lượng</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">
+                  100% đối tác tour, khách sạn và dịch vụ được kiểm tra pháp lý và đánh giá thực tế.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Giá cả hợp lý</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">Cam kết giá tốt nhất thị trường</p>
-            </div>
-            
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
-                </svg>
+              
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm text-center group hover:-translate-y-1 transition-all">
+                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
+                  <TagIcon className="w-7 h-7" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Giá cả minh bạch</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">
+                  Cam kết không phụ phí ẩn, chiết khấu trực tiếp với hệ thống voucher cập nhật mỗi ngày.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Hỗ trợ 24/7</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">Đội ngũ chăm sóc khách hàng chuyên nghiệp</p>
-            </div>
-            
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
+              
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm text-center group hover:-translate-y-1 transition-all">
+                <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                  <PhoneArrowUpRightIcon className="w-7 h-7" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Hỗ trợ 24/7 tức thì</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">
+                  Tích hợp trợ lý AI thông minh cùng đội ngũ tư vấn viên sẵn sàng xử lý mọi phát sinh trên đường đi.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Trải nghiệm cá nhân</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">Gợi ý phù hợp với sở thích của bạn</p>
+              
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm text-center group hover:-translate-y-1 transition-all">
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">
+                  <UserGroupIcon className="w-7 h-7" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Cá nhân hóa tối đa</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">
+                  Gợi ý lịch trình và dịch vụ theo độ tuổi, ngân sách và sở thích cá nhân từng du khách.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-800">
-        <div className="w-full">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 max-w-5xl mx-auto text-center">
-            <div>
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">850+</div>
-              <div className="text-gray-600 dark:text-gray-400">Điểm đến</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-green-600 dark:text-green-400 mb-2">80+</div>
-              <div className="text-gray-600 dark:text-gray-400">Quốc gia</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">25K+</div>
-              <div className="text-gray-600 dark:text-gray-400">Khách hàng</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-orange-600 dark:text-orange-400 mb-2">9</div>
-              <div className="text-gray-600 dark:text-gray-400">Danh mục</div>
+        {/* Stats Section */}
+        <section className="py-16 bg-white dark:bg-slate-950">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+              <div>
+                <div className="text-4xl sm:text-5xl font-black text-teal-600 dark:text-teal-400 mb-2">850+</div>
+                <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">Điểm đến phong phú</div>
+              </div>
+              <div>
+                <div className="text-4xl sm:text-5xl font-black text-blue-600 dark:text-blue-400 mb-2">80+</div>
+                <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">Tỉnh thành & Quốc gia</div>
+              </div>
+              <div>
+                <div className="text-4xl sm:text-5xl font-black text-purple-600 dark:text-purple-400 mb-2">25K+</div>
+                <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">Khách hàng tin chọn</div>
+              </div>
+              <div>
+                <div className="text-4xl sm:text-5xl font-black text-amber-500 dark:text-amber-400 mb-2">9</div>
+                <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">Nhóm trải nghiệm đa dạng</div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Back to Home */}
-      <section className="py-16">
-        <div className="w-full text-center">
+        {/* Back to Home CTA */}
+        <section className="py-16 text-center">
           <Link 
             to="/" 
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-teal-600/30 hover:shadow-xl hover:scale-105 transition-all"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Quay lại trang chủ
+            <span>Quay lại trang chủ TravelHub</span>
+            <ArrowRightIcon className="w-5 h-5" />
           </Link>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </>
   );
 }
+

@@ -9,7 +9,6 @@ import {
   BriefcaseIcon,
   GlobeAltIcon,
   HeartIcon,
-  SparklesIcon,
   CheckCircleIcon,
   MapPinIcon,
   PhoneIcon,
@@ -82,10 +81,10 @@ export default function About() {
           <div className="text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-6 py-2.5 mb-6">
               <BuildingOfficeIcon className="h-6 w-6" />
-              <span className="font-semibold">Về TravelGo</span>
+              <span className="font-semibold">Về TravelHub</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6">
-              Giới thiệu về TravelGo
+              Giới thiệu về TravelHub
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto">
               Hành trình cùng bạn khám phá thế giới, tạo ra những kỷ niệm đáng nhớ trong mọi chuyến đi
@@ -98,14 +97,14 @@ export default function About() {
         {/* Vì sao chọn TravelGo */}
         <section className="mb-16">
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
-            <h2 className="text-3xl font-bold mb-8 text-gray-900">Vì sao chọn TravelGo?</h2>
+            <h2 className="text-3xl font-bold mb-8 text-gray-900">Vì sao chọn TravelHub?</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[ 
                 { icon: GlobeAltIcon, title: '500+ điểm đến', desc: 'Mạng lưới điểm đến trong và ngoài nước, luôn cập nhật.' },
                 { icon: ShieldCheckIcon, title: 'Thanh toán an toàn', desc: 'Chuẩn bảo mật, hoàn tiền theo chính sách.' },
                 { icon: TrophyIcon, title: '4.8/5 từ khách hàng', desc: 'Hàng chục nghìn đánh giá tích cực.' },
                 { icon: UserGroupIcon, title: 'Hỗ trợ 24/7', desc: 'Đồng hành trước – trong – sau chuyến đi.' },
-                { icon: SparklesIcon, title: 'Lịch trình tinh gọn', desc: 'Tối ưu di chuyển, trải nghiệm nhiều hơn.' },
+                { icon: MapPinIcon, title: 'Lịch trình tinh gọn', desc: 'Tối ưu di chuyển, trải nghiệm nhiều hơn.' },
                 { icon: HeartIcon, title: 'Ưu đãi độc quyền', desc: 'Voucher thành viên, combo tiết kiệm theo mùa.' },
               ].map((f, i) => {
                 const Icon = f.icon;
@@ -131,12 +130,12 @@ export default function About() {
             <h2 className="text-3xl font-bold mb-6">Lịch sử hình thành</h2>
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 leading-relaxed mb-4">
-                TravelGo được thành lập vào năm 2015 với sứ mệnh mang đến những trải nghiệm du lịch tuyệt vời cho mọi người. 
-                Từ những ngày đầu với chỉ 10 nhân viên, chúng tôi đã phát triển thành một trong những công ty du lịch hàng đầu Việt Nam.
+                TravelHub được xây dựng với sứ mệnh kết nối du khách với những kỳ quan thiên nhiên và trải nghiệm văn hóa tuyệt sắc của Việt Nam. 
+                Chúng tôi không ngừng đổi mới công nghệ để mang đến nền tảng du lịch trực tuyến hiện đại, minh bạch và an toàn nhất.
               </p>
               <p className="text-gray-700 leading-relaxed mb-4">
                 Với hơn 500 điểm đến trên khắp thế giới, hơn 50,000 khách hàng tin tưởng và hơn 10,000 tour đã được tổ chức thành công, 
-                TravelGo tự hào là đối tác tin cậy cho mọi hành trình của bạn.
+                TravelHub tự hào là đối tác tin cậy cho mọi hành trình của bạn.
               </p>
             </div>
 
@@ -170,7 +169,7 @@ export default function About() {
             </div>
 
             <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-8 text-white">
-              <SparklesIcon className="h-12 w-12 mb-4" />
+              <GlobeAltIcon className="h-12 w-12 mb-4" />
               <h3 className="text-2xl font-bold mb-4">Tầm nhìn</h3>
               <p className="text-white/90">
                 Trở thành nền tảng du lịch hàng đầu Việt Nam và khu vực Đông Nam Á, 
@@ -413,7 +412,7 @@ export default function About() {
               <div className="bg-white rounded-xl p-6 shadow-lg">
                 <h3 className="text-xl font-bold mb-3">Top 10 công ty du lịch uy tín Việt Nam</h3>
                 <p className="text-gray-600">
-                  TravelGo đã được vinh danh trong top 10 công ty du lịch uy tín nhất Việt Nam năm 2024 
+                  TravelHub đã được vinh danh trong top 10 nền tảng du lịch trực tuyến uy tín nhất Việt Nam năm 2026 
                   bởi Hiệp hội Du lịch Việt Nam.
                 </p>
               </div>
@@ -485,7 +484,7 @@ export default function About() {
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Báo chí & Truyền thông</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              TravelGo trên các phương tiện truyền thông
+              TravelHub trên các phương tiện truyền thông
             </p>
           </div>
 
@@ -527,7 +526,7 @@ export default function About() {
                 <AcademicCapIcon className="h-12 w-12 text-green-600 mb-4" />
                 <h2 className="text-4xl font-bold mb-4">Tuyển dụng</h2>
                 <p className="text-xl text-gray-700">
-                  Tham gia đội ngũ TravelGo và cùng chúng tôi tạo ra những trải nghiệm tuyệt vời
+                  Tham gia đội ngũ TravelHub và cùng chúng tôi tạo ra những trải nghiệm tuyệt vời
                 </p>
               </div>
               <Link
@@ -593,7 +592,7 @@ export default function About() {
                   <Icon className="h-12 w-12 text-blue-600 mb-4" />
                   <h3 className="text-xl font-bold mb-2">{policy.title}</h3>
                   <p className="text-gray-600 mb-4">
-                    Xem chi tiết chính sách {policy.title.toLowerCase()} của TravelGo
+                    Xem chi tiết chính sách {policy.title.toLowerCase()} của TravelHub
                   </p>
                   <Link
                     to="#"

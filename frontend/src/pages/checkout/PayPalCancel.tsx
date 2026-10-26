@@ -114,7 +114,7 @@ export default function PayPalCancelPage() {
 
         <p className="mt-6 text-center text-xs text-gray-500">
           Nếu bạn gặp vấn đề trong quá trình thanh toán, hãy liên hệ đội ngũ hỗ
-          trợ của TravelGo để được trợ giúp kịp thời.
+          trợ của TravelHub để được trợ giúp kịp thời.
         </p>
       </div>
     </div>

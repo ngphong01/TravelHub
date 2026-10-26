@@ -6,7 +6,6 @@ import {
   XMarkIcon, 
   PaperAirplaneIcon,
   UserIcon,
-  SparklesIcon,
   TrashIcon,
   ClockIcon,
   ArrowPathIcon
@@ -28,7 +27,7 @@ export default function LiveChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Xin chào! Tôi là GoGo, AI Assistant của TravelGo. Tôi có thể giúp bạn tìm hiểu về các điểm đến, đặt chỗ, hoặc trả lời bất kỳ câu hỏi nào về du lịch. Bạn cần hỗ trợ gì?",
+      text: "Xin chào! Tôi là tư vấn viên của TravelHub. Tôi luôn sẵn sàng hỗ trợ quý khách thông tin tour, lịch trình, chính sách đặt chỗ, thanh toán hoặc hóa đơn điện tử. Quý khách cần hỗ trợ gì ạ?",
       isUser: false,
       timestamp: new Date()
     }
@@ -40,7 +39,7 @@ export default function LiveChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
-  const botName = "GoGo";
+  const botName = "Tư vấn viên TravelHub";
   const botAvatar = "/uploads/avatars/chatbot.jpg";
 
   const scrollToBottom = () => {
@@ -104,7 +103,7 @@ export default function LiveChat() {
       setMessages([
         {
           id: "1",
-          text: "Xin chào! Tôi là GoGo, AI Assistant của TravelGo. Tôi có thể giúp bạn tìm hiểu về các điểm đến, đặt chỗ, hoặc trả lời bất kỳ câu hỏi nào về du lịch. Bạn cần hỗ trợ gì?",
+          text: "Xin chào! Tôi là GoGo, trợ lý du lịch của TravelGo. Tôi có thể giúp bạn tìm hiểu về các điểm đến, đặt chỗ, hoặc trả lời bất kỳ câu hỏi nào về du lịch. Bạn cần hỗ trợ gì?",
           isUser: false,
           timestamp: new Date()
         }
@@ -231,7 +230,7 @@ export default function LiveChat() {
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white p-4">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
                 <img 
@@ -350,7 +349,7 @@ export default function LiveChat() {
               </button>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-              Powered by Google AI • TravelGo Assistant
+              TravelGo Assistant hỗ trợ thông tin điểm đến và đặt chỗ.
             </p>
           </div>
         </div>

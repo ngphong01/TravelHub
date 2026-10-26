@@ -17,12 +17,12 @@ import {
   EyeSlashIcon
 } from '@heroicons/react/24/outline';
 import AccountSidebar from "../../components/AccountSidebar";
-import { useI18n } from '../../contexts/I18nContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { getAuthHeaders } from '../../utils/api';
 
 export default function SettingsPage() {
-  const { language, setLanguage, t } = useI18n();
+  const { language, setLanguage, t } = useLanguage();
   const { theme, setTheme } = useTheme();
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);

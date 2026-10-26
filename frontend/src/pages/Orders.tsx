@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookingAPI, UserAPI } from '../utils/api';
+import { BookingAPI, UserAPI, getAuthHeaders } from '../utils/api';
+import toast from 'react-hot-toast';
 import { 
   MapPinIcon, 
   CalendarDaysIcon, 
@@ -11,8 +12,12 @@ import {
   TicketIcon,
   ArrowRightIcon,
   MagnifyingGlassIcon,
-  SparklesIcon,
-  FunnelIcon
+  FunnelIcon,
+  PrinterIcon,
+  ArrowDownTrayIcon,
+  DocumentTextIcon,
+  EnvelopeIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 type Order = {
@@ -72,6 +77,9 @@ export default function Orders() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [emailOrder, setEmailOrder] = useState<any | null>(null);
+  const [cancellingId, setCancellingId] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,6 +103,32 @@ export default function Orders() {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  const handleCancelOrder = async (orderId: number) => {
+    if (!window.confirm('Bạn có chắc chắn muốn hủy đơn đặt chỗ này không?')) return;
+    try {
+      setCancellingId(orderId);
+      const res = await fetch(`/api/booking/${orderId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders(),
+        },
+        credentials: 'include',
+        body: JSON.stringify({ status: 'CANCELLED' }),
+      });
+      if (!res.ok) throw new Error('Không thể hủy đơn đặt tour');
+      toast.success('Đã hủy tour thành công');
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'CANCELLED' } : o));
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder((prev: any) => prev ? { ...prev, status: 'CANCELLED' } : null);
+      }
+    } catch (err: any) {
+      toast.error(err?.message || 'Lỗi khi hủy đơn');
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch = !searchTerm || 
@@ -159,9 +193,8 @@ export default function Orders() {
                     <TicketIcon className="w-8 h-8 md:w-10 md:h-10 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-3xl md:text-5xl font-bold mb-2 flex items-center gap-3">
+                    <h1 className="text-3xl md:text-5xl font-bold mb-2">
                       Tour Đã Đặt
-                      <SparklesIcon className="w-8 h-8 text-yellow-300" />
                     </h1>
                     <p className="text-white/90 text-base md:text-lg">Theo dõi và quản lý các tour du lịch của bạn</p>
                   </div>
@@ -438,15 +471,48 @@ export default function Orders() {
                             </div>
                           </div>
 
-                          {order.destination?.slug && (
-                            <Link
-                              to={`/destinations/${order.destination.slug}`}
-                              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedOrder(order)}
+                              className="inline-flex items-center gap-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 border border-indigo-200 shadow-sm hover:shadow text-sm"
                             >
-                              Xem chi tiết
-                              <ArrowRightIcon className="w-5 h-5" />
-                            </Link>
-                          )}
+                              <DocumentTextIcon className="w-4 h-4 text-indigo-600" />
+                              Vé & Hóa đơn
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setEmailOrder(order)}
+                              className="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold px-3.5 py-2.5 rounded-xl transition-all duration-200 border border-blue-200 shadow-sm hover:shadow text-sm"
+                              title="Xem mẫu Email xác nhận đặt tour gửi cho khách hàng"
+                            >
+                              <EnvelopeIcon className="w-4 h-4 text-blue-600" />
+                              Email xác nhận
+                            </button>
+
+                            {order.status !== 'CANCELLED' && (
+                              <button
+                                type="button"
+                                disabled={cancellingId === order.id}
+                                onClick={() => handleCancelOrder(order.id)}
+                                className="inline-flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 text-sm border border-red-200 disabled:opacity-50"
+                              >
+                                <XCircleIcon className="w-4 h-4" />
+                                {cancellingId === order.id ? 'Đang xử lý...' : 'Hủy tour'}
+                              </button>
+                            )}
+
+                            {order.destination?.slug && (
+                              <Link
+                                to={`/destinations/${order.destination.slug}`}
+                                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
+                              >
+                                Xem tour
+                                <ArrowRightIcon className="w-4 h-4" />
+                              </Link>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -486,6 +552,287 @@ export default function Orders() {
                 Hiển thị <span className="font-bold text-indigo-600">{filteredOrders.length}</span> trong tổng số{' '}
                 <span className="font-bold text-gray-900">{orders.length}</span> tour
               </span>
+            </div>
+          </div>
+        )}
+        {/* E-Ticket & Invoice Modal */}
+        {selectedOrder && (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+              {/* Header Gradient */}
+              <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-6 text-white relative">
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrder(null)}
+                  className="absolute top-5 right-5 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                    <TicketIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">VÉ ĐIỆN TỬ & HÓA ĐƠN ĐẶT TOUR</h3>
+                    <p className="text-blue-100 text-xs font-mono">TravelHub E-Ticket System</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-white/20 pt-3">
+                  <span className="text-sm font-mono tracking-wider font-bold bg-white/20 px-3 py-1 rounded-lg">
+                    Mã đơn: {selectedOrder.code || `#${selectedOrder.id}`}
+                  </span>
+                  <span className="text-xs uppercase px-3 py-1 rounded-full font-bold bg-white text-indigo-700 shadow-sm">
+                    {getStatusConfig(selectedOrder.status).label}
+                  </span>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 md:p-8 space-y-6">
+                {/* Destination & Schedule */}
+                <div className="bg-gradient-to-br from-slate-50 to-blue-50/50 p-5 rounded-2xl border border-blue-100/60">
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Điểm đến / Tour</p>
+                  <h4 className="text-2xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <MapPinIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
+                    {selectedOrder.destination?.name || 'Điểm đến không xác định'}
+                  </h4>
+
+                  {selectedOrder.from && selectedOrder.to ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-gray-200/60 text-sm">
+                      <div>
+                        <span className="text-gray-500 block text-xs">Khởi hành:</span>
+                        <span className="font-semibold text-gray-800">
+                          {new Date(selectedOrder.from).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 block text-xs">Kết thúc:</span>
+                        <span className="font-semibold text-gray-800">
+                          {new Date(selectedOrder.to).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        </span>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+
+                {/* Billing Summary */}
+                <div className="border border-gray-200 rounded-2xl p-5 space-y-3 text-sm">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Mã đặt chỗ:</span>
+                    <span className="font-mono font-bold text-gray-900">{selectedOrder.code || `#${selectedOrder.id}`}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Thời gian đặt:</span>
+                    <span className="font-medium text-gray-800">
+                      {selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleString('vi-VN') : '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Trạng thái đơn hàng:</span>
+                    <span className="font-semibold text-indigo-600">{getStatusConfig(selectedOrder.status).label}</span>
+                  </div>
+                  <div className="border-t border-dashed border-gray-200 pt-3 flex justify-between items-center">
+                    <span className="text-base font-bold text-gray-900">Tổng thanh toán:</span>
+                    <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                      {(selectedOrder.totalAmount || 0).toLocaleString('vi-VN')} VNĐ
+                    </span>
+                  </div>
+                </div>
+
+                {/* QR Code Demo Section */}
+                <div className="flex items-center justify-between bg-gray-50 p-4 rounded-2xl border border-gray-200">
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-gray-900">Mã QR Check-in</p>
+                    <p className="text-xs text-gray-500">Quét mã này tại quầy hoặc xuất trình cho Hướng dẫn viên</p>
+                  </div>
+                  <div className="w-16 h-16 bg-white p-1 rounded-xl shadow-sm border border-gray-300 flex items-center justify-center">
+                    {/* SVG QR Code Simulation */}
+                    <svg className="w-full h-full text-gray-800" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14-2h4v2h-4v-2zm-4 0h2v4h-2v-4zm2 4h2v4h-2v-4zm2 2h4v2h-4v-2zm0-4h2v2h-2v-2z" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all text-sm"
+                  >
+                    <PrinterIcon className="w-4 h-4" />
+                    In vé / Hóa đơn
+                  </button>
+
+                  <a
+                    href={`/api/invoice/${selectedOrder.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all text-sm"
+                  >
+                    <ArrowDownTrayIcon className="w-4 h-4" />
+                    Tải PDF Hóa đơn
+                  </a>
+
+                  <a
+                    href={`/api/itinerary/${selectedOrder.id}/pdf`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all text-sm"
+                  >
+                    <DocumentTextIcon className="w-4 h-4" />
+                    Lịch trình PDF
+                  </a>
+                </div>
+
+                {selectedOrder.status !== 'CANCELLED' && (
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      disabled={cancellingId === selectedOrder.id}
+                      onClick={() => handleCancelOrder(selectedOrder.id)}
+                      className="text-xs text-red-600 hover:text-red-800 font-semibold underline disabled:opacity-50"
+                    >
+                      {cancellingId === selectedOrder.id ? 'Đang hủy đơn...' : 'Yêu cầu hủy đơn đặt chỗ này'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Email Confirmation Preview Modal */}
+        {emailOrder && (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+              {/* Mail Client Bar */}
+              <div className="bg-slate-900 px-6 py-4 text-white flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1.5">
+                    <span className="w-3 h-3 rounded-full bg-red-500 inline-block" />
+                    <span className="w-3 h-3 rounded-full bg-yellow-500 inline-block" />
+                    <span className="w-3 h-3 rounded-full bg-green-500 inline-block" />
+                  </div>
+                  <span className="text-xs font-mono text-slate-300">
+                    Mẫu Email Xác Nhận Đơn Hàng (Preview)
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEmailOrder(null)}
+                  className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Email Meta Header */}
+              <div className="p-6 bg-slate-50 border-b border-gray-200 space-y-2 text-xs text-gray-600">
+                <div className="flex items-center justify-between">
+                  <p>
+                    <strong className="text-gray-900 font-semibold">Từ:</strong> TravelHub Booking System &lt;booking@travelhub.vn&gt;
+                  </p>
+                  <span className="text-[11px] text-gray-400">
+                    {emailOrder.createdAt ? new Date(emailOrder.createdAt).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''}
+                  </span>
+                </div>
+                <p>
+                  <strong className="text-gray-900 font-semibold">Tới:</strong> Quý khách hàng &lt;khachhang@travelhub.vn&gt;
+                </p>
+                <p className="text-sm font-bold text-gray-900 pt-1">
+                  Tiêu đề: [TravelHub] Xác nhận đặt tour thành công - Mã đơn #{emailOrder.id}
+                </p>
+              </div>
+
+              {/* Email Body Content */}
+              <div className="p-6 md:p-8 space-y-6 max-h-[65vh] overflow-y-auto bg-white">
+                {/* Brand Banner */}
+                <div className="rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-6 text-white text-center">
+                  <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-xs font-semibold mb-2">
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-300" />
+                    ĐẶT CHỖ THÀNH CÔNG
+                  </div>
+                  <h3 className="text-2xl font-black">XÁC NHẬN HÀNH TRÌNH DU LỊCH</h3>
+                  <p className="text-xs text-blue-100 mt-1">Cảm ơn quý khách đã tin chọn nền tảng du lịch trực tuyến TravelHub!</p>
+                </div>
+
+                {/* Greeting & Order Details Table */}
+                <div className="space-y-4 text-sm text-gray-700">
+                  <p>
+                    Kính gửi <strong>Quý khách</strong>,
+                  </p>
+                  <p className="text-gray-600 leading-relaxed text-xs sm:text-sm">
+                    Yêu cầu đặt tour của quý khách đã được hệ thống ghi nhận và xác nhận chính thức. Dưới đây là thông tin chi tiết về hành trình của quý khách:
+                  </p>
+
+                  <div className="bg-gray-50 rounded-2xl p-5 border border-gray-200 space-y-3">
+                    <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                      <span className="text-gray-500 text-xs">Mã đơn hàng:</span>
+                      <span className="font-mono font-bold text-indigo-600 text-sm">#TH-{emailOrder.id}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                      <span className="text-gray-500 text-xs">Tour / Điểm đến:</span>
+                      <span className="font-bold text-gray-900 text-right">{emailOrder.destination?.name || 'Tour Du Lịch Trọn Gói'}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                      <span className="text-gray-500 text-xs">Ngày khởi hành:</span>
+                      <span className="font-medium text-gray-900">
+                        {emailOrder.from ? new Date(emailOrder.from).toLocaleDateString('vi-VN') : 'Theo thông báo'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                      <span className="text-gray-500 text-xs">Trạng thái vé:</span>
+                      <span className="font-bold text-emerald-600">
+                        {getStatusConfig(emailOrder.status).label}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center pt-1">
+                      <span className="text-gray-900 font-bold text-sm">Tổng thanh toán:</span>
+                      <span className="font-extrabold text-blue-600 text-lg">
+                        {(emailOrder.totalAmount || 0).toLocaleString('vi-VN')} VNĐ
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Travel Tips */}
+                  <div className="bg-blue-50/60 rounded-2xl p-4 border border-blue-100 text-xs text-blue-900 space-y-1.5">
+                    <p className="font-bold flex items-center gap-1.5 text-blue-800">
+                      <CheckCircleIcon className="w-4 h-4 text-blue-600" />
+                      Lưu ý quan trọng trước chuyến đi:
+                    </p>
+                    <p>• Quý khách vui lòng có mặt tại điểm đón trước ít nhất 30 phút so với giờ khởi hành.</p>
+                    <p>• Mang theo CCCD/Hộ chiếu bản gốc còn hạn để làm thủ tục nhận phòng khách sạn.</p>
+                    <p>• Xuất trình mã vé điện tử <strong>#TH-{emailOrder.id}</strong> cho Hướng dẫn viên tại điểm tập trung.</p>
+                  </div>
+                </div>
+
+                {/* Email Sign-off */}
+                <div className="pt-4 border-t border-gray-200 text-xs text-gray-500 space-y-1">
+                  <p className="font-bold text-gray-800">Ban Quản Trị Hệ Thống TravelHub</p>
+                  <p>Hotline hỗ trợ 24/7: 1900 8888 • Email: support@travelhub.vn</p>
+                  <p className="text-[11px] text-gray-400">Website: https://travelhub.vn — Nền tảng đặt tour & du lịch trực tuyến số 1</p>
+                </div>
+              </div>
+
+              {/* Footer Actions */}
+              <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 hover:bg-gray-100 rounded-xl text-xs font-semibold text-gray-700 transition"
+                >
+                  <PrinterIcon className="w-4 h-4" />
+                  In Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEmailOrder(null)}
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition"
+                >
+                  Đóng
+                </button>
+              </div>
             </div>
           </div>
         )}
