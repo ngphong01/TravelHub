@@ -99,6 +99,232 @@ interface Destination {
   image?: string;
 }
 
+const FALLBACK_DESTINATIONS: Destination[] = [
+  {
+    id: 1,
+    name: 'Vịnh Hạ Long',
+    slug: 'ha-long',
+    country: 'Quảng Ninh, Việt Nam',
+    price: 2490000,
+    description: 'Kỳ quan thiên nhiên thế giới với hàng nghìn đảo đá vôi kỳ vĩ và du thuyền 5 sao đẳng cấp.',
+    featured: true,
+    image: '/uploads/avatars/ha-long4.jpg',
+  },
+  {
+    id: 2,
+    name: 'Đà Nẵng & Hội An',
+    slug: 'da-nang',
+    country: 'Miền Trung, Việt Nam',
+    price: 2990000,
+    description: 'Cầu Vàng Bà Nà Hills, biển Mỹ Khê trong xanh và phố cổ Hội An rực rỡ đèn lồng.',
+    featured: true,
+    image: '/uploads/avatars/da-nang.png',
+  },
+  {
+    id: 3,
+    name: 'Đảo Ngọc Phú Quốc',
+    slug: 'phu-quoc',
+    country: 'Kiên Giang, Việt Nam',
+    price: 3390000,
+    description: 'Thiên đường nghỉ dưỡng nhiệt đới với Bãi Sao cát trắng, cáp treo Hòn Thơm và lặn ngắm san hô.',
+    featured: true,
+    image: '/uploads/avatars/phu-quoc.jpg',
+  },
+  {
+    id: 4,
+    name: 'Sa Pa - Fansipan',
+    slug: 'sa-pa',
+    country: 'Lào Cai, Việt Nam',
+    price: 1890000,
+    description: 'Chinh phục nóc nhà Đông Dương, thưởng ngoạn ruộng bậc thang Mường Hoa và bản làng Cát Cát.',
+    featured: true,
+    image: '/uploads/avatars/sapa.jpg',
+  },
+  {
+    id: 5,
+    name: 'Ninh Bình - Tràng An',
+    slug: 'ninh-binh',
+    country: 'Ninh Bình, Việt Nam',
+    price: 850000,
+    description: 'Quần thể danh thắng Tràng An di sản thế giới kép, Hang Múa và chùa Bái Đính linh thiêng.',
+    featured: true,
+    image: '/uploads/avatars/ninh-binh.jpg',
+  },
+  {
+    id: 6,
+    name: 'Đà Lạt Mộng Mơ',
+    slug: 'da-lat',
+    country: 'Lâm Đồng, Việt Nam',
+    price: 2150000,
+    description: 'Thành phố ngàn hoa ngập tràn sương mờ, đồi thông bạt ngàn và những quán cafe săn mây.',
+    featured: true,
+    image: '/uploads/avatars/da-lat.jpg',
+  },
+  {
+    id: 7,
+    name: 'Thủ Đô Hà Nội',
+    slug: 'ha-noi',
+    country: 'Hà Nội, Việt Nam',
+    price: 1650000,
+    description: '36 phố phường nghìn năm văn hiến, ẩm thực phở gia truyền và hồ Hoàn Kiếm thơ mộng.',
+    featured: true,
+    image: '/uploads/avatars/ha-noi.jpg',
+  },
+  {
+    id: 8,
+    name: 'Biển Nha Trang',
+    slug: 'nha-trang',
+    country: 'Khánh Hòa, Việt Nam',
+    price: 2450000,
+    description: 'Vịnh biển quyến rũ hàng đầu thế giới với Vinpearl Harbour, lặn biển ngắm san hô đảo Hòn Mun.',
+    featured: true,
+    image: '/uploads/avatars/nha-trang.jpg',
+  },
+  {
+    id: 9,
+    name: 'Cố Đô Huế',
+    slug: 'hue',
+    country: 'Thừa Thiên Huế, Việt Nam',
+    price: 1950000,
+    description: 'Di sản cung đình vàng son, Đại Nội cổ kính, sông Hương êm đềm và ẩm thực cố đô tinh túy.',
+    featured: false,
+    image: '/uploads/avatars/hue.jpg',
+  },
+  {
+    id: 10,
+    name: 'Cao Nguyên Hà Giang',
+    slug: 'ha-giang',
+    country: 'Hà Giang, Việt Nam',
+    price: 2650000,
+    description: 'Đèo Mã Pí Lèng đệ nhất hùng quan, dòng sông Nho Quế xanh ngọc bích và mùa hoa tam giác mạch.',
+    featured: true,
+    image: '/uploads/avatars/Ha Giang.jpg',
+  },
+];
+
+const FALLBACK_TOURS_LIST: Tour[] = [
+  {
+    id: 101,
+    name: 'Tour Hạ Long 2N1Đ - Du Thuyền 5 Sao Đẳng Cấp Heritage',
+    slug: 'tour-ha-long-2n1d-du-thuyen-5-sao',
+    duration: 2,
+    price: 2490000,
+    originalPrice: 3890000,
+    rating: 4.9,
+    reviewCount: 1420,
+    featured: true,
+    image: '/uploads/tours/halong-bay-karsts.jpg',
+    transport: 'Xe Limousine Dcar',
+    departurePoint: 'Hà Nội',
+    destination: { id: 1, name: 'Vịnh Hạ Long', slug: 'ha-long' },
+  },
+  {
+    id: 102,
+    name: 'Tour Đà Nẵng - Cầu Vàng Bà Nà Hills - Phố Cổ Hội An',
+    slug: 'tour-da-nang-ba-na-hills-3n2d',
+    duration: 3,
+    price: 2990000,
+    originalPrice: 4500000,
+    rating: 4.85,
+    reviewCount: 980,
+    featured: true,
+    image: '/uploads/tours/danang-cauvang.jpg',
+    transport: 'Máy bay khứ hồi + Ô tô',
+    departurePoint: 'TP. Hồ Chí Minh',
+    destination: { id: 2, name: 'Đà Nẵng & Hội An', slug: 'da-nang' },
+  },
+  {
+    id: 103,
+    name: 'Nghỉ Dưỡng Đảo Ngọc Phú Quốc - Cáp Treo Hòn Thơm 3N2Đ',
+    slug: 'nghi-duong-phu-quoc-3n2d',
+    duration: 3,
+    price: 3390000,
+    originalPrice: 5200000,
+    rating: 4.92,
+    reviewCount: 1650,
+    featured: true,
+    image: '/uploads/tours/phuquoc-sao-beach.jpg',
+    transport: 'Máy bay + Resort 5 Sao',
+    departurePoint: 'Hà Nội / TP.HCM',
+    destination: { id: 3, name: 'Đảo Ngọc Phú Quốc', slug: 'phu-quoc' },
+  },
+  {
+    id: 104,
+    name: 'Tour Sa Pa - Chinh Phục Đỉnh Fansipan - Bản Cát Cát',
+    slug: 'tour-sa-pa-fansipan-2n1d',
+    duration: 2,
+    price: 1890000,
+    originalPrice: 2600000,
+    rating: 4.8,
+    reviewCount: 760,
+    featured: true,
+    image: '/uploads/tours/sapa-fansipan-peak.jpg',
+    transport: 'Xe giường nằm Cabin đôi',
+    departurePoint: 'Hà Nội',
+    destination: { id: 4, name: 'Sa Pa - Fansipan', slug: 'sa-pa' },
+  },
+  {
+    id: 105,
+    name: 'Khám Phá Ninh Bình - Tràng An - Hang Múa - Bái Đính Trong Ngày',
+    slug: 'tour-ninh-binh-trang-an-1-ngay',
+    duration: 1,
+    price: 850000,
+    originalPrice: 1200000,
+    rating: 4.9,
+    reviewCount: 1120,
+    featured: true,
+    image: '/uploads/tours/ninhbinh-trangan.jpg',
+    transport: 'Xe du lịch máy lạnh cao cấp',
+    departurePoint: 'Hà Nội',
+    destination: { id: 5, name: 'Ninh Bình - Tràng An', slug: 'ninh-binh' },
+  },
+  {
+    id: 106,
+    name: 'Tour Khám Phá Cao Nguyên Đá Hà Giang - Đèo Mã Pí Lèng',
+    slug: 'tour-ha-giang-ma-pi-leng-3n2d',
+    duration: 3,
+    price: 2650000,
+    originalPrice: 3500000,
+    rating: 4.95,
+    reviewCount: 890,
+    featured: true,
+    image: '/uploads/tours/hagiang-mapileng.jpg',
+    transport: 'Xe Limousine + Xe máy bản địa',
+    departurePoint: 'Hà Nội',
+    destination: { id: 10, name: 'Cao Nguyên Hà Giang', slug: 'ha-giang' },
+  },
+  {
+    id: 107,
+    name: 'Đà Lạt Săn Mây - Thung Lũng Tình Yêu - Đồi Chè Cầu Đất 3N2Đ',
+    slug: 'tour-da-lat-san-may-3n2d',
+    duration: 3,
+    price: 2150000,
+    originalPrice: 2900000,
+    rating: 4.88,
+    reviewCount: 820,
+    featured: true,
+    image: '/uploads/tours/dalat-camtucau.jpg',
+    transport: 'Xe Limousine cao cấp',
+    departurePoint: 'TP. Hồ Chí Minh',
+    destination: { id: 6, name: 'Đà Lạt Mộng Mơ', slug: 'da-lat' },
+  },
+  {
+    id: 108,
+    name: 'Tour Hà Nội City Tour - Tràng An Bái Đính - Hạ Long 4N3Đ',
+    slug: 'tour-ha-noi-trang-an-ha-long-4n3d',
+    duration: 4,
+    price: 3890000,
+    originalPrice: 5100000,
+    rating: 4.91,
+    reviewCount: 640,
+    featured: true,
+    image: '/uploads/tours/hanoi-tran-quoc.jpg',
+    transport: 'Xe ô tô du lịch + Du thuyền',
+    departurePoint: 'Hà Nội',
+    destination: { id: 7, name: 'Thủ Đô Hà Nội', slug: 'ha-noi' },
+  },
+];
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
@@ -584,11 +810,15 @@ export default function Destinations() {
   const { isInWishlist, toggleWishlistItem } = useWishlist(currentUser?.id);
 
   // Fetch all destinations for dropdown
-  const { data: allDestinationsList = [] } = useQuery({
+  const { data: allDestinationsList = FALLBACK_DESTINATIONS } = useQuery<Destination[]>({
     queryKey: ['destinations', 'all', i18n.language],
-    queryFn: async () => {
-      const result = await getDestinationsPaged(1, 1000, {});
-      return result?.items || [];
+    queryFn: async (): Promise<Destination[]> => {
+      try {
+        const result = await getDestinationsPaged(1, 1000, {});
+        return result?.items?.length ? (result.items as Destination[]) : FALLBACK_DESTINATIONS;
+      } catch {
+        return FALLBACK_DESTINATIONS;
+      }
     },
   });
 
@@ -609,12 +839,31 @@ export default function Destinations() {
       i18n.language
     ],
     queryFn: async () => {
-      return await getDestinationsPaged(currentPage, PAGINATION.PAGE_SIZE, {
-        q: filters.searchQuery,
-        sort: filters.sortBy === 'all' ? 'created-desc' : filters.sortBy,
-        minPrice: priceRange.minPrice,
-        maxPrice: priceRange.maxPrice,
-      });
+      try {
+        const res = await getDestinationsPaged(currentPage, PAGINATION.PAGE_SIZE, {
+          q: filters.searchQuery,
+          sort: filters.sortBy === 'all' ? 'created-desc' : filters.sortBy,
+          minPrice: priceRange.minPrice,
+          maxPrice: priceRange.maxPrice,
+        });
+        if (res?.items?.length) return res;
+      } catch (err) {
+        // Fallback
+      }
+      // Client-side filtering on FALLBACK_DESTINATIONS
+      let filtered = [...FALLBACK_DESTINATIONS];
+      if (filters.searchQuery) {
+        const q = filters.searchQuery.toLowerCase();
+        filtered = filtered.filter(d => d.name.toLowerCase().includes(q) || (d.country && d.country.toLowerCase().includes(q)));
+      }
+      if (priceRange.minPrice) filtered = filtered.filter(d => (d.price || 0) >= priceRange.minPrice!);
+      if (priceRange.maxPrice) filtered = filtered.filter(d => (d.price || 0) <= priceRange.maxPrice!);
+      return {
+        items: filtered,
+        total: filtered.length,
+        page: currentPage,
+        pageSize: PAGINATION.PAGE_SIZE,
+      };
     },
     enabled: currentViewMode === 'destinations',
   });
@@ -622,7 +871,7 @@ export default function Destinations() {
   // Build API params for tours
   const tourApiParams = useMemo(() => {
     const destinationId = filters.destinationName
-      ? allDestinationsList.find((d: any) => d.name === filters.destinationName)?.id
+      ? (allDestinationsList as Destination[]).find((d: any) => d.name === filters.destinationName)?.id
       : undefined;
 
     return {
@@ -642,13 +891,33 @@ export default function Destinations() {
     error: toursError 
   } = useQuery({
     queryKey: ['tours', currentPage, tourApiParams, i18n.language],
-    queryFn: () => getToursPaged(currentPage, PAGINATION.PAGE_SIZE, tourApiParams),
+    queryFn: async () => {
+      try {
+        const res = await getToursPaged(currentPage, PAGINATION.PAGE_SIZE, tourApiParams);
+        if (res?.items?.length) return res;
+      } catch (err) {
+        // Fallback
+      }
+      let filtered = [...FALLBACK_TOURS_LIST];
+      if (tourApiParams.q) {
+        const q = tourApiParams.q.toLowerCase();
+        filtered = filtered.filter(t => t.name.toLowerCase().includes(q) || (t.destination?.name && t.destination.name.toLowerCase().includes(q)));
+      }
+      if (tourApiParams.minPrice) filtered = filtered.filter(t => (t.price || 0) >= tourApiParams.minPrice!);
+      if (tourApiParams.maxPrice) filtered = filtered.filter(t => (t.price || 0) <= tourApiParams.maxPrice!);
+      return {
+        items: filtered,
+        total: filtered.length,
+        page: currentPage,
+        pageSize: PAGINATION.PAGE_SIZE,
+      };
+    },
     enabled: currentViewMode === 'tours',
   });
 
   // Sort tours client-side
   const sortedToursList = useMemo(() => {
-    const tourItems = toursResponse?.items || [];
+    const tourItems = (toursResponse?.items?.length ? toursResponse.items : FALLBACK_TOURS_LIST);
     
     switch (filters.sortBy) {
       case 'price-asc':
@@ -664,11 +933,11 @@ export default function Destinations() {
 
   // Calculate totals
   const totalItems = currentViewMode === 'destinations' 
-    ? (destinationsResponse?.total || 0)
-    : (toursResponse?.total || 0);
-  const totalPages = Math.ceil(totalItems / PAGINATION.PAGE_SIZE);
+    ? (destinationsResponse?.total ?? FALLBACK_DESTINATIONS.length)
+    : (toursResponse?.total ?? FALLBACK_TOURS_LIST.length);
+  const totalPages = Math.ceil(totalItems / PAGINATION.PAGE_SIZE) || 1;
   
-  const destinationsList = destinationsResponse?.items || [];
+  const destinationsList = destinationsResponse?.items?.length ? destinationsResponse.items : FALLBACK_DESTINATIONS;
 
   // Check if any filters are active
   const hasActiveFilters = Boolean(

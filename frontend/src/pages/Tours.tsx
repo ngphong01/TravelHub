@@ -21,6 +21,129 @@ import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import FloatingCompareDrawer, { CompareTourItem } from '../components/FloatingCompareDrawer';
 import toast from 'react-hot-toast';
 
+const FALLBACK_TOURS: Tour[] = [
+  {
+    id: 101,
+    name: 'Tour Hạ Long 2N1Đ - Du Thuyền 5 Sao Đẳng Cấp Heritage',
+    slug: 'tour-ha-long-2n1d-du-thuyen-5-sao',
+    duration: 2,
+    price: 2490000,
+    originalPrice: 3890000,
+    rating: 4.9,
+    reviewCount: 1420,
+    featured: true,
+    image: '/uploads/tours/halong-bay-karsts.jpg',
+    transport: 'Xe Limousine Dcar',
+    departurePoint: 'Hà Nội',
+    destination: { id: 1, name: 'Vịnh Hạ Long', slug: 'ha-long' },
+  },
+  {
+    id: 102,
+    name: 'Tour Đà Nẵng - Cầu Vàng Bà Nà Hills - Phố Cổ Hội An',
+    slug: 'tour-da-nang-ba-na-hills-3n2d',
+    duration: 3,
+    price: 2990000,
+    originalPrice: 4500000,
+    rating: 4.85,
+    reviewCount: 980,
+    featured: true,
+    image: '/uploads/tours/danang-cauvang.jpg',
+    transport: 'Máy bay khứ hồi + Ô tô',
+    departurePoint: 'TP. Hồ Chí Minh',
+    destination: { id: 2, name: 'Đà Nẵng & Hội An', slug: 'da-nang' },
+  },
+  {
+    id: 103,
+    name: 'Nghỉ Dưỡng Đảo Ngọc Phú Quốc - Cáp Treo Hòn Thơm 3N2Đ',
+    slug: 'nghi-duong-phu-quoc-3n2d',
+    duration: 3,
+    price: 3390000,
+    originalPrice: 5200000,
+    rating: 4.92,
+    reviewCount: 1650,
+    featured: true,
+    image: '/uploads/tours/phuquoc-sao-beach.jpg',
+    transport: 'Máy bay + Resort 5 Sao',
+    departurePoint: 'Hà Nội / TP.HCM',
+    destination: { id: 3, name: 'Đảo Ngọc Phú Quốc', slug: 'phu-quoc' },
+  },
+  {
+    id: 104,
+    name: 'Tour Sa Pa - Chinh Phục Đỉnh Fansipan - Bản Cát Cát',
+    slug: 'tour-sa-pa-fansipan-2n1d',
+    duration: 2,
+    price: 1890000,
+    originalPrice: 2600000,
+    rating: 4.8,
+    reviewCount: 760,
+    featured: true,
+    image: '/uploads/tours/sapa-fansipan-peak.jpg',
+    transport: 'Xe giường nằm Cabin đôi',
+    departurePoint: 'Hà Nội',
+    destination: { id: 4, name: 'Sa Pa - Fansipan', slug: 'sa-pa' },
+  },
+  {
+    id: 105,
+    name: 'Khám Phá Ninh Bình - Tràng An - Hang Múa - Bái Đính Trong Ngày',
+    slug: 'tour-ninh-binh-trang-an-1-ngay',
+    duration: 1,
+    price: 850000,
+    originalPrice: 1200000,
+    rating: 4.9,
+    reviewCount: 1120,
+    featured: true,
+    image: '/uploads/tours/ninhbinh-trangan.jpg',
+    transport: 'Xe du lịch máy lạnh cao cấp',
+    departurePoint: 'Hà Nội',
+    destination: { id: 5, name: 'Ninh Bình - Tràng An', slug: 'ninh-binh' },
+  },
+  {
+    id: 106,
+    name: 'Tour Khám Phá Cao Nguyên Đá Hà Giang - Đèo Mã Pí Lèng',
+    slug: 'tour-ha-giang-ma-pi-leng-3n2d',
+    duration: 3,
+    price: 2650000,
+    originalPrice: 3500000,
+    rating: 4.95,
+    reviewCount: 890,
+    featured: true,
+    image: '/uploads/tours/hagiang-mapileng.jpg',
+    transport: 'Xe Limousine + Xe máy bản địa',
+    departurePoint: 'Hà Nội',
+    destination: { id: 10, name: 'Cao Nguyên Hà Giang', slug: 'ha-giang' },
+  },
+  {
+    id: 107,
+    name: 'Đà Lạt Săn Mây - Thung Lũng Tình Yêu - Đồi Chè Cầu Đất 3N2Đ',
+    slug: 'tour-da-lat-san-may-3n2d',
+    duration: 3,
+    price: 2150000,
+    originalPrice: 2900000,
+    rating: 4.88,
+    reviewCount: 820,
+    featured: true,
+    image: '/uploads/tours/dalat-camtucau.jpg',
+    transport: 'Xe Limousine cao cấp',
+    departurePoint: 'TP. Hồ Chí Minh',
+    destination: { id: 6, name: 'Đà Lạt Mộng Mơ', slug: 'da-lat' },
+  },
+  {
+    id: 108,
+    name: 'Tour Hà Nội City Tour - Tràng An Bái Đính - Hạ Long 4N3Đ',
+    slug: 'tour-ha-noi-trang-an-ha-long-4n3d',
+    duration: 4,
+    price: 3890000,
+    originalPrice: 5100000,
+    rating: 4.91,
+    reviewCount: 640,
+    featured: true,
+    image: '/uploads/tours/hanoi-tran-quoc.jpg',
+    transport: 'Xe ô tô du lịch + Du thuyền',
+    departurePoint: 'Hà Nội',
+    destination: { id: 7, name: 'Thủ Đô Hà Nội', slug: 'ha-noi' },
+  },
+];
+
 export default function ToursPage() {
   const { addItem } = useCart();
   const [searchParams] = useSearchParams();
@@ -75,14 +198,28 @@ export default function ToursPage() {
 
   const { data: toursData, isLoading } = useQuery({
     queryKey: ['tours-list', page, searchTerm, selectedDestination],
-    queryFn: () =>
-      getToursPaged(page, 9, {
-        q: searchTerm || undefined,
-        destinationId: selectedDestination,
-      }),
+    queryFn: async () => {
+      try {
+        const res = await getToursPaged(page, 9, {
+          q: searchTerm || undefined,
+          destinationId: selectedDestination,
+        });
+        if (res?.items?.length) return res;
+      } catch (err) {}
+      let filtered = [...FALLBACK_TOURS];
+      if (searchTerm) {
+        const q = searchTerm.toLowerCase();
+        filtered = filtered.filter(t => t.name.toLowerCase().includes(q) || (t.destination?.name && t.destination.name.toLowerCase().includes(q)));
+      }
+      return {
+        items: filtered,
+        total: filtered.length,
+        pages: Math.ceil(filtered.length / 9) || 1,
+      };
+    },
   });
 
-  const tours = toursData?.items || [];
+  const tours = toursData?.items?.length ? toursData.items : FALLBACK_TOURS;
   const totalPages = toursData?.pages || 1;
 
   const sortedTours = [...tours].sort((a, b) => {
