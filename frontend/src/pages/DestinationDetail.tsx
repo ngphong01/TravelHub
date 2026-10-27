@@ -70,25 +70,83 @@ export default function DestinationDetail() {
 
   const destination = useMemo(() => {
     if (dbDestination) return dbDestination;
+    const s = (slug || '').toLowerCase();
+    
+    if (s.includes('da-nang') || s.includes('danang')) {
+      return {
+        id: 6,
+        name: 'Đà Nẵng - Thành Phố Đáng Sống',
+        slug: slug || 'da-nang',
+        country: 'Việt Nam',
+        rating: 4.9,
+        price: 2490000,
+        featured: true,
+        description: 'Thành phố biển đáng sống bậc nhất Việt Nam với bãi biển Mỹ Khê quyến rũ, cây Cầu Vàng Bà Nà Hills vươn ra giữa mây ngàn, bán đảo Sơn Trà và danh thắng Ngũ Hành Sơn huyền thoại.',
+        image: getAuthenticImage(null, 'da-nang', 'destination'),
+      };
+    }
+    if (s.includes('phu-quoc') || s.includes('phuquoc')) {
+      return {
+        id: 4,
+        name: 'Đảo Ngọc Phú Quốc',
+        slug: slug || 'phu-quoc',
+        country: 'Việt Nam',
+        rating: 4.9,
+        price: 2890000,
+        featured: true,
+        description: 'Đảo ngọc thiên đường với những bãi biển cát trắng mịn màng như Bãi Sao, Bãi Khem, hệ thống cáp treo vượt biển Hòn Thơm dài nhất thế giới và những khu vui chơi giải trí tầm cỡ quốc tế.',
+        image: getAuthenticImage(null, 'phu-quoc', 'destination'),
+      };
+    }
+    if (s.includes('sa-pa') || s.includes('sapa')) {
+      return {
+        id: 2,
+        name: 'Sa Pa - Thị Trấn Trong Sương',
+        slug: slug || 'sa-pa',
+        country: 'Việt Nam',
+        rating: 4.8,
+        price: 1990000,
+        featured: true,
+        description: 'Thị trấn mờ sương trên đỉnh Hoàng Liên Sơn kỳ vĩ, chinh phục Nóc nhà Đông Dương Fansipan, ngắm nhìn ruộng bậc thang Mường Hoa và trải nghiệm văn hóa độc đáo của đồng bào H\'Mông, Dao đỏ.',
+        image: getAuthenticImage(null, 'sa-pa', 'destination'),
+      };
+    }
+    if (s.includes('hoi-an') || s.includes('hoian')) {
+      return {
+        id: 5,
+        name: 'Phố Cổ Hội An - Di Sản Văn Hóa',
+        slug: slug || 'hoi-an',
+        country: 'Việt Nam',
+        rating: 4.9,
+        price: 1850000,
+        featured: true,
+        description: 'Đô thị cổ được UNESCO công nhận với những dãy nhà tường vàng rêu phong, lung linh ánh đèn lồng bên dòng sông Hoài thơ mộng và nền ẩm thực phong phú nức lòng du khách.',
+        image: getAuthenticImage(null, 'hoi-an', 'destination'),
+      };
+    }
+    if (s.includes('ninh-binh') || s.includes('ninhbinh')) {
+      return {
+        id: 3,
+        name: 'Ninh Bình - Quần Thể Danh Thắng Tràng An',
+        slug: slug || 'ninh-binh',
+        country: 'Việt Nam',
+        rating: 4.8,
+        price: 1550000,
+        featured: true,
+        description: 'Vùng đất cố đô ngàn năm văn hiến sở hữu Di sản hỗn hợp Văn hóa & Thiên nhiên thế giới Tràng An, Tam Cốc Bích Động và quần thể chùa Bái Đính linh thiêng.',
+        image: getAuthenticImage(null, 'ninh-binh', 'destination'),
+      };
+    }
+
     return {
       id: 1,
-      name: slug?.includes('phu-quoc')
-        ? 'Đảo Ngọc Phú Quốc'
-        : slug?.includes('da-nang')
-        ? 'Đà Nẵng - Thành Phố Đáng Sống'
-        : slug?.includes('sa-pa') || slug?.includes('sapa')
-        ? 'Sa Pa - Thị Trấn Trong Sương'
-        : slug?.includes('hoi-an')
-        ? 'Phố Cổ Hội An - Di Sản Văn Hóa'
-        : slug?.includes('ninh-binh')
-        ? 'Ninh Bình - Quần Thể Danh Thắng Tràng An'
-        : 'Vịnh Hạ Long - Kỳ Quan Thiên Nhiên Thế Giới',
+      name: 'Vịnh Hạ Long - Kỳ Quan Thiên Nhiên Thế Giới',
       slug: slug || 'ha-long',
       country: 'Việt Nam',
       rating: 4.9,
       price: 2490000,
       featured: true,
-      description: 'Được UNESCO vinh danh là Di sản Thiên nhiên Thế giới, nơi đây mê hoặc du khách bởi hàng ngàn hòn đảo đá vôi kỳ vĩ nhô lên giữa làn nước xanh ngọc bích, các hang động huyền bí và những làng chài nổi bình yên.',
+      description: 'Được UNESCO vinh danh là Di sản Thiên nhiên Thế giới, nơi đây mê hoặc du khách bởi hàng ngàn hòn đảo đá vôi kỳ vĩ nhô lên giữa làn nước xanh ngọc bích, các hang động huyền bí và những du thuyền 5 sao đẳng cấp.',
       image: getAuthenticImage(null, slug, 'destination'),
     };
   }, [dbDestination, slug]);

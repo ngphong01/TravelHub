@@ -48,8 +48,10 @@ export default function Hotels() {
     }),
   });
 
-  const hotels = hotelsData?.items || [];
-  const total = hotelsData?.total || 0;
+  const hotels = Array.isArray(hotelsData)
+    ? hotelsData
+    : (hotelsData?.items || []);
+  const total = hotelsData?.total ?? (Array.isArray(hotelsData) ? hotelsData.length : 0);
 
   const handleFilterChange = (key: keyof FilterState | 'q', value: any) => {
     const newParams = new URLSearchParams(searchParams);

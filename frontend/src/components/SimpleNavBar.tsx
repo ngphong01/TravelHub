@@ -335,10 +335,10 @@ export default function SimpleNavBar() {
       <div className="container flex items-center justify-between py-4">
         <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">TG</span>
+            <span className="text-white font-bold text-sm">TH</span>
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">
-            TravelGo
+            TravelHub
           </span>
         </Link>
 

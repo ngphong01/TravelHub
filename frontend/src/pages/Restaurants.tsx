@@ -46,8 +46,10 @@ export default function Restaurants() {
     }),
   });
 
-  const restaurants = restaurantsData?.items || [];
-  const total = restaurantsData?.total || 0;
+  const restaurants = Array.isArray(restaurantsData)
+    ? restaurantsData
+    : (restaurantsData?.items || []);
+  const total = restaurantsData?.total ?? (Array.isArray(restaurantsData) ? restaurantsData.length : 0);
 
   const handleFilterChange = (key: keyof FilterState | 'q', value: any) => {
     const newParams = new URLSearchParams(searchParams);

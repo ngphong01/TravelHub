@@ -62,6 +62,8 @@ const Orders = lazy(() => import('./pages/Orders'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Tours = lazy(() => import('./pages/Tours'));
 const TravelPlanner = lazy(() => import('./pages/TravelPlanner'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
 import { CartProvider } from './contexts/CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AccountLayout from './layouts/AccountLayout';
@@ -257,6 +259,16 @@ function AppContent() {
           <Route path="/payment-methods" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <PaymentMethods />
+            </Suspense>
+          } />
+          <Route path="/terms" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Terms />
+            </Suspense>
+          } />
+          <Route path="/privacy" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Privacy />
             </Suspense>
           } />
           <Route path="/chatbot" element={

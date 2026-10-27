@@ -56,29 +56,63 @@ export default function RestaurantDetail() {
 
   const restaurant = useMemo(() => {
     if (dbRestaurant) return dbRestaurant;
+
+    const s = (slug || '').toLowerCase();
+    let name = 'Nhà Hàng Ẩm Thực Cao Cấp';
+    let city = 'Đà Nẵng';
+    let address = 'Đường bờ biển du lịch, Trung tâm ẩm thực';
+    let desc = 'Không gian ẩm thực sang trọng với nguồn nguyên liệu tươi ngon đánh bắt trong ngày, phục vụ các món ăn truyền thống và hải sản cao cấp.';
+
+    if (s.includes('ha-noi') || s.includes('hanoi')) {
+      name = 'Nhà Hàng Sen Tây Hồ Hà Nội';
+      city = 'Hà Nội';
+      address = 'Lạc Long Quân, Quận Tây Hồ, Hà Nội';
+      desc = 'Không gian ẩm thực truyền thống Bắc Bộ đặc sắc bên bờ hồ Tây thơ mộng, quy tụ hàng trăm món ngon 3 miền.';
+    } else if (s.includes('ha-long') || s.includes('halong')) {
+      name = 'Nhà Hàng Cua Vàng Bãi Cháy';
+      city = 'Quảng Ninh';
+      address = 'Đường Hạ Long, Khu Bãi Cháy, TP. Hạ Long';
+      desc = 'Thương hiệu hải sản nổi tiếng Hạ Long với món lẩu cua vàng trứ danh và các loại hải sản vịnh tươi sống.';
+    } else if (s.includes('phu-quoc') || s.includes('phuquoc')) {
+      name = 'Nhà Hàng Gió Biển Sunset Phú Quốc';
+      city = 'Phú Quốc';
+      address = 'Bãi Trường, Dương Tơ, TP. Phú Quốc';
+      desc = 'Nhà hàng ven biển lãng mạn ngắm hoàng hôn, nổi tiếng với ghẹ Hàm Ninh và gỏi cá trích tươi ngon.';
+    } else if (s.includes('hoi-an') || s.includes('hoian')) {
+      name = 'Nhà Hàng Bông Hồng Trắng Phố Cổ Hội An';
+      city = 'Quảng Nam';
+      address = 'Đường Phan Chu Trinh, Phường Minh An, TP. Hội An';
+      desc = 'Điểm đến ẩm thực di sản với đặc sản bánh bao, bánh vạc và cao lầu Hội An gia truyền.';
+    } else if (s.includes('sa-pa') || s.includes('sapa')) {
+      name = 'Nhà Hàng Bản Sắc Tây Bắc Sa Pa';
+      city = 'Sa Pa';
+      address = 'Đường Cầu Mây, Thị xã Sa Pa, Lào Cai';
+      desc = 'Ẩm thực độc đáo vùng cao với thắng cố ngựa, cá hồi tươi Sa Pa và lợn bản nướng thơm lừng.';
+    } else if (s.includes('da-nang') || s.includes('danang')) {
+      name = 'Nhà Hàng Hải Sản Bé Mặn Đà Nẵng';
+      city = 'Đà Nẵng';
+      address = 'Đường Võ Nguyên Giáp, Phường Mân Thái, Quận Sơn Trà, Đà Nẵng';
+      desc = 'Địa chỉ hải sản tươi sống bậc nhất Đà Nẵng ngay sát bãi biển Mỹ Khê, tự tay chọn hải sản đang bơi.';
+    } else if (slug) {
+      const formatted = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      name = `Nhà Hàng ${formatted}`;
+    }
+
     return {
       id: 888,
-      name: slug?.includes('ha-long')
-        ? 'Nhà Hàng Cua Vàng Bãi Cháy'
-        : slug?.includes('da-nang')
-        ? 'Nhà Hàng Hải Sản Bé Mặn Đà Nẵng'
-        : slug?.includes('phu-quoc')
-        ? 'Nhà Hàng Gió Biển Sunset Phú Quốc'
-        : slug?.includes('hoi-an')
-        ? 'Nhà Hàng Bông Hồng Trắng Phố Cổ Hội An'
-        : 'Nhà Hàng Ẩm Thực Cung Đình Heritage',
+      name,
       slug: slug || 'nha-hang-am-thuc-heritage',
-      description: 'Không gian ẩm thực ven biển sang trọng với nguồn hải sản tươi sống đánh bắt trong ngày. Bếp trưởng giàu kinh nghiệm chế biến các món đặc sản địa phương kết hợp phong cách ẩm thực Á - Âu tinh tế.',
+      description: desc,
       image: getAuthenticImage(null, slug, 'restaurant'),
-      address: 'Đường bờ biển du lịch, Trung tâm ẩm thực',
-      city: 'Đà Nẵng',
+      address,
+      city,
       country: 'Việt Nam',
       cuisine: 'Hải sản & Ẩm thực Việt Nam cao cấp',
       priceRange: '250.000đ - 650.000đ / người',
       rating: 4.8,
       featured: true,
       amenities: ['Chỗ đỗ xe miễn phí', 'Không gian ngoài trời ngắm biển', 'Phòng VIP riêng tư', 'Thanh toán thẻ & VietQR', 'WiFi tốc độ cao'],
-      contact: '0236 389 9999',
+      contact: '1900 232389',
       website: 'https://travelhub.vn',
       openingHours: {
         'Thứ Hai': '10:00 - 22:30',
@@ -97,6 +131,12 @@ export default function RestaurantDetail() {
       toast.error('Vui lòng chọn ngày và giờ dùng bữa');
       return;
     }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (new Date(reservationDate) < today) {
+      toast.error('Không thể đặt bàn vào ngày trong quá khứ!');
+      return;
+    }
     const estimatedAmount = partySize * 300000;
     navigate(`/checkout?type=restaurant&id=${restaurant?.id}&slug=${restaurant?.slug}&date=${reservationDate}&time=${reservationTime}&partySize=${partySize}&amount=${estimatedAmount}`);
   };
@@ -104,6 +144,12 @@ export default function RestaurantDetail() {
   const handleAddToCart = () => {
     if (!reservationDate || !reservationTime) {
       toast.error('Vui lòng chọn ngày và giờ dùng bữa trước khi thêm vào giỏ');
+      return;
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (new Date(reservationDate) < today) {
+      toast.error('Không thể đặt bàn vào ngày trong quá khứ!');
       return;
     }
     const estimatedAmount = partySize * 300000;

@@ -214,12 +214,12 @@ export default function Footer() {
                 <div>
                   <p className="text-gray-400 text-sm">Website:</p>
                   <a 
-                    href="https://travelgo.com" 
+                    href="https://www.daophong.id.vn" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-white text-sm hover:text-blue-400 transition-colors"
                   >
-                    www.travelgo.com
+                    daophong.id.vn
                   </a>
                 </div>
               </li>
@@ -233,18 +233,18 @@ export default function Footer() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3">
             <p className="text-gray-400 text-xs text-center md:text-left">
-              © {currentYear} <span className="text-white font-semibold">TravelGo</span>. Tất cả quyền được bảo lưu.
+              © {currentYear} <span className="text-white font-semibold">TravelHub</span>. Tất cả quyền được bảo lưu.
             </p>
             <div className="flex items-center gap-4 text-xs">
-              <a href="#terms" className="text-gray-400 hover:text-white transition-colors">
+              <Link to="/terms" className="text-gray-400 hover:text-white transition-colors">
                 Điều khoản
-              </a>
-              <a href="#privacy" className="text-gray-400 hover:text-white transition-colors">
+              </Link>
+              <Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">
                 Bảo mật
-              </a>
-              <a href="#cookies" className="text-gray-400 hover:text-white transition-colors">
-                Cookies
-              </a>
+              </Link>
+              <Link to="/about" className="text-gray-400 hover:text-white transition-colors">
+                Về chúng tôi
+              </Link>
             </div>
           </div>
         </div>

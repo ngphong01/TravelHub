@@ -103,7 +103,7 @@ export default function LiveChat() {
       setMessages([
         {
           id: "1",
-          text: "Xin chào! Tôi là GoGo, trợ lý du lịch của TravelGo. Tôi có thể giúp bạn tìm hiểu về các điểm đến, đặt chỗ, hoặc trả lời bất kỳ câu hỏi nào về du lịch. Bạn cần hỗ trợ gì?",
+          text: "Xin chào! Tôi là tư vấn viên của TravelHub. Tôi luôn sẵn sàng hỗ trợ quý khách thông tin tour, lịch trình, chính sách đặt chỗ, thanh toán hoặc hóa đơn điện tử. Quý khách cần hỗ trợ gì ạ?",
           isUser: false,
           timestamp: new Date()
         }
@@ -349,7 +349,7 @@ export default function LiveChat() {
               </button>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-              TravelGo Assistant hỗ trợ thông tin điểm đến và đặt chỗ.
+              Trợ lý AI TravelHub hỗ trợ thông tin điểm đến và đặt chỗ 24/7.
             </p>
           </div>
         </div>

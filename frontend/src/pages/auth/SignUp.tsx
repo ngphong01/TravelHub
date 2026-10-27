@@ -378,9 +378,9 @@ export default function SignUpPage() {
           {/* Terms */}
           <p className="mt-6 text-xs text-center text-gray-500 leading-relaxed">
             Bằng cách tạo tài khoản, bạn đồng ý với{' '}
-            <a href="#" className="text-indigo-600 hover:text-indigo-700 underline">Điều Khoản Dịch Vụ</a>
+            <Link to="/terms" className="text-indigo-600 hover:text-indigo-700 underline font-medium">Điều Khoản Dịch Vụ</Link>
             {' '}và{' '}
-            <a href="#" className="text-indigo-600 hover:text-indigo-700 underline">Chính Sách Bảo Mật</a>
+            <Link to="/privacy" className="text-indigo-600 hover:text-indigo-700 underline font-medium">Chính Sách Bảo Mật</Link>
           </p>
         </div>
 

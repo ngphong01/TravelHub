@@ -21,6 +21,7 @@ export default function CartPage() {
   const [couponCode, setCouponCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
   const [appliedCoupon, setAppliedCoupon] = useState('');
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   const formatPrice = (amount: number) => {
     return (amount || 0).toLocaleString('vi-VN') + ' đ';
@@ -28,20 +29,40 @@ export default function CartPage() {
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
+    setCouponError(null);
     const code = couponCode.trim().toUpperCase();
-    if (code === 'MEMBER10' || code === 'TRAVELHUB10') {
+    if (!code) {
+      setCouponError('Vui lòng nhập mã ưu đãi.');
+      return;
+    }
+
+    if (code === 'MEMBER10' || code === 'TRAVELHUB10' || code === 'EARLY10') {
       setDiscountPercent(10);
       setAppliedCoupon(code);
+      setCouponError(null);
       toast.success(`Đã áp dụng mã ${code} (Giảm 10%)`);
-    } else if (code === 'TRAVELGO20' || code === 'TRAVELHUB20') {
+    } else if (code === 'TRAVELHUB20') {
       setDiscountPercent(20);
       setAppliedCoupon('TRAVELHUB20');
+      setCouponError(null);
       toast.success('Đã áp dụng mã TRAVELHUB20 (Giảm 20%)');
     } else if (code === 'GROUP5') {
+      const totalGuests = items.reduce((s, i) => s + (i.guests || 1), 0);
+      if (totalGuests < 4) {
+        setDiscountPercent(0);
+        setAppliedCoupon('');
+        setCouponError('Mã GROUP5 chỉ áp dụng cho nhóm từ 4 khách trở lên.');
+        toast.error('Mã GROUP5 chỉ áp dụng cho nhóm từ 4 khách trở lên!');
+        return;
+      }
       setDiscountPercent(5);
       setAppliedCoupon('GROUP5');
+      setCouponError(null);
       toast.success('Đã áp dụng mã GROUP5 (Giảm 5%)');
     } else {
+      setDiscountPercent(0);
+      setAppliedCoupon('');
+      setCouponError('Mã giảm giá không hợp lệ hoặc đã hết hạn.');
       toast.error('Mã giảm giá không hợp lệ hoặc đã hết hạn');
     }
   };
@@ -240,9 +261,15 @@ export default function CartPage() {
                       </button>
                     </div>
                     {appliedCoupon && (
-                      <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5 flex items-center gap-1">
+                      <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5 flex items-center gap-1 font-medium">
                         <CheckCircleIcon className="w-3.5 h-3.5" />
                         Đang áp dụng: <strong>{appliedCoupon}</strong> (-{discountPercent}%)
+                      </p>
+                    )}
+                    {couponError && (
+                      <p className="text-xs text-rose-500 dark:text-rose-400 mt-1.5 flex items-center gap-1 font-medium">
+                        <span>⚠️</span>
+                        {couponError}
                       </p>
                     )}
                   </form>

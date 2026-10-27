@@ -283,6 +283,20 @@ router.post('/', async (req, res) => {
       finalAmount = Math.max(0, price - discountAmount);
     }
 
+    // ========== SERVER-SIDE PRICE TAMPERING PROTECTION ==========
+    if (tour && tour.price) {
+      const guestCount = Math.max(1, parseInt(guests) || ((parseInt(adults) || 1) + (parseInt(children) || 0)));
+      const baseExpected = Number(tour.price) * guestCount;
+      const minAcceptablePrice = Math.round(baseExpected * 0.5);
+      if (finalAmount < minAcceptablePrice) {
+        console.warn(`🚨 Price tampering detected for tour ${tour.id}: submitted ${finalAmount}, minimum expected ${minAcceptablePrice}`);
+        return res.status(400).json({ 
+          message: 'Số tiền thanh toán không hợp lệ với giá tour niêm yết. Vui lòng kiểm tra lại.',
+          expectedPrice: baseExpected
+        });
+      }
+    }
+
     // ========== TẠO BOOKING ==========
     const bookingCode = generateBookingCode();
     

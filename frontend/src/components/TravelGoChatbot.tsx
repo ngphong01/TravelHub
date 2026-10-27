@@ -346,7 +346,7 @@ export default function TravelGoChatbot() {
           </button>
         </div>
         <p className="text-xs text-gray-500 mt-2 text-center">
-          TravelGo Assistant hỗ trợ thông tin điểm đến và đặt chỗ.
+          Trợ lý AI TravelHub hỗ trợ thông tin điểm đến và đặt chỗ 24/7.
         </p>
       </div>
     </div>

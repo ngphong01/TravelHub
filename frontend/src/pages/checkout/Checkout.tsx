@@ -46,6 +46,8 @@ interface UserData {
 const COUPONS: Record<string, number> = {
   MEMBER10: 10,
   EARLY10: 10,
+  TRAVELHUB10: 10,
+  TRAVELHUB20: 20,
   GROUP5: 5,
 };
 
@@ -109,7 +111,7 @@ const getErrorMessage = (err: any, context: string): string => {
   let errorMessage = `Không thể tải thông tin ${context}. `;
 
   if (err?.response?.status === 404) {
-    errorMessage += `${context} không tồn tại. `;
+    errorMessage += `${context} không tồn tại hoặc đã ngừng phục vụ. `;
   } else if (err?.response?.status === 400) {
     errorMessage += 'Dữ liệu không hợp lệ. ';
   } else if (err?.code === 'NETWORK_ERROR' || err?.message?.includes('Network')) {
@@ -118,7 +120,7 @@ const getErrorMessage = (err: any, context: string): string => {
     errorMessage += 'Hết thời gian chờ. ';
   }
 
-  errorMessage += 'Vui lòng nhập số tiền thủ công hoặc thử lại sau.';
+  errorMessage += 'Vui lòng quay lại chọn dịch vụ khác hoặc thử lại sau.';
   return errorMessage;
 };
 
@@ -299,6 +301,12 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (normalized === 'GROUP5' && guests < 4) {
+      setDiscountPercent(0);
+      setCouponMsg('Mã GROUP5 chỉ áp dụng cho nhóm từ 4 khách trở lên.');
+      return;
+    }
+
     const pct = COUPONS[normalized];
     if (pct) {
       setDiscountPercent(pct);
@@ -307,7 +315,7 @@ export default function CheckoutPage() {
       setDiscountPercent(0);
       setCouponMsg('Mã không hợp lệ hoặc đã hết hạn');
     }
-  }, []);
+  }, [guests]);
 
   // Method change handler
   const handleMethodChange = useCallback((value: PaymentOption['id']) => {
@@ -322,11 +330,20 @@ export default function CheckoutPage() {
     (newGuests: number) => {
       const g = Math.max(1, newGuests);
       setGuests(g);
-      if (basePrice > 0 && !isCombo) {
+      if (basePrice > 0) {
         setAmount(String(basePrice * g));
       }
+      if (coupon.trim().toUpperCase() === 'GROUP5') {
+        if (g < 4) {
+          setDiscountPercent(0);
+          setCouponMsg('Mã GROUP5 chỉ áp dụng cho nhóm từ 4 khách trở lên.');
+        } else {
+          setDiscountPercent(5);
+          setCouponMsg('Áp dụng mã GROUP5: giảm 5%');
+        }
+      }
     },
-    [basePrice, isCombo]
+    [basePrice, coupon]
   );
 
   // Copy to clipboard
@@ -548,6 +565,7 @@ export default function CheckoutPage() {
     // Combo booking
     if (type === 'combo') {
       setIsCombo(true);
+      setBookingType('combo');
 
       if (title) {
         const decodedTitle = decodeURIComponent(title);
@@ -565,8 +583,9 @@ export default function CheckoutPage() {
       }
 
       if (qAmount) {
-        setAmount(qAmount);
-        setBasePrice(Number(qAmount));
+        const p = Number(qAmount);
+        setBasePrice(p);
+        setAmount(String(p * Math.max(1, qGuests)));
       }
 
       setIsLoadingData(false);
@@ -575,6 +594,7 @@ export default function CheckoutPage() {
 
     // Cart booking
     if (searchParams.get('from') === 'cart') {
+      setBookingType('cart');
       const qDiscount = Number(searchParams.get('discount') || '0');
       const qCoupon = searchParams.get('coupon') || '';
       if (qDiscount > 0) setDiscountPercent(qDiscount);
@@ -1107,13 +1127,14 @@ export default function CheckoutPage() {
 
   // Render guests control
   const renderGuestsControl = () => {
+    if (bookingType === 'cart' || searchParams.get('from') === 'cart') return null;
     if (basePrice <= 0 && !isCombo) return null;
 
     return (
       <div className="space-y-2">
         <label className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-slate-200">
           <UserGroupIcon className="w-5 h-5 text-cyan-500" />
-          {isCombo ? 'Số người' : 'Số khách'}
+          {isCombo ? 'Số người tham gia' : 'Số khách'}
         </label>
         <div className="flex items-center gap-3">
           <button
@@ -1140,7 +1161,12 @@ export default function CheckoutPage() {
         </div>
         <p className="text-xs text-gray-500 dark:text-slate-400">
           {isCombo ? (
-            'Giá combo đã bao gồm tất cả dịch vụ'
+            <>
+              Giá combo cơ bản:{' '}
+              <span className="font-semibold text-gray-800 dark:text-slate-200">
+                {formatCurrency(basePrice)} VNĐ/người
+              </span>
+            </>
           ) : (
             <>
               Giá cơ bản:{' '}
@@ -1470,32 +1496,19 @@ export default function CheckoutPage() {
               </label>
               <div className="relative">
                 <input
-                  className="w-full px-4 py-4 rounded-xl border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 text-lg font-semibold transition-all bg-white dark:bg-slate-900 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-slate-800 disabled:cursor-not-allowed"
-                  placeholder="Nhập số tiền"
+                  className="w-full px-4 py-4 rounded-xl border-2 border-gray-200 dark:border-slate-700 text-lg font-semibold transition-all bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white cursor-not-allowed"
+                  placeholder={errorMsg ? 'Không có giá' : 'Số tiền thanh toán'}
                   type="number"
                   min="0"
                   step="1000"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  readOnly={basePrice > 0 && !errorMsg && !isLoadingData}
+                  readOnly={true}
                   disabled={isLoadingData}
                   required
                 />
-                {basePrice > 0 && !errorMsg && !isLoadingData && (
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <span className="text-gray-400 text-sm">🔒</span>
-                  </div>
-                )}
-                {errorMsg && (
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <span
-                      className="text-cyan-600 text-sm"
-                      title="Có thể nhập thủ công"
-                    >
-                      ✏️
-                    </span>
-                  </div>
-                )}
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <span className="text-gray-400 text-sm" title="Số tiền được cố định bởi hệ thống">🔒</span>
+                </div>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500 dark:text-slate-400">
@@ -1647,9 +1660,9 @@ export default function CheckoutPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={submitting || !amount || Number(amount) <= 0}
+              disabled={submitting || !amount || Number(amount) <= 0 || !!errorMsg || isLoadingData}
               className={`w-full px-6 py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all transform ${
-                !amount || Number(amount) <= 0 || submitting
+                !amount || Number(amount) <= 0 || submitting || !!errorMsg || isLoadingData
                   ? 'bg-gray-400 dark:bg-slate-700 cursor-not-allowed opacity-75'
                   : 'bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 hover:from-cyan-600 hover:via-teal-600 hover:to-sky-600 hover:scale-[1.01] active:scale-[0.99] shadow-cyan-500/25'
               }`}

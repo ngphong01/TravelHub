@@ -88,7 +88,7 @@ export const PACKAGE_OPTIONS: PackageOption[] = [
     id: 'vip',
     name: 'Gói Trải Nghiệm VIP',
     subtitle: 'VIP Luxury & Priority',
-    badge: 'Klook Choice ★ Khuyên dùng',
+    badge: 'TravelHub Choice ★ Khuyên dùng',
     badgeStyle: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm',
     priceDelta: 350000,
     highlight: true,
@@ -178,7 +178,7 @@ export default function TourDetail() {
       originalPrice: 3890000,
       rating: 4.9,
       reviewCount: 1420,
-      tags: ['Bán chạy nhất', 'Klook Choice', 'Xác nhận tức thì', 'Tour 5 Sao'],
+      tags: ['Bán chạy nhất', 'TravelHub Choice', 'Xác nhận tức thì', 'Tour 5 Sao'],
       highlights: [
         { icon: 'ship', text: 'Nghỉ dưỡng chuẩn 5 sao view toàn cảnh thiên nhiên' },
         { icon: 'fork-knife', text: 'Thưởng thức buffet hải sản tươi sống đặc sản' },
@@ -562,10 +562,13 @@ export default function TourDetail() {
     const year = selectedMonth.getFullYear();
     const month = selectedMonth.getMonth();
     const basePrice = tour?.price || 15590000;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
     for (let i = 1; i <= 31; i++) {
       const date = new Date(year, month, i);
       if (date.getMonth() !== month) break;
+      if (date < today) continue;
       const dayOfWeek = date.getDay(); // 0 is Sun, 2 is Tue, 4 is Thu, 5 is Fri, 6 is Sat
       if ([0, 2, 4, 5, 6].includes(dayOfWeek)) {
         dates[i.toString()] = basePrice;
@@ -655,13 +658,19 @@ export default function TourDetail() {
 
   const handleMonthChange = (direction: 'prev' | 'next') => {
     setSelectedMonth(prev => {
-      const newDate = new Date(prev);
+      const now = new Date();
       if (direction === 'prev') {
+        if (prev.getFullYear() === now.getFullYear() && prev.getMonth() <= now.getMonth()) {
+          return prev;
+        }
+        const newDate = new Date(prev);
         newDate.setMonth(prev.getMonth() - 1);
+        return newDate;
       } else {
+        const newDate = new Date(prev);
         newDate.setMonth(prev.getMonth() + 1);
+        return newDate;
       }
-      return newDate;
     });
   };
 

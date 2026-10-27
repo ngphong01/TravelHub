@@ -97,7 +97,7 @@ export default function ReviewSection({ type, targetId, slug, title }: ReviewSec
     submitMutation.mutate({
       rating,
       comment: comment.trim(),
-      author: authorName.trim() || 'Du khách TravelGo',
+      author: authorName.trim() || 'Du khách TravelHub',
     });
   };
 

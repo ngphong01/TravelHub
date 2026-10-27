@@ -95,22 +95,62 @@ export default function HotelDetail() {
   const hotel = useMemo(() => {
     if (dbHotel) return dbHotel;
 
-    // Fallback luxury resort
+    const s = (slug || '').toLowerCase();
+    let name = 'Khách sạn cao cấp';
+    let city = 'Đà Nẵng';
+    let address = 'Đường biển Mỹ Khê, Đà Nẵng';
+    let desc = 'Khách sạn nghỉ dưỡng sang trọng với tầm nhìn trọn vẹn ra cảnh quan thiên nhiên tuyệt mỹ.';
+
+    if (s.includes('ha-noi') || s.includes('hanoi') || s.includes('hoan-kiem')) {
+      name = 'Khách sạn Khang Palace Hà Nội';
+      city = 'Hà Nội';
+      address = 'Phố Hàng Bông, Quận Hoàn Kiếm, Hà Nội';
+      desc = 'Khách sạn boutique đậm phong cách thanh lịch phố cổ Hà Nội, gần hồ Hoàn Kiếm và các điểm tham quan trung tâm.';
+    } else if (s.includes('ha-long') || s.includes('halong') || s.includes('bai-chay')) {
+      name = 'Heritage Hạ Long Grand Resort';
+      city = 'Quảng Ninh';
+      address = 'Đường Bãi Cháy, TP. Hạ Long, Quảng Ninh';
+      desc = 'Resort nghỉ dưỡng hướng vịnh di sản với hồ bơi vô cực và ẩm thực hải sản phong phú.';
+    } else if (s.includes('phu-quoc') || s.includes('phuquoc')) {
+      name = 'Sunset Sanato Resort Phú Quốc';
+      city = 'Phú Quốc';
+      address = 'Bãi Trường, Dương Tơ, TP. Phú Quốc';
+      desc = 'Khu nghỉ dưỡng biển với bãi cát dài thơ mộng, ngắm hoàng hôn rực rỡ và dịch vụ thư giãn đẳng cấp.';
+    } else if (s.includes('sa-pa') || s.includes('sapa')) {
+      name = 'Silk Path Grand Resort & Spa Sa Pa';
+      city = 'Sa Pa';
+      address = 'Đồi Quan Sứ, Thị xã Sa Pa, Lào Cai';
+      desc = 'Khu nghỉ dưỡng mang phong cách châu Âu giữa mây ngàn Tây Bắc, nhìn thẳng ra dãy Hoàng Liên Sơn hùng vĩ.';
+    } else if (s.includes('nha-trang')) {
+      name = 'Amiana Resort Nha Trang';
+      city = 'Nha Trang';
+      address = 'Đường Phạm Văn Đồng, TP. Nha Trang';
+      desc = 'Resort ven biển với hồ bơi nước biển tự nhiên, bãi tắm riêng và các tiện ích spa đẳng cấp.';
+    } else if (s.includes('da-nang') || s.includes('danang') || s.includes('vinpearl')) {
+      name = 'Vinpearl Luxury Resort & Spa';
+      city = 'Đà Nẵng';
+      address = 'Đường Trường Sa, Bán đảo Sơn Trà, Ngũ Hành Sơn, Đà Nẵng';
+      desc = 'Tọa lạc trên bãi biển Mỹ Khê tuyệt đẹp, khu nghỉ dưỡng sở hữu không gian biển xanh thơ mộng, hồ bơi vô cực rộng lớn và hệ thống ẩm thực quốc tế 5 sao đẳng cấp.';
+    } else if (slug) {
+      const formatted = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      name = `Khách Sạn & Resort ${formatted}`;
+    }
+
     return {
       id: 999,
-      name: 'Vinpearl Luxury Resort & Spa',
-      slug: slug || 'vinpearl-luxury-resort',
-      address: 'Đường Trường Sa, Bán đảo Sơn Trà, Ngũ Hành Sơn',
-      city: 'Đà Nẵng',
+      name,
+      slug: slug || 'khach-san-nghi-duong',
+      address,
+      city,
       country: 'Việt Nam',
       pricePerNight: 2890000,
       rating: 4.9,
       reviewCount: 1420,
-      description: 'Tọa lạc trên bãi biển Mỹ Khê tuyệt đẹp, khu nghỉ dưỡng sở hữu không gian biển xanh thơ mộng, hồ bơi vô cực rộng lớn và hệ thống ẩm thực quốc tế 5 sao đẳng cấp.',
+      description: desc,
       image: getAuthenticImage(null, slug, 'hotel'),
       amenities: ['wifi', 'pool', 'spa', 'gym', 'restaurant', 'beach', 'breakfast'],
-      contact: '0236 395 8888',
-      website: 'https://vinpearl.com',
+      contact: '1900 232389',
+      website: 'https://travelhub.vn',
     };
   }, [dbHotel, slug]);
 
@@ -209,11 +249,21 @@ export default function HotelDetail() {
     ];
   }, [hotel.pricePerNight]);
 
+  // Date validation
+  const isDateInvalid = useMemo(() => {
+    if (!checkIn || !checkOut) return true;
+    const inDate = new Date(checkIn);
+    const outDate = new Date(checkOut);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return inDate < today || outDate <= inDate;
+  }, [checkIn, checkOut]);
+
   // Calculate nights
   const totalNights = useMemo(() => {
     if (!checkIn || !checkOut) return 1;
     const diff = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24));
-    return diff > 0 ? diff : 1;
+    return diff > 0 ? diff : 0;
   }, [checkIn, checkOut]);
 
   // Calculate total price based on selected rooms
@@ -238,6 +288,10 @@ export default function HotelDetail() {
   };
 
   const handleReserve = (roomId?: string) => {
+    if (isDateInvalid || totalNights <= 0) {
+      toast.error('Ngày trả phòng phải sau ngày nhận phòng và không được chọn ngày trong quá khứ!');
+      return;
+    }
     let targetRoom = roomId;
     if (!targetRoom) {
       targetRoom = Object.keys(roomsCount).find((k) => roomsCount[k] > 0) || 'deluxe';
@@ -249,6 +303,10 @@ export default function HotelDetail() {
   };
 
   const handleAddToCart = (roomTarget?: RoomType) => {
+    if (isDateInvalid || totalNights <= 0) {
+      toast.error('Ngày trả phòng phải sau ngày nhận phòng và không được chọn ngày trong quá khứ!');
+      return;
+    }
     let target = roomTarget;
     if (!target) {
       const selectedId = Object.keys(roomsCount).find((k) => roomsCount[k] > 0) || 'deluxe';
@@ -527,8 +585,17 @@ export default function HotelDetail() {
                   <label className="text-xs text-slate-300 block mb-1">Ngày nhận phòng</label>
                   <input
                     type="date"
+                    min={new Date().toISOString().split('T')[0]}
                     value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
+                    onChange={(e) => {
+                      const newIn = e.target.value;
+                      setCheckIn(newIn);
+                      if (new Date(checkOut) <= new Date(newIn)) {
+                        const next = new Date(newIn);
+                        next.setDate(next.getDate() + 1);
+                        setCheckOut(next.toISOString().split('T')[0]);
+                      }
+                    }}
                     className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 font-bold text-sm text-white focus:outline-none"
                   />
                 </div>
@@ -536,8 +603,20 @@ export default function HotelDetail() {
                   <label className="text-xs text-slate-300 block mb-1">Ngày trả phòng</label>
                   <input
                     type="date"
+                    min={(() => {
+                      if (!checkIn) return new Date().toISOString().split('T')[0];
+                      const d = new Date(checkIn);
+                      d.setDate(d.getDate() + 1);
+                      return d.toISOString().split('T')[0];
+                    })()}
                     value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
+                    onChange={(e) => {
+                      const newOut = e.target.value;
+                      if (checkIn && new Date(newOut) <= new Date(checkIn)) {
+                        toast.error('Ngày trả phòng phải sau ngày nhận phòng!');
+                      }
+                      setCheckOut(newOut);
+                    }}
                     className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 font-bold text-sm text-white focus:outline-none"
                   />
                 </div>
@@ -545,10 +624,18 @@ export default function HotelDetail() {
                   <label className="text-xs text-slate-300 block mb-1">Số khách</label>
                   <div className="bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 font-bold text-sm text-white flex items-center justify-between">
                     <span>{adults} Người lớn {children > 0 ? `, ${children} trẻ` : ''}</span>
-                    <span className="text-amber-400 text-xs">({totalNights} đêm)</span>
+                    <span className={totalNights > 0 ? "text-amber-400 text-xs" : "text-rose-400 text-xs font-bold"}>
+                      ({totalNights > 0 ? `${totalNights} đêm` : 'Ngày không hợp lệ'})
+                    </span>
                   </div>
                 </div>
               </div>
+              {isDateInvalid && (
+                <div className="mt-3 p-2.5 rounded-xl bg-rose-500/20 border border-rose-400/40 text-xs text-rose-200 flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>Ngày trả phòng phải sau ngày nhận phòng và không được chọn ngày trong quá khứ.</span>
+                </div>
+              )}
             </div>
 
             {/* BẢNG CHỌN LOẠI PHÒNG (Room Availability Table) */}
