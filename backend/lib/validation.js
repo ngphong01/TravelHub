@@ -86,6 +86,7 @@ function sanitizeObject(obj) {
   }
   
   if (typeof obj === 'object') {
+    const sanitized = {};
     const sensitiveKeys = ['password', 'newPassword', 'currentPassword', 'passwordHash', 'token', 'refreshToken', 'twoFactorToken', 'twoFactorSecret'];
     for (const [key, value] of Object.entries(obj)) {
       if (sensitiveKeys.includes(key)) {
