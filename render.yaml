@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: travelhub-api
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://www.daophong.id.vn
+      - key: ALLOWED_ORIGIN
+        value: https://www.daophong.id.vn

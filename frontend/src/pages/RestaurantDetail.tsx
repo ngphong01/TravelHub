@@ -21,7 +21,10 @@ import {
   SparklesIcon,
   CalendarDaysIcon,
   CheckCircleIcon,
+  ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
+import { useCart } from '../contexts/CartContext';
+import toast from 'react-hot-toast';
 import {
   StarIcon as StarIconSolid,
   HeartIcon as HeartIconSolid,
@@ -32,6 +35,7 @@ import { useState, useMemo } from 'react';
 export default function RestaurantDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { addItem } = useCart();
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -97,10 +101,47 @@ export default function RestaurantDetail() {
 
   const handleReservation = () => {
     if (!reservationDate || !reservationTime) {
-      alert('Vui lòng chọn ngày và giờ dùng bữa');
+      toast.error('Vui lòng chọn ngày và giờ dùng bữa');
       return;
     }
-    navigate(`/checkout?type=restaurant&id=${restaurant?.id}&slug=${restaurant?.slug}&date=${reservationDate}&time=${reservationTime}&partySize=${partySize}`);
+    const estimatedAmount = partySize * 300000;
+    navigate(`/checkout?type=restaurant&id=${restaurant?.id}&slug=${restaurant?.slug}&date=${reservationDate}&time=${reservationTime}&partySize=${partySize}&amount=${estimatedAmount}`);
+  };
+
+  const handleAddToCart = () => {
+    if (!reservationDate || !reservationTime) {
+      toast.error('Vui lòng chọn ngày và giờ dùng bữa trước khi thêm vào giỏ');
+      return;
+    }
+    const estimatedAmount = partySize * 300000;
+    addItem({
+      type: 'restaurant',
+      itemId: restaurant.id,
+      title: `${restaurant.name} (Bàn ${partySize} khách)`,
+      slug: restaurant.slug,
+      price: estimatedAmount,
+      date: `${reservationDate} lúc ${reservationTime}`,
+      guests: partySize,
+      location: restaurant.city || 'Việt Nam',
+      image: restaurant.image || undefined,
+    });
+  };
+
+  const handleToggleWishlist = () => {
+    setIsFavorite((prev) => {
+      const next = !prev;
+      if (next) {
+        toast.success(`Đã lưu "${restaurant.name}" vào danh sách yêu thích!`);
+      } else {
+        toast.success(`Đã bỏ "${restaurant.name}" khỏi danh sách yêu thích`);
+      }
+      return next;
+    });
+  };
+
+  const handleShareRestaurant = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success('Đã sao chép liên kết nhà hàng vào bộ nhớ tạm!');
   };
 
   const amenitiesList = useMemo(() => {
@@ -162,18 +203,17 @@ export default function RestaurantDetail() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setIsFavorite(!isFavorite)}
+                onClick={handleToggleWishlist}
                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
+                title="Lưu vào danh sách yêu thích"
               >
                 {isFavorite ? <HeartIconSolid className="w-5 h-5 text-red-500" /> : <HeartIcon className="w-5 h-5" />}
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  alert('Đã sao chép liên kết nhà hàng!');
-                }}
+                onClick={handleShareRestaurant}
                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
+                title="Chia sẻ"
               >
                 <ShareIcon className="w-5 h-5" />
               </button>
@@ -372,13 +412,23 @@ export default function RestaurantDetail() {
                   <p>Thanh toán trực tiếp tại nhà hàng sau khi dùng bữa</p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleReservation}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-extrabold text-sm uppercase tracking-wider shadow-lg shadow-orange-500/25 hover:shadow-xl transition-all"
-                >
-                  Xác Nhận Giữ Chỗ
-                </button>
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={handleReservation}
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-extrabold text-sm uppercase tracking-wider shadow-lg shadow-orange-500/25 hover:shadow-xl transition-all"
+                  >
+                    Xác Nhận Giữ Chỗ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="w-full py-3 rounded-2xl border-2 border-orange-600 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/40 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+                  >
+                    <ShoppingBagIcon className="w-4 h-4" />
+                    Thêm Vào Giỏ Hàng
+                  </button>
+                </div>
 
                 <div className="text-center">
                   <span className="text-[11px] text-slate-400">

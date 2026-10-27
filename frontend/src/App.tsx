@@ -55,6 +55,7 @@ const SimpleLogin = lazy(() => import('./pages/auth/SimpleLogin'));
 const SimpleRegister = lazy(() => import('./pages/auth/SimpleRegister'));
 const SignOut = lazy(() => import('./pages/auth/SignOut'));
 const Checkout = lazy(() => import('./pages/checkout/Checkout'));
+const Payment = lazy(() => import('./pages/checkout/Payment'));
 const PayPalSuccess = lazy(() => import('./pages/checkout/PayPalSuccess'));
 const PayPalCancel = lazy(() => import('./pages/checkout/PayPalCancel'));
 const Orders = lazy(() => import('./pages/Orders'));
@@ -308,6 +309,16 @@ function AppContent() {
               <Checkout />
             </Suspense>
           } />
+          <Route path="/payment" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Payment />
+            </Suspense>
+          } />
+          <Route path="/checkout/payment" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Payment />
+            </Suspense>
+          } />
           <Route path="/checkout/paypal/success" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <PayPalSuccess />
@@ -474,6 +485,16 @@ function AppContent() {
           <Route path="/:lang/checkout" element={
             <Suspense fallback={<Skeleton className="h-screen w-full" />}>
               <Checkout />
+            </Suspense>
+          } />
+          <Route path="/:lang/payment" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Payment />
+            </Suspense>
+          } />
+          <Route path="/:lang/checkout/payment" element={
+            <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+              <Payment />
             </Suspense>
           } />
           <Route path="/:lang/orders" element={

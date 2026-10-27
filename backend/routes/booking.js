@@ -403,6 +403,52 @@ router.get('/user/:userId', authRequired, async (req, res) => {
   }
 });
 
+// GET /api/booking/code/:code - Lấy booking theo mã code
+router.get('/code/:code', async (req, res) => {
+  try {
+    const { code } = req.params;
+
+    const booking = await prisma.booking.findUnique({
+      where: { code: String(code).trim().toUpperCase() },
+      include: {
+        destination: true,
+        payment: true,
+        user: {
+          select: { id: true, name: true, email: true, phone: true }
+        }
+      }
+    });
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    res.json(booking);
+  } catch (error) {
+    console.error('Get booking by code error:', error);
+    res.status(500).json({ message: 'Failed to get booking', error: error.message });
+  }
+});
+
+// POST /api/booking/:id/cancel - Hủy đặt chỗ
+router.post('/:id/cancel', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const booking = await prisma.booking.update({
+      where: { id: parseInt(id) },
+      data: { status: 'CANCELLED' },
+      include: { destination: true, payment: true }
+    });
+
+    res.json({ success: true, message: 'Đã hủy đặt chỗ thành công', booking });
+  } catch (error) {
+    console.error('Cancel booking error:', error);
+    res.status(500).json({ message: 'Failed to cancel booking', error: error.message });
+  }
+});
+
 // GET /api/booking/:id - Lấy chi tiết booking
 router.get('/:id', async (req, res) => {
   try {

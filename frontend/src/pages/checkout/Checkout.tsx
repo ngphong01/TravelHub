@@ -3,6 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PaymentAPI, UserAPI, BookingAPI } from '../../utils/api';
 import { getDestinationBySlug } from '../../services/destination';
 import { getTourById, getTourBySlug } from '../../services/tour';
+import { getHotelBySlug } from '../../services/hotel';
+import { getRestaurantBySlug } from '../../services/restaurant';
 import { useCart } from '../../contexts/CartContext';
 import {
   CreditCardIcon,
@@ -166,6 +168,11 @@ export default function CheckoutPage() {
   const [bookingDate, setBookingDate] = useState<string | null>(null);
   const [adultsCount, setAdultsCount] = useState<number>(1);
   const [childrenCount, setChildrenCount] = useState<number>(0);
+
+  // Booking category type
+  const [bookingType, setBookingType] = useState<'tour' | 'hotel' | 'restaurant' | 'combo' | 'cart' | 'destination'>('tour');
+  const [hotelDetails, setHotelDetails] = useState<{ checkIn?: string; checkOut?: string; rooms?: number; roomType?: string }>({});
+  const [restaurantDetails, setRestaurantDetails] = useState<{ date?: string; time?: string; partySize?: number }>({});
 
   // Combo state
   const [isCombo, setIsCombo] = useState<boolean>(false);
@@ -442,6 +449,70 @@ export default function CheckoutPage() {
     }
   }, []);
 
+  // Fetch hotel data
+  const fetchHotelData = useCallback(async (slug: string, checkIn?: string, checkOut?: string, rooms?: number, roomType?: string, qAmount?: string | null) => {
+    try {
+      setDestinationSlug(slug);
+      const hotel = await getHotelBySlug(slug);
+      const name = hotel?.name || 'Khách sạn nghỉ dưỡng cao cấp';
+      setDestinationName(name);
+      setDestinationId((hotel as any)?.id ?? null);
+
+      const nights = (checkIn && checkOut)
+        ? Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)))
+        : 1;
+
+      let total = 0;
+      if (qAmount && Number(qAmount) > 0) {
+        total = Number(qAmount);
+      } else {
+        const roomCount = rooms || 1;
+        const pricePerNight = Number(hotel?.pricePerNight || 2500000);
+        total = pricePerNight * roomCount * nights;
+      }
+
+      setBasePrice(total);
+      setAmount(String(total));
+      setDescription(`Đặt phòng nghỉ: ${name} (${rooms || 1} phòng, ${nights} đêm, từ ${checkIn || 'hôm nay'} đến ${checkOut || 'ngày mai'})`);
+      setErrorMsg(null);
+    } catch (err: any) {
+      const fallbackPrice = qAmount ? Number(qAmount) : 2500000;
+      setBasePrice(fallbackPrice);
+      setAmount(String(fallbackPrice));
+      setDestinationName('Khách sạn nghỉ dưỡng');
+      setDescription(`Đặt phòng khách sạn (${slug})`);
+    } finally {
+      setIsLoadingData(false);
+    }
+  }, []);
+
+  // Fetch restaurant data
+  const fetchRestaurantData = useCallback(async (slug: string, date?: string, time?: string, partySize?: number, qAmount?: string | null) => {
+    try {
+      setDestinationSlug(slug);
+      const res = await getRestaurantBySlug(slug);
+      const name = res?.name || 'Nhà hàng ẩm thực cao cấp';
+      setDestinationName(name);
+      setDestinationId((res as any)?.id ?? null);
+
+      const guestsCount = partySize || 2;
+      const total = qAmount && Number(qAmount) > 0 ? Number(qAmount) : guestsCount * 300000;
+
+      setBasePrice(total);
+      setAmount(String(total));
+      setDescription(`Đặt bàn ẩm thực: ${name} cho ${guestsCount} khách vào lúc ${time || '18:30'} ngày ${date || 'hôm nay'}`);
+      setErrorMsg(null);
+    } catch (err: any) {
+      const fallbackPrice = qAmount ? Number(qAmount) : 600000;
+      setBasePrice(fallbackPrice);
+      setAmount(String(fallbackPrice));
+      setDestinationName('Nhà hàng ẩm thực');
+      setDescription(`Đặt bàn nhà hàng (${slug}) cho ${partySize || 2} khách`);
+    } finally {
+      setIsLoadingData(false);
+    }
+  }, []);
+
   // Initialize from URL params
   useEffect(() => {
     setIsLoadingData(true);
@@ -529,6 +600,29 @@ export default function CheckoutPage() {
         setErrorMsg('ID tour không hợp lệ.');
         setIsLoadingData(false);
       }
+      return;
+    }
+
+    // Hotel booking
+    if (type === 'hotel' && slug) {
+      const checkIn = searchParams.get('checkIn') || undefined;
+      const checkOut = searchParams.get('checkOut') || undefined;
+      const rooms = Number(searchParams.get('rooms') || '1');
+      const roomType = searchParams.get('roomType') || undefined;
+      setBookingType('hotel');
+      setHotelDetails({ checkIn, checkOut, rooms, roomType });
+      fetchHotelData(slug, checkIn, checkOut, rooms, roomType, qAmount);
+      return;
+    }
+
+    // Restaurant reservation
+    if (type === 'restaurant' && slug) {
+      const rDate = searchParams.get('date') || undefined;
+      const rTime = searchParams.get('time') || undefined;
+      const partySize = Number(searchParams.get('partySize') || searchParams.get('guests') || '2');
+      setBookingType('restaurant');
+      setRestaurantDetails({ date: rDate, time: rTime, partySize });
+      fetchRestaurantData(slug, rDate, rTime, partySize, qAmount);
       return;
     }
 
@@ -661,10 +755,10 @@ export default function CheckoutPage() {
           throw new Error('Không thể tạo đơn combo (thiếu mã đơn).');
         }
       } else if (tourId || destinationSlug) {
-        // ========== TOUR BOOKING ==========
+        // ========== TOUR / HOTEL / RESTAURANT BOOKING ==========
         const bookingPayload: any = {
-          type: 'tour',
-          destination: destinationSlug, // Backend cần trường này
+          type: bookingType || 'tour',
+          destination: destinationSlug || 'travelhub', // Backend cần trường này
           destinationName: destinationName || undefined,
           guests: guests || adultsCount + childrenCount || 1,
           name: userName,
@@ -674,6 +768,19 @@ export default function CheckoutPage() {
           paymentMethod: paymentMethodValue,
           addons: selectedAddonNames.length > 0 ? selectedAddonNames : undefined,
         };
+
+        // Ghi chú chi tiết cho khách sạn & nhà hàng
+        if (bookingType === 'hotel') {
+          if (hotelDetails.checkIn) bookingPayload.from = hotelDetails.checkIn;
+          if (hotelDetails.checkOut) bookingPayload.to = hotelDetails.checkOut;
+          bookingPayload.notes = `Khách sạn: ${destinationName} | ${hotelDetails.rooms || 1} phòng (${hotelDetails.roomType || 'Deluxe'}) | Nhận phòng: ${hotelDetails.checkIn || ''} - Trả phòng: ${hotelDetails.checkOut || ''}`;
+        } else if (bookingType === 'restaurant') {
+          if (restaurantDetails.date) {
+            bookingPayload.from = restaurantDetails.date;
+            bookingPayload.to = restaurantDetails.date;
+          }
+          bookingPayload.notes = `Nhà hàng: ${destinationName} | Bàn ${restaurantDetails.partySize || guests} khách | Giờ: ${restaurantDetails.time || '18:30'} ngày ${restaurantDetails.date || ''}`;
+        }
 
         // Thêm tourId nếu có
         if (tourId) {
@@ -685,8 +792,8 @@ export default function CheckoutPage() {
           bookingPayload.destinationId = destinationId;
         }
 
-        // Thêm ngày đặt tour
-        if (bookingDate) {
+        // Thêm ngày đặt tour nếu có
+        if (bookingDate && !bookingPayload.from) {
           bookingPayload.from = bookingDate;
           bookingPayload.to = bookingDate;
         }

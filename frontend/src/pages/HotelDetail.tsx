@@ -31,12 +31,15 @@ import {
   InformationCircleIcon,
   CurrencyDollarIcon,
   HandThumbUpIcon,
+  ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
 import {
   StarIcon as StarIconSolid,
   HeartIcon as HeartIconSolid,
   CheckBadgeIcon,
 } from '@heroicons/react/24/solid';
+import { useCart } from '../contexts/CartContext';
+import toast from 'react-hot-toast';
 
 interface RoomType {
   id: string;
@@ -56,6 +59,7 @@ interface RoomType {
 export default function HotelDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { addItem } = useCart();
 
   // Booking parameters state (Chuẩn Booking.com)
   const tomorrow = new Date();
@@ -245,7 +249,49 @@ export default function HotelDetail() {
       targetRoom = Object.keys(roomsCount).find((k) => roomsCount[k] > 0) || 'deluxe';
     }
     const count = roomsCount[targetRoom] || 1;
-    navigate(`/checkout?type=hotel&id=${hotel.id}&slug=${hotel.slug}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${adults + children}&roomType=${targetRoom}&rooms=${count}`);
+    const roomObj = roomTypes.find((r) => r.id === targetRoom);
+    const amount = (roomObj?.pricePerNight || hotel.pricePerNight || 2500000) * count * totalNights;
+    navigate(`/checkout?type=hotel&id=${hotel.id}&slug=${hotel.slug}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${adults + children}&roomType=${targetRoom}&rooms=${count}&amount=${amount}`);
+  };
+
+  const handleAddToCart = (roomTarget?: RoomType) => {
+    let target = roomTarget;
+    if (!target) {
+      const selectedId = Object.keys(roomsCount).find((k) => roomsCount[k] > 0) || 'deluxe';
+      target = roomTypes.find((r) => r.id === selectedId) || roomTypes[0];
+    }
+    const count = roomsCount[target.id] || 1;
+    const roomTotal = target.pricePerNight * count * totalNights;
+
+    addItem({
+      type: 'hotel',
+      itemId: hotel.id,
+      title: `${hotel.name} - ${target.name}`,
+      slug: hotel.slug,
+      price: roomTotal,
+      originalPrice: target.originalPrice * count * totalNights,
+      date: `${checkIn} đến ${checkOut} (${totalNights} đêm)`,
+      guests: count,
+      location: hotel.city || 'Việt Nam',
+      image: target.image || hotel.image || undefined,
+    });
+  };
+
+  const handleToggleWishlist = () => {
+    setIsFavorite((prev) => {
+      const next = !prev;
+      if (next) {
+        toast.success(`Đã lưu "${hotel.name}" vào danh sách yêu thích!`);
+      } else {
+        toast.success(`Đã bỏ "${hotel.name}" khỏi danh sách yêu thích`);
+      }
+      return next;
+    });
+  };
+
+  const handleShareHotel = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success('Đã sao chép liên kết khách sạn vào bộ nhớ tạm!');
   };
 
   if (isLoading) {
@@ -284,7 +330,7 @@ export default function HotelDetail() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setIsFavorite(!isFavorite)}
+                onClick={handleToggleWishlist}
                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
                 title="Lưu vào danh sách yêu thích"
               >
@@ -292,10 +338,7 @@ export default function HotelDetail() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  alert('Đã sao chép liên kết khách sạn!');
-                }}
+                onClick={handleShareHotel}
                 className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
                 title="Chia sẻ"
               >
@@ -621,13 +664,23 @@ export default function HotelDetail() {
                             </div>
                           </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleReserve(room.id)}
-                            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all"
-                          >
-                            Đặt Ngay
-                          </button>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleAddToCart(room)}
+                              className="py-2.5 rounded-xl border border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 font-bold text-xs flex items-center justify-center gap-1 transition-all"
+                            >
+                              <ShoppingBagIcon className="w-4 h-4" />
+                              Giỏ Hàng
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleReserve(room.id)}
+                              className="py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all"
+                            >
+                              Đặt Ngay
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -827,13 +880,23 @@ export default function HotelDetail() {
                 <p>Hủy miễn phí trước 24h nhận phòng</p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => handleReserve()}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-extrabold text-sm uppercase tracking-wider shadow-lg shadow-blue-500/25 hover:shadow-xl transition-all"
-              >
-                Tiến Hành Đặt Phòng
-              </button>
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => handleReserve()}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-extrabold text-sm uppercase tracking-wider shadow-lg shadow-blue-500/25 hover:shadow-xl transition-all"
+                >
+                  Tiến Hành Đặt Phòng
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAddToCart()}
+                  className="w-full py-3 rounded-2xl border-2 border-blue-600 text-blue-600 dark:text-cyan-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+                >
+                  <ShoppingBagIcon className="w-4 h-4" />
+                  Thêm Vào Giỏ Hàng
+                </button>
+              </div>
 
               <div className="text-center">
                 <span className="text-[11px] text-slate-400">
