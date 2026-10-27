@@ -109,3 +109,4 @@ coverage/
 *.temp
 cloudflared.exe
 *.exe
+backend/database_dump.sql
