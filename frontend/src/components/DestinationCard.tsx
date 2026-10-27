@@ -15,8 +15,10 @@ export default function DestinationCard({ d }: { d: Destination }) {
     >
       <div className="relative h-56 w-full overflow-hidden">
         <SmartImage
-          src={d.image || "/uploads/avatars/ha-long4.jpg"}
+          src={d.image}
           alt={d.name}
+          nameOrSlug={d.name}
+          category="destination"
           className="object-cover transition-opacity duration-300 group-hover:opacity-90 w-full h-full"
         />
         {/* Gradient overlay for better text readability */}

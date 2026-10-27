@@ -19,6 +19,7 @@ import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { getTours, Tour } from '../services/tour';
 import { getActivePromos, PromoCode } from '../services/promo';
 import { getTourImageUrl } from '../utils/imageHelper';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 import SEOHead from '../components/SEOHead';
 import Skeleton from '../components/Skeleton';
 
@@ -46,7 +47,7 @@ const LUXURY_COMBOS: ComboDeal[] = [
     originalPrice: 4850000,
     salePrice: 3390000,
     discount: 30,
-    imageUrl: '/uploads/tours/halong-bay-karsts.jpg',
+    imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
     destination: 'Hạ Long',
     duration: '3 ngày 2 đêm',
     rating: 4.9,
@@ -60,7 +61,7 @@ const LUXURY_COMBOS: ComboDeal[] = [
     originalPrice: 6200000,
     salePrice: 4340000,
     discount: 30,
-    imageUrl: '/uploads/tours/phuquoc-sunset-sanato.jpg',
+    imageUrl: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
     destination: 'Phú Quốc',
     duration: '4 ngày 3 đêm',
     rating: 4.9,
@@ -74,7 +75,7 @@ const LUXURY_COMBOS: ComboDeal[] = [
     originalPrice: 4200000,
     salePrice: 2940000,
     discount: 30,
-    imageUrl: '/uploads/tours/danang-golden-bridge.jpg',
+    imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
     destination: 'Đà Nẵng & Hội An',
     duration: '3 ngày 2 đêm',
     rating: 4.8,
@@ -88,7 +89,7 @@ const LUXURY_COMBOS: ComboDeal[] = [
     originalPrice: 3600000,
     salePrice: 2520000,
     discount: 30,
-    imageUrl: '/uploads/tours/dalat-sanmay.jpg',
+    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
     destination: 'Đà Lạt',
     duration: '3 ngày 2 đêm',
     rating: 4.9,
@@ -356,12 +357,12 @@ export default function Deals() {
                   >
                     <div className="relative h-48 overflow-hidden bg-slate-200 dark:bg-slate-800">
                       <img
-                        src={combo.imageUrl}
+                        src={getAuthenticImage(combo.imageUrl, combo.destination || combo.title, 'tour')}
                         alt={combo.title}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         loading="lazy"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/uploads/tours/halong-bay-karsts.jpg';
+                          handleImageError(e, combo.destination || combo.title, 'tour');
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -450,7 +451,7 @@ export default function Deals() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {filteredTours.map((tour) => {
-                    const imgUrl = getTourImageUrl(tour.image);
+                    const imgUrl = getTourImageUrl(tour.image, tour.name);
                     return (
                       <div
                         key={tour.id}
@@ -463,7 +464,7 @@ export default function Deals() {
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                             loading="lazy"
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/uploads/tours/halong-bay-karsts.jpg';
+                              handleImageError(e, tour.name, 'tour');
                             }}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

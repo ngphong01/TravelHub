@@ -5,6 +5,7 @@ import { getTourBySlug, getToursPaged } from '../services/tour';
 import { useLanguage } from '../contexts/LanguageContext';
 import Skeleton from '../components/Skeleton';
 import SEOHead from '../components/SEOHead';
+import { getAuthenticImage, getAuthenticGallery, handleImageError } from '../utils/imageFallback';
 import {
   CalendarDaysIcon,
   MapPinIcon,
@@ -171,13 +172,7 @@ export default function TourDetail() {
       slug: slug || 'tour-ha-long-2n1d',
       shortDescription: 'Trải nghiệm kỳ nghỉ thiên đường với dịch vụ chuẩn quốc tế, ẩm thực hải sản thượng hạng và xe đưa đón Limousine cao cấp.',
       description: 'Chuyến hành trình được thiết kế công phu đưa du khách thưởng ngoạn những cảnh quan tuyệt sắc của thiên nhiên kỳ vĩ. Trọn gói vé tham quan các điểm du lịch nổi tiếng, hướng dẫn viên chuyên nghiệp và bảo hiểm du lịch toàn diện.',
-      image: slug?.includes('phu-quoc')
-        ? '/uploads/tours/phuquoc-sao-beach.jpg'
-        : slug?.includes('da-nang')
-        ? '/uploads/tours/danang-cauvang.jpg'
-        : slug?.includes('sa-pa')
-        ? '/uploads/tours/sapa-fansipan-peak.jpg'
-        : '/uploads/tours/halong-bay-karsts.jpg',
+      image: getAuthenticImage(null, slug, 'tour'),
       duration: 2,
       price: 2490000,
       originalPrice: 3890000,
@@ -246,30 +241,22 @@ export default function TourDetail() {
     setExpandedAccordion(null);
   }, [slug]);
 
-  // Get images with normalization and deduplication
+  // Get images with authentic gallery fallback (guaranteed unique and authentic)
   const images = useMemo(() => {
     if (!tour) return [];
-    const set = new Set<string>();
-    const normalize = (path: string) => {
-      if (!path) return '';
-      if (path.startsWith('http')) return path;
-      if (path.startsWith('/')) return path;
-      return `/uploads/tours/${path}`;
-    };
-
-    if (tour.image) set.add(normalize(tour.image));
-    if (tour.photos && Array.isArray(tour.photos)) {
-      tour.photos.forEach((p: string) => p && set.add(normalize(p)));
-    } else if (tour.photos && typeof tour.photos === 'string') {
-      try {
-        const parsed = JSON.parse(tour.photos);
-        if (Array.isArray(parsed)) {
-          parsed.forEach((p: string) => p && set.add(normalize(p)));
-        }
-      } catch {}
+    const photoList: string[] = [];
+    if (tour.image) photoList.push(tour.image);
+    if (tour.photos) {
+      if (Array.isArray(tour.photos)) {
+        photoList.push(...tour.photos);
+      } else if (typeof tour.photos === 'string') {
+        try {
+          const parsed = JSON.parse(tour.photos);
+          if (Array.isArray(parsed)) photoList.push(...parsed);
+        } catch {}
+      }
     }
-    const list = Array.from(set).filter(Boolean);
-    return list.length > 0 ? list : ['/uploads/tours/halong-bay-karsts.jpg'];
+    return getAuthenticGallery(photoList, tour.name || tour.slug, 'tour');
   }, [tour]);
 
   // Gallery images
@@ -708,11 +695,11 @@ export default function TourDetail() {
 
 
 
-  const mainImage = images[selectedImageIndex] || images[0] || '/uploads/tours/halong-bay-karsts.jpg';
+  const mainImage = images[selectedImageIndex] || images[0] || getAuthenticImage(null, tour.name || tour.slug, 'tour');
   const price = tour.price || 980000;
   const originalPrice = tour.originalPrice;
   const destinationName = tour.destination?.name || 'Phú Quốc';
-  const tourImage = tour.image && tour.image.startsWith('http') ? tour.image : (tour.image && tour.image.startsWith('/uploads') ? tour.image : `/uploads/tours/${tour.image}`) || '/uploads/tours/halong-bay-karsts.jpg';
+  const tourImage = getAuthenticImage(tour.image, tour.name || tour.slug, 'tour');
 
   return (
     <>
@@ -867,7 +854,7 @@ export default function TourDetail() {
                   alt={tour.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/uploads/tours/halong-bay-karsts.jpg';
+                    handleImageError(e, tour.name || tour.slug, 'tour');
                   }}
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
@@ -876,8 +863,8 @@ export default function TourDetail() {
                 </span>
               </div>
 
-              {/* Photos 2-5: 2x2 Grid on the right */}
-              {(images.length > 1 ? images.slice(1, 5) : [images[0], images[0], images[0], images[0]]).map((photo, idx) => {
+              {/* Photos 2-5: 2x2 Grid on the right (Unique authentic photos) */}
+              {images.slice(1, 5).map((photo, idx) => {
                 const photoIndex = idx + 1;
                 const isLast = idx === 3 || photoIndex === images.length;
                 return (
@@ -894,7 +881,7 @@ export default function TourDetail() {
                       alt={`${tour.name} - ${photoIndex}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/uploads/tours/halong-cruise-hero.jpg';
+                        handleImageError(e, tour.name || tour.slug, 'tour');
                       }}
                     />
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
@@ -1950,12 +1937,11 @@ export default function TourDetail() {
                     >
                       <div className="relative h-48 overflow-hidden">
                         <img
-                          src={relatedImage}
+                          src={getAuthenticImage(relatedTour.image, relatedTour.name || relatedTour.slug, 'tour')}
                           alt={relatedTour.name}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/uploads/tours/tour-du-thuyen-ha-long-5-sao-2n1d.jpg';
+                            handleImageError(e, relatedTour.name || relatedTour.slug, 'tour');
                           }}
                         />
                         <button

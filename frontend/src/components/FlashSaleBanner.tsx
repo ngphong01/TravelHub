@@ -8,6 +8,7 @@ import {
   TagIcon,
   BoltIcon
 } from '@heroicons/react/24/solid';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 interface DealItem {
   id: number;
@@ -26,7 +27,7 @@ const SAMPLE_DEALS: DealItem[] = [
     id: 1,
     title: 'Tour Hạ Long 2N1Đ - Du thuyền 5 Sao Heritage',
     destination: 'Vịnh Hạ Long',
-    image: '/uploads/tours/halong-bay-karsts.jpg',
+    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
     originalPrice: 3890000,
     discountedPrice: 2490000,
     discountPercent: 36,
@@ -37,7 +38,7 @@ const SAMPLE_DEALS: DealItem[] = [
     id: 2,
     title: 'Tour Đà Nẵng - Bà Nà Hills - Cầu Vàng 3N2Đ',
     destination: 'Đà Nẵng',
-    image: '/uploads/tours/danang-cauvang.jpg',
+    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
     originalPrice: 4500000,
     discountedPrice: 2990000,
     discountPercent: 34,
@@ -48,7 +49,7 @@ const SAMPLE_DEALS: DealItem[] = [
     id: 3,
     title: 'Nghỉ dưỡng Đảo Ngọc Phú Quốc 3N2Đ Resort 5 Sao',
     destination: 'Phú Quốc',
-    image: '/uploads/tours/phuquoc-sao-beach.jpg',
+    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
     originalPrice: 5200000,
     discountedPrice: 3390000,
     discountPercent: 35,
@@ -143,9 +144,12 @@ export default function FlashSaleBanner() {
               {/* Image & Discount Badge */}
               <div className="relative h-48 overflow-hidden">
                 <img
-                  src={deal.image}
+                  src={getAuthenticImage(deal.image, deal.destination || deal.title, 'tour')}
                   alt={deal.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    handleImageError(e, deal.destination || deal.title, 'tour');
+                  }}
                 />
                 <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-gradient-to-r from-rose-600 to-amber-500 text-white font-black text-xs shadow-lg flex items-center gap-1">
                   <TagIcon className="w-3.5 h-3.5" />

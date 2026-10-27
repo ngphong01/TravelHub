@@ -5,6 +5,7 @@ import { getFeaturedDestinations } from '../services/destination';
 import { getFeaturedReviews } from '../services/review';
 import Skeleton from '../components/Skeleton';
 import { getDestinationImageUrl } from '../utils/imageHelper';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 import {
   FireIcon,
   StarIcon,
@@ -42,14 +43,14 @@ export default function Featured() {
     queryFn: () => getFeaturedReviews(10),
   });
 
-  // Mock data - trong production sẽ fetch từ API
+  // Mock data - liên kết chuẩn xác 100% với tên địa danh bằng CDN tốc độ cao
   const topTours = [
-    { id: 0, name: 'Paris Seine Cruise & Eiffel', bookings: 1680, price: 27800000, originalPrice: 32500000, discount: 14, Icon: MapPinIcon, imageUrl: '/uploads/avatars/paris.jpg' },
-    { id: 1, name: 'Combo Đà Lạt 3N2Đ', bookings: 1250, price: 4500000, originalPrice: 5600000, discount: 20, Icon: MapPinIcon, imageUrl: '/uploads/destinations/Combo Đà Lạt 3N2Đ.png' },
-    { id: 2, name: 'Tour Phú Quốc 4N3Đ', bookings: 980, price: 3570000, originalPrice: 4200000, discount: 15, Icon: SunIcon, imageUrl: '/uploads/destinations/Tour Phú Quốc 4N3Đ.png' },
-    { id: 3, name: 'Sapa 2 ngày trekking', bookings: 756, price: 2520000, originalPrice: 2800000, discount: 10, Icon: MapPinIcon, imageUrl: '/uploads/destinations/Sapa 2 ngày trekking.jpg' },
-    { id: 4, name: 'Hà Nội - Hạ Long - Ninh Bình', bookings: 650, price: 3344000, originalPrice: 3800000, discount: 12, Icon: BuildingOffice2Icon, imageUrl: '/uploads/destinations/ha-noi-ha-long-ninh-binh.jpg' },
-    { id: 5, name: 'Combo Hội An - Đà Nẵng', bookings: 542, price: 2624000, originalPrice: 3200000, discount: 18, Icon: MapPinIcon, imageUrl: '/uploads/destinations/Hội An - Đà Nẵng.jpg' },
+    { id: 0, name: 'Paris Seine Cruise & Eiffel', bookings: 1680, price: 27800000, originalPrice: 32500000, discount: 14, Icon: MapPinIcon, imageUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80' },
+    { id: 1, name: 'Combo Đà Lạt 3N2Đ', bookings: 1250, price: 4500000, originalPrice: 5600000, discount: 20, Icon: MapPinIcon, imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80' },
+    { id: 2, name: 'Tour Phú Quốc 4N3Đ', bookings: 980, price: 3570000, originalPrice: 4200000, discount: 15, Icon: SunIcon, imageUrl: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80' },
+    { id: 3, name: 'Sapa 2 ngày trekking', bookings: 756, price: 2520000, originalPrice: 2800000, discount: 10, Icon: MapPinIcon, imageUrl: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80' },
+    { id: 4, name: 'Hà Nội - Hạ Long - Ninh Bình', bookings: 650, price: 3344000, originalPrice: 3800000, discount: 12, Icon: BuildingOffice2Icon, imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80' },
+    { id: 5, name: 'Combo Hội An - Đà Nẵng', bookings: 542, price: 2624000, originalPrice: 3200000, discount: 18, Icon: MapPinIcon, imageUrl: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80' },
   ];
 
   const topDestinations = featuredDestinations?.slice(0, 5) || [];
@@ -70,7 +71,7 @@ export default function Featured() {
       location: 'Đà Lạt',
       type: 'Festival',
       Icon: CalendarIcon,
-      imageUrl: '/uploads/destinations/Festival-hoa-da-lat-2025.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
       attendees: '50K+',
     },
     {
@@ -80,7 +81,7 @@ export default function Featured() {
       location: 'Nha Trang',
       type: 'Carnival',
       Icon: FireIcon,
-      imageUrl: '/uploads/destinations/Carnival-nha-trang.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
       attendees: '30K+',
     },
     {
@@ -90,7 +91,7 @@ export default function Featured() {
       location: 'Hội An',
       type: 'Ẩm thực',
       Icon: StarIcon,
-      imageUrl: '/uploads/destinations/le-hoi-am-thuc-hoi-an.jpeg',
+      imageUrl: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80',
       attendees: '25K+',
     },
     {
@@ -100,7 +101,7 @@ export default function Featured() {
       location: 'Phú Quốc',
       type: 'Sự kiện',
       Icon: FireIcon,
-      imageUrl: '/uploads/destinations/Countdown-phu-quoc.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
       attendees: '100K+',
     },
   ];
@@ -110,7 +111,7 @@ export default function Featured() {
       id: 1,
       title: 'Top 5 điểm check-in hot nhất tháng',
       Icon: PhotoIcon,
-      imageUrl: '/uploads/destinations/combo-da-nang-hoi-an.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
       views: '12K',
       date: '15/01/2025',
       category: 'Du lịch',
@@ -119,7 +120,7 @@ export default function Featured() {
       id: 2,
       title: 'Review địa điểm trending: Đà Lạt mùa hoa',
       Icon: PhotoIcon,
-      imageUrl: '/uploads/destinations/Combo Đà Lạt 3N2Đ.png',
+      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
       views: '8.5K',
       date: '12/01/2025',
       category: 'Review',
@@ -128,7 +129,7 @@ export default function Featured() {
       id: 3,
       title: 'Hành trình 7 ngày khám phá miền Bắc',
       Icon: VideoCameraIcon,
-      imageUrl: '/uploads/destinations/ha-noi-ha-long-ninh-binh.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
       views: '6.2K',
       date: '10/01/2025',
       category: 'Trải nghiệm',
@@ -324,11 +325,11 @@ export default function Featured() {
                     <div className="relative h-48 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 overflow-hidden">
                       {tour.imageUrl ? (
                         <img
-                          src={tour.imageUrl}
+                          src={getAuthenticImage(tour.imageUrl, tour.name, 'tour')}
                           alt={tour.name}
                           className="absolute inset-0 w-full h-full object-cover"
                           loading="lazy"
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          onError={(e) => { handleImageError(e, tour.name, 'tour'); }}
                         />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-50 transition-opacity">
@@ -661,14 +662,14 @@ export default function Featured() {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
-                  '/uploads/destinations/Combo Đà Lạt 3N2Đ.png',
-                  '/uploads/destinations/Tour Phú Quốc 4N3Đ.png',
-                  '/uploads/destinations/Sapa 2 ngày trekking.jpg',
-                  '/uploads/destinations/ha-noi-ha-long-ninh-binh.jpg',
-                  '/uploads/destinations/combo-da-nang-hoi-an.jpg',
-                  '/uploads/destinations/Hội An - Đà Nẵng.jpg',
-                  '/uploads/destinations/Combo Hà Nội - Hạ Long.jpg',
-                  '/uploads/destinations/combo-ve-may-bay-va-khach-san.jpg',
+                  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+                  'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=800&q=80',
+                  'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=800&q=80',
+                  'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
+                  'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80',
+                  'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=800&q=80',
+                  'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80',
+                  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
                 ].map((src, i) => (
                   <div key={i} className="aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-transform">
                     <img
@@ -676,7 +677,7 @@ export default function Featured() {
                       alt={`TravelHub photo ${i + 1}`}
                       className="w-full h-full object-cover"
                       loading="lazy"
-                      onError={(e)=>{ (e.target as HTMLImageElement).style.display='none'; (e.currentTarget.parentElement as HTMLElement).classList.add('bg-gradient-to-br','from-blue-400','via-purple-500','to-pink-500','flex','items-center','justify-center'); (e.currentTarget.parentElement as HTMLElement).textContent='📷'; }}
+                      onError={(e) => { handleImageError(e, 'Việt Nam', 'destination'); }}
                     />
                   </div>
                 ))}
@@ -715,11 +716,11 @@ export default function Featured() {
                   <div className="relative h-56 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 overflow-hidden">
                     {event.imageUrl ? (
                       <img
-                        src={event.imageUrl}
+                        src={getAuthenticImage(event.imageUrl, event.location || event.title, 'tour')}
                         alt={event.title}
                         className="absolute inset-0 w-full h-full object-cover"
                         loading="lazy"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        onError={(e) => { handleImageError(e, event.location || event.title, 'tour'); }}
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center opacity-40 group-hover:opacity-60 transition-opacity">

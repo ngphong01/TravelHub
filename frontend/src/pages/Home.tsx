@@ -9,6 +9,7 @@ import { getToursPaged } from '../services/tour';
 import { getHotelsPaged } from '../services/hotel';
 import { getRestaurantsPaged } from '../services/restaurant';
 import { getDestinationImageUrl } from '../utils/imageHelper';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 import MegaSearchBar from '../components/MegaSearchBar';
 import FlashSaleBanner from '../components/FlashSaleBanner';
 import InteractiveTravelMap from '../components/InteractiveTravelMap';
@@ -31,39 +32,39 @@ import {
   CheckBadgeIcon,
 } from '@heroicons/react/24/solid';
 
-// Slides phong cảnh 4K chuẩn điện ảnh cho Hero Banner
+// Slides phong cảnh 4K chuẩn điện ảnh cho Hero Banner (Unsplash CDN tốc độ cao)
 const HERO_SLIDES = [
   {
-    image: '/uploads/banners/banner-hero-halong.jpg',
+    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1920&q=85',
     tag: 'Vịnh Hạ Long',
     title: 'Kỳ Quan Thiên Nhiên Thế Giới',
     subtitle: 'Nghỉ dưỡng du thuyền 5 sao đẳng cấp, chèo kayak xuyên hang động và ngắm hoàng hôn vịnh ngọc.',
     badge: '★ Tour Bán Chạy Nhất · Tiết Kiệm Đến 35%',
-    link: '/tours/du-thuyen-ha-long-2n1d',
+    link: '/tours/tour-ha-long-2n1d-du-thuyen-5-sao',
   },
   {
-    image: '/uploads/banners/banner-danang-goldenbridge.jpg',
+    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1920&q=85',
     tag: 'Đà Nẵng & Hội An',
     title: 'Cầu Vàng Bà Nà & Phố Cổ Hội An',
     subtitle: 'Trải nghiệm cáp treo đạt kỷ lục thế giới, dạo phố cổ lung linh đèn lồng và tắm biển Mỹ Khê.',
     badge: '★ Lựa Chọn Hàng Đầu Của Du Khách 2026',
-    link: '/tours/da-nang-hoi-an-3n2d',
+    link: '/tours/tour-da-nang-ba-na-hills-3n2d',
   },
   {
-    image: '/uploads/banners/banner-phuquoc-paradise.jpg',
+    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1920&q=85',
     tag: 'Đảo Ngọc Phú Quốc',
     title: 'Thiên Đường Nghỉ Dưỡng Nhiệt Đới',
     subtitle: 'Hòa mình vào làn nước trong vắt bãi Sao, cáp treo vượt biển Hòn Thơm và ẩm thực bún quậy trứ danh.',
     badge: '★ Combo Vé Máy Bay + Resort 5 Sao',
-    link: '/tours/tour-4-dao-phu-quoc',
+    link: '/tours/tour-phu-quoc-4-dao-3n2d',
   },
   {
-    image: '/uploads/banners/banner-sapa-fansipan.jpg',
+    image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1920&q=85',
     tag: 'Sa Pa - Fansipan',
     title: 'Nóc Nhà Đông Dương & Mùa Săn Mây',
     subtitle: 'Chinh phục cột mốc đỉnh Fansipan 3.143m, thưởng ngoạn ruộng bậc thang Mường Hoa kỳ vĩ.',
     badge: '★ Mùa Lúa Chín & Săn Mây Đẹp Nhất Năm',
-    link: '/tours/sa-pa-fansipan-2n1d',
+    link: '/tours/tour-sa-pa-fansipan-2n1d',
   },
 ];
 
@@ -76,7 +77,7 @@ const REAL_VIETNAM_REVIEWS = [
     tour: 'Tour Du Thuyền Hạ Long 5 Sao Heritage',
     rating: 5,
     date: '15/10/2026',
-    avatar: '/uploads/avatars/ha-long4.jpg',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     comment: 'Chuyến đi tuyệt vời cùng cả gia đình. Du thuyền 5 sao chuẩn mực, buffet hải sản rất tươi và phong phú. Nhận mã QR vé điện tử từ TravelHub nhanh chóng, lên tàu không phải chờ đợi.',
     verified: true,
   },
@@ -87,7 +88,7 @@ const REAL_VIETNAM_REVIEWS = [
     tour: 'Tour Đà Nẵng - Bà Nà Hills - Phố Cổ Hội An',
     rating: 5,
     date: '08/10/2026',
-    avatar: '/uploads/avatars/da-nang.png',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
     comment: 'Hướng dẫn viên nhiệt tình, chu đáo từng chút một cho bố mẹ lớn tuổi của mình. Lịch trình linh hoạt, xe đưa đón Limousine êm ái. Giá tour qua TravelHub tiết kiệm hơn 25% so với đại lý truyền thống.',
     verified: true,
   },
@@ -98,13 +99,13 @@ const REAL_VIETNAM_REVIEWS = [
     tour: 'Combo Nghỉ Dưỡng Phú Quốc 3N2Đ Resort View Biển',
     rating: 5,
     date: '22/09/2026',
-    avatar: '/uploads/avatars/phu-quoc.jpg',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
     comment: 'Resort ở Bãi Trường ngắm hoàng hôn rất đẹp. Hỗ trợ check-in mượt mà, nhân viên TravelHub tư vấn tận tình qua Zalo. Chắc chắn sẽ quay lại đặt tiếp cho chuyến đi tới.',
     verified: true,
   },
 ];
 
-// Fallback Tour bán chạy (Chuẩn Vietravel & Klook)
+// Fallback Tour bán chạy (Chuẩn Vietravel & Klook - Mỗi tour 1 ảnh đặc trưng độc nhất)
 const FALLBACK_TOURS = [
   {
     id: 101,
@@ -114,7 +115,7 @@ const FALLBACK_TOURS = [
     duration: '2 ngày 1 đêm',
     departureSchedule: 'Thứ 5 & Thứ 7 hàng tuần',
     transport: 'Xe Limousine Dcar',
-    image: '/uploads/tours/halong-bay-karsts.jpg',
+    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
     rating: 4.9,
     reviewsCount: 1420,
     price: 2490000,
@@ -128,7 +129,7 @@ const FALLBACK_TOURS = [
     duration: '3 ngày 2 đêm',
     departureSchedule: 'Thứ 6 & Chủ Nhật hàng tuần',
     transport: 'Máy bay khứ hồi + Ô tô',
-    image: '/uploads/tours/danang-cauvang.jpg',
+    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
     rating: 4.85,
     reviewsCount: 980,
     price: 2990000,
@@ -142,7 +143,7 @@ const FALLBACK_TOURS = [
     duration: '3 ngày 2 đêm',
     departureSchedule: 'Khởi hành hàng ngày',
     transport: 'Máy bay + Resort 5 Sao',
-    image: '/uploads/tours/phuquoc-sao-beach.jpg',
+    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
     rating: 4.92,
     reviewsCount: 1650,
     price: 3390000,
@@ -156,7 +157,7 @@ const FALLBACK_TOURS = [
     duration: '2 ngày 1 đêm',
     departureSchedule: 'Thứ 6 hàng tuần',
     transport: 'Xe giường nằm Cabin đôi',
-    image: '/uploads/tours/sapa-fansipan-peak.jpg',
+    image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80',
     rating: 4.8,
     reviewsCount: 760,
     price: 1890000,
@@ -170,7 +171,7 @@ const FALLBACK_TOURS = [
     duration: '1 ngày',
     departureSchedule: 'Khởi hành hàng ngày từ Hà Nội',
     transport: 'Xe du lịch máy lạnh cao cấp',
-    image: '/uploads/tours/ninhbinh-trangan.jpg',
+    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
     rating: 4.9,
     reviewsCount: 1120,
     price: 850000,
@@ -184,7 +185,7 @@ const FALLBACK_TOURS = [
     duration: '3 ngày 2 đêm',
     departureSchedule: 'Thứ 5 hàng tuần',
     transport: 'Xe Limousine + Xe máy bản địa',
-    image: '/uploads/tours/hagiang-mapileng.jpg',
+    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
     rating: 4.95,
     reviewsCount: 890,
     price: 2650000,
@@ -199,7 +200,7 @@ const FALLBACK_HOTELS = [
     name: 'Ha Long Bay Luxury Resort & Spa',
     slug: 'halong-bay-luxury-resort',
     city: 'Hạ Long, Quảng Ninh',
-    image: '/uploads/hotels/halong-luxury.jpg',
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
     rating: 9.4,
     ratingText: 'Xuất sắc',
     reviewsCount: 1420,
@@ -213,7 +214,7 @@ const FALLBACK_HOTELS = [
     name: 'InterContinental Danang Sun Peninsula Resort',
     slug: 'intercontinental-danang',
     city: 'Bán đảo Sơn Trà, Đà Nẵng',
-    image: '/uploads/hotels/danang-beach.jpg',
+    image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80',
     rating: 9.6,
     ratingText: 'Tuyệt hảo',
     reviewsCount: 2180,
@@ -227,7 +228,7 @@ const FALLBACK_HOTELS = [
     name: 'JW Marriott Phu Quoc Emerald Bay Resort',
     slug: 'jw-marriott-phu-quoc',
     city: 'Bãi Khem, An Thới, Phú Quốc',
-    image: '/uploads/hotels/phuquoc-sunset.jpg',
+    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=80',
     rating: 9.5,
     ratingText: 'Xuất sắc',
     reviewsCount: 1890,
@@ -241,7 +242,7 @@ const FALLBACK_HOTELS = [
     name: 'Vinpearl Resort & Spa Nha Trang Bay',
     slug: 'vinpearl-resort-nha-trang',
     city: 'Đảo Hòn Tre, Nha Trang',
-    image: '/uploads/hotels/intercontinental-nhatrang.jpg',
+    image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=80',
     rating: 9.2,
     ratingText: 'Tuyệt vời',
     reviewsCount: 1640,
@@ -255,7 +256,7 @@ const FALLBACK_HOTELS = [
     name: 'Legacy Yen Tu - MGallery Resort',
     slug: 'legacy-yen-tu-mgallery',
     city: 'Uông Bí, Quảng Ninh',
-    image: '/uploads/hotels/ninhbinh-eco.jpg',
+    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80',
     rating: 9.3,
     ratingText: 'Xuất sắc',
     reviewsCount: 1120,
@@ -269,7 +270,7 @@ const FALLBACK_HOTELS = [
     name: 'Hôtel de la Coupole - MGallery Sa Pa',
     slug: 'hotel-de-la-coupole-sapa',
     city: 'Trung tâm Sa Pa, Lào Cai',
-    image: '/uploads/hotels/victoria-sapa.jpg',
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80',
     rating: 9.4,
     ratingText: 'Xuất sắc',
     reviewsCount: 1950,
@@ -292,7 +293,7 @@ const FALLBACK_RESTAURANTS = [
     rating: 4.8,
     reviewsCount: 1820,
     ranking: '#1 trên 340 quán phở tại Hà Nội',
-    image: '/uploads/restaurants/pho-batdan.jpg',
+    image: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=1200&q=80',
     signatureDish: 'Phở bò tái lăn nước dùng trong veo thơm gừng',
   },
   {
@@ -305,7 +306,7 @@ const FALLBACK_RESTAURANTS = [
     rating: 4.7,
     reviewsCount: 2450,
     ranking: 'Top Michelin Bib Gourmand 2026',
-    image: '/uploads/restaurants/buncha-obama.jpg',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
     signatureDish: 'Combo bún chả nem cua bể giòn rụm trứ danh',
   },
   {
@@ -318,7 +319,7 @@ const FALLBACK_RESTAURANTS = [
     rating: 4.8,
     reviewsCount: 1670,
     ranking: '#2 trên 190 quán ăn tại Phố Cổ Hội An',
-    image: '/uploads/restaurants/comga-babuoi.jpg',
+    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1200&q=80',
     signatureDish: 'Gà ta thả vườn xé phay bóp gỏi rau răm',
   },
   {
@@ -331,7 +332,7 @@ const FALLBACK_RESTAURANTS = [
     rating: 4.9,
     reviewsCount: 1320,
     ranking: '#1 Hải sản nổi tiếng Bãi Cháy',
-    image: '/uploads/restaurants/haisan-cuavang.jpg',
+    image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1200&q=80',
     signatureDish: 'Lẩu cua biển nấu niêu đất gia truyền đặc sắc',
   },
 ];
@@ -343,24 +344,24 @@ const TRAVEL_GUIDES = [
     title: 'Kinh nghiệm du lịch Phú Quốc 3N2Đ: Lịch trình tối ưu & Địa điểm check-in không thể bỏ lỡ',
     category: 'Cẩm nang biển đảo',
     readTime: '5 phút đọc',
-    image: '/uploads/tours/phuquoc-sunset.jpg',
-    link: '/destinations/dao-ngoc-phu-quoc',
+    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
+    link: '/destinations/phu-quoc',
   },
   {
     id: 2,
     title: 'Top 10 trải nghiệm ẩm thực phố cổ Hội An: Mì Quảng, Cao Lầu và Bánh Mì Phượng trứ danh',
     category: 'Văn hóa & Ẩm thực',
     readTime: '4 phút đọc',
-    image: '/uploads/tours/hoian-lanterns-night.jpg',
-    link: '/destinations/da-nang-hoi-an',
+    image: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80',
+    link: '/destinations/hoi-an',
   },
   {
     id: 3,
     title: 'Thời điểm vàng săn mây Sa Pa & Y Tý: Mẹo giữ ấm và cung đường ngắm ruộng bậc thang',
     category: 'Mẹo du lịch vùng cao',
     readTime: '6 phút đọc',
-    image: '/uploads/tours/sapa-fansipan.jpg',
-    link: '/destinations/sa-pa-fansipan',
+    image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80',
+    link: '/destinations/sa-pa',
   },
 ];
 
@@ -370,28 +371,28 @@ const PROPERTY_TYPES = [
     id: 1,
     name: 'Khách sạn cao cấp',
     count: '1.240+ chỗ nghỉ',
-    image: '/uploads/hotels/sofitel-hanoi.jpg',
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
     link: '/hotels',
   },
   {
     id: 2,
     name: 'Khu nghỉ dưỡng & Spa',
     count: '480+ resort ven biển',
-    image: '/uploads/hotels/danang-beach.jpg',
+    image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=80',
     link: '/hotels?type=resort',
   },
   {
     id: 3,
     name: 'Biệt thự & Villa riêng tư',
     count: '320+ villa nguyên căn',
-    image: '/uploads/hotels/dalat-villa.jpg',
+    image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1200&q=80',
     link: '/hotels?type=villa',
   },
   {
     id: 4,
     name: 'Du thuyền ngủ đêm',
     count: '150+ du thuyền 5 sao',
-    image: '/uploads/tours/halong-cruise-hero.jpg',
+    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
     link: '/tours?q=du-thuyen',
   },
 ];
@@ -811,7 +812,7 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
               {(destinations?.slice(0, 5) || []).map((dest: any, idx: number) => {
-                const img = getDestinationImageUrl(dest) || '/uploads/avatars/ha-long4.jpg';
+                const img = getAuthenticImage(dest.image || getDestinationImageUrl(dest), dest.name || dest.slug, 'destination');
                 const isLarge = idx < 2; // 2 ô đầu to chuẩn Booking.com
                 return (
                   <Link
@@ -825,7 +826,7 @@ export default function Home() {
                       src={img}
                       alt={dest.name}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/uploads/avatars/ha-long4.jpg';
+                        handleImageError(e, dest.name || dest.slug, 'destination');
                       }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     />
@@ -908,10 +909,10 @@ export default function Home() {
                   {/* Image Container with Badges */}
                   <div className="relative h-56 overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <img
-                      src={hotel.image}
+                      src={getAuthenticImage(hotel.image, hotel.name, 'hotel')}
                       alt={hotel.name}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/uploads/hotels/hotel-vinpearl-resort-spa-ha-long.jpg';
+                        handleImageError(e, hotel.name, 'hotel');
                       }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -1041,7 +1042,7 @@ export default function Home() {
             {displayTours.slice(0, 6).map((tour: any) => {
               const tourPrice = tour.price || 1990000;
               const originalPrice = tour.originalPrice || Math.round(tourPrice * 1.3);
-              const img = tour.image || '/uploads/tours/tour-du-thuyen-ha-long-5-sao-2n1d.jpg';
+              const img = getAuthenticImage(tour.image, tour.name || tour.slug, 'tour');
               const discountPercent = originalPrice > tourPrice ? Math.round(((originalPrice - tourPrice) / originalPrice) * 100) : 0;
 
               return (
@@ -1055,7 +1056,7 @@ export default function Home() {
                       src={img}
                       alt={tour.name}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/uploads/tours/tour-du-thuyen-ha-long-5-sao-2n1d.jpg';
+                        handleImageError(e, tour.name || tour.slug, 'tour');
                       }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -1185,10 +1186,10 @@ export default function Home() {
                   {/* Card Image */}
                   <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <img
-                      src={rest.image}
+                      src={getAuthenticImage(rest.image, rest.name, 'restaurant')}
                       alt={rest.name}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/uploads/restaurants/pho-batdan.jpg';
+                        handleImageError(e, rest.name, 'restaurant');
                       }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

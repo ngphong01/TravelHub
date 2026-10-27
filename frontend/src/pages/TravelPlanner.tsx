@@ -26,6 +26,7 @@ import {
   LightBulbIcon,
   TruckIcon
 } from '@heroicons/react/24/outline';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 interface DayPlan {
   day: number;
@@ -58,14 +59,14 @@ interface GeneratedPlan {
 }
 
 const PRESET_DESTINATIONS = [
-  { id: 'da-nang', name: 'Đà Nẵng - Hội An', image: '/uploads/avatars/da-nang.png' },
-  { id: 'ha-long', name: 'Vịnh Hạ Long', image: '/uploads/avatars/ha-long4.jpg' },
-  { id: 'phu-quoc', name: 'Đảo Ngọc Phú Quốc', image: '/uploads/avatars/phu-quoc.jpg' },
-  { id: 'ninh-binh', name: 'Ninh Bình - Tràng An', image: '/uploads/avatars/ninh-binh.jpg' },
-  { id: 'da-lat', name: 'Đà Lạt Mộng Mơ', image: '/uploads/avatars/da-lat.jpg' },
-  { id: 'ha-noi', name: 'Thủ Đô Hà Nội', image: '/uploads/avatars/ha-noi.jpg' },
-  { id: 'sa-pa', name: 'Sa Pa - Fansipan', image: '/uploads/avatars/sapa.jpg' },
-  { id: 'nha-trang', name: 'Biển Nha Trang', image: '/uploads/avatars/nha-trang.jpg' },
+  { id: 'da-nang', name: 'Đà Nẵng - Hội An', image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80' },
+  { id: 'ha-long', name: 'Vịnh Hạ Long', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80' },
+  { id: 'phu-quoc', name: 'Đảo Ngọc Phú Quốc', image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=600&q=80' },
+  { id: 'ninh-binh', name: 'Ninh Bình - Tràng An', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=600&q=80' },
+  { id: 'da-lat', name: 'Đà Lạt Mộng Mơ', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80' },
+  { id: 'ha-noi', name: 'Thủ Đô Hà Nội', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80' },
+  { id: 'sa-pa', name: 'Sa Pa - Fansipan', image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=600&q=80' },
+  { id: 'nha-trang', name: 'Biển Nha Trang', image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80' },
 ];
 
 const getToday = () => {
@@ -302,10 +303,13 @@ export default function TravelPlanner() {
                     }`}
                   >
                     <img
-                      src={dest.image}
+                      src={getAuthenticImage(dest.image, dest.name, 'destination')}
                       alt={dest.name}
                       className="w-full h-20 object-cover rounded-xl mb-2"
                       loading="lazy"
+                      onError={(e) => {
+                        handleImageError(e, dest.name, 'destination');
+                      }}
                     />
                     <span className="font-semibold text-gray-900 dark:text-slate-100 text-sm block truncate">{dest.name}</span>
                     {isSelected && (
@@ -687,9 +691,12 @@ export default function TravelPlanner() {
                     <div key={tour.id} className="border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 rounded-2xl overflow-hidden hover:shadow-lg transition-all group">
                       <div className="relative h-44 overflow-hidden">
                         <img
-                          src={tour.image || '/uploads/tours/halong-bay-karsts.jpg'}
+                          src={getAuthenticImage(tour.image, tour.name, 'tour')}
                           alt={tour.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            handleImageError(e, tour.name, 'tour');
+                          }}
                         />
                         <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-lg font-medium">
                           {tour.duration || '3N2Đ'}

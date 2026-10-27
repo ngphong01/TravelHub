@@ -5,6 +5,7 @@ import { getHotelsPaged } from '../services/hotel';
 import Skeleton from '../components/Skeleton';
 import SEOHead from '../components/SEOHead';
 import TravelAnimatedBackground from '../components/TravelAnimatedBackground';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 import {
   MapPinIcon,
   StarIcon,
@@ -202,11 +203,11 @@ export default function Hotels() {
                 >
                   <div className="relative h-52 overflow-hidden bg-gray-100 dark:bg-slate-800">
                     <img
-                      src={hotel.image && hotel.image.startsWith('http') ? hotel.image : (hotel.image && hotel.image.startsWith('/uploads') ? hotel.image : `/uploads/destinations/${hotel.image}`) || '/placeholder-hotel.jpg'}
+                      src={getAuthenticImage(hotel.image, hotel.name || hotel.slug, 'hotel')}
                       alt={hotel.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/placeholder-hotel.jpg';
+                        handleImageError(e, hotel.name || hotel.slug, 'hotel');
                       }}
                     />
                     {hotel.featured && (

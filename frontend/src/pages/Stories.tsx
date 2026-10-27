@@ -20,6 +20,7 @@ import {
   StarIcon as StarIconSolid,
   HeartIcon as HeartIconSolid,
 } from '@heroicons/react/24/solid';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 type StoryType = 'experience' | 'customer' | 'review' | 'guide' | 'blog';
 
@@ -707,7 +708,13 @@ export default function Stories() {
                 <article className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                   <div className="relative h-72 bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center text-7xl overflow-hidden">
                     {story.imageUrl ? (
-                      <img src={story.imageUrl} alt={story.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                      <img
+                        src={getAuthenticImage(story.imageUrl, story.title, 'destination')}
+                        alt={story.title}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => handleImageError(e, story.title, 'destination')}
+                      />
                     ) : story.images ? (
                       <div className="grid grid-cols-2 gap-2 w-full h-full p-4">
                         {story.images.map((img: string, i: number) => (
@@ -799,7 +806,13 @@ function StoryCard({ story, type, onSelect }: { story: any; type: StoryType; onS
       {/* Image */}
       <div className="relative h-48 bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center text-6xl overflow-hidden">
         {story.imageUrl ? (
-          <img src={story.imageUrl} alt={story.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+          <img
+            src={getAuthenticImage(story.imageUrl, story.title, 'destination')}
+            alt={story.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+            onError={(e) => handleImageError(e, story.title, 'destination')}
+          />
         ) : story.images ? (
           <div className="grid grid-cols-2 gap-2 w-full h-full p-4">
             {story.images.map((img: string, i: number) => (
@@ -857,7 +870,14 @@ function StoryCard({ story, type, onSelect }: { story: any; type: StoryType; onS
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <div className="flex items-center gap-3">
             {story.avatarUrl ? (
-              <img src={story.avatarUrl} alt={story.author} className="w-10 h-10 rounded-full object-cover" />
+              <img
+                src={story.avatarUrl.startsWith('/uploads') ? `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author || 'User')}&background=0284c7&color=fff&size=100` : story.avatarUrl}
+                alt={story.author}
+                className="w-10 h-10 rounded-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(story.author || 'User')}&background=0284c7&color=fff&size=100`;
+                }}
+              />
             ) : (
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
                 {story.avatar}
@@ -938,7 +958,14 @@ function ReviewCard({ review }: { review: any }) {
       {review.user && (
         <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
           {review.user.avatarUrl ? (
-            <img src={review.user.avatarUrl} alt={review.user.name || 'User'} className="w-12 h-12 rounded-full object-cover" />
+            <img
+              src={review.user.avatarUrl.startsWith('/uploads') ? `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user.name || 'User')}&background=0284c7&color=fff&size=100` : review.user.avatarUrl}
+              alt={review.user.name || 'User'}
+              className="w-12 h-12 rounded-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(review.user.name || 'User')}&background=0284c7&color=fff&size=100`;
+              }}
+            />
           ) : (
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
               {(review.user.name || review.user.email || 'U')[0].toUpperCase()}

@@ -13,34 +13,35 @@ import {
   GlobeAltIcon,
   BookmarkSquareIcon,
 } from '@heroicons/react/24/outline';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 type SearchMode = 'tours' | 'hotels' | 'destinations';
 
 const POPULAR_TOURS = [
-  { id: 1, name: 'Đà Nẵng - Hội An', tag: 'Biển & Di sản', image: '/uploads/avatars/da-nang.png' },
-  { id: 2, name: 'Vịnh Hạ Long', tag: 'Kỳ quan thiên nhiên', image: '/uploads/avatars/ha-long4.jpg' },
-  { id: 3, name: 'Đảo Ngọc Phú Quốc', tag: 'Thiên đường nghỉ dưỡng', image: '/uploads/avatars/phu-quoc.jpg' },
-  { id: 4, name: 'Sa Pa - Fansipan', tag: 'Săn mây & Núi rừng', image: '/uploads/avatars/sapa.jpg' },
-  { id: 5, name: 'Ninh Bình - Tràng An', tag: 'Non nước hữu tình', image: '/uploads/avatars/ninh-binh.jpg' },
-  { id: 6, name: 'Đà Lạt Mộng Mơ', tag: 'Khí hậu ôn đới', image: '/uploads/avatars/da-lat.jpg' },
+  { id: 1, name: 'Đà Nẵng - Hội An', tag: 'Biển & Di sản', image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=300&q=80' },
+  { id: 2, name: 'Vịnh Hạ Long', tag: 'Kỳ quan thiên nhiên', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=300&q=80' },
+  { id: 3, name: 'Đảo Ngọc Phú Quốc', tag: 'Thiên đường nghỉ dưỡng', image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=300&q=80' },
+  { id: 4, name: 'Sa Pa - Fansipan', tag: 'Săn mây & Núi rừng', image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=300&q=80' },
+  { id: 5, name: 'Ninh Bình - Tràng An', tag: 'Non nước hữu tình', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=300&q=80' },
+  { id: 6, name: 'Đà Lạt Mộng Mơ', tag: 'Khí hậu ôn đới', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80' },
 ];
 
 const POPULAR_HOTELS = [
-  { id: 1, name: 'Đà Nẵng', tag: 'Ven biển Mỹ Khê & Bán đảo Sơn Trà', image: '/uploads/hotels/danang-beach.jpg' },
-  { id: 2, name: 'Phú Quốc', tag: 'Resort 5 sao Bãi Trường & Sunset', image: '/uploads/hotels/phuquoc-sunset.jpg' },
-  { id: 3, name: 'Hà Nội', tag: 'Khách sạn Phố Cổ & Hồ Tây', image: '/uploads/hotels/sofitel-hanoi.jpg' },
-  { id: 4, name: 'Nha Trang', tag: 'Trần Phú view trọn vịnh ngọc', image: '/uploads/hotels/intercontinental-nhatrang.jpg' },
-  { id: 5, name: 'Hội An', tag: 'Boutique Resort ven sông Hoài', image: '/uploads/hotels/hoian-riverside.jpg' },
-  { id: 6, name: 'Đà Lạt', tag: 'Biệt thự sương mù & Hồ Tuyền Lâm', image: '/uploads/hotels/dalat-mountain.jpg' },
+  { id: 1, name: 'Đà Nẵng', tag: 'Ven biển Mỹ Khê & Bán đảo Sơn Trà', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80' },
+  { id: 2, name: 'Phú Quốc', tag: 'Resort 5 sao Bãi Trường & Sunset', image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=300&q=80' },
+  { id: 3, name: 'Hà Nội', tag: 'Khách sạn Phố Cổ & Hồ Tây', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=300&q=80' },
+  { id: 4, name: 'Nha Trang', tag: 'Trần Phú view trọn vịnh ngọc', image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=300&q=80' },
+  { id: 5, name: 'Hội An', tag: 'Boutique Resort ven sông Hoài', image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80' },
+  { id: 6, name: 'Đà Lạt', tag: 'Biệt thự sương mù & Hồ Tuyền Lâm', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80' },
 ];
 
 const POPULAR_DESTINATIONS = [
-  { id: 1, name: 'Vịnh Hạ Long', tag: 'Kỳ quan Thiên nhiên Thế giới (UNESCO)', image: '/uploads/avatars/ha-long4.jpg' },
-  { id: 2, name: 'Quần thể Tràng An', tag: 'Di sản Văn hóa & Thiên nhiên Kép', image: '/uploads/avatars/ninh-binh.jpg' },
-  { id: 3, name: 'Phố cổ Hội An', tag: 'Di sản Văn hóa & Đèn lồng lung linh', image: '/uploads/avatars/hoi-an.png' },
-  { id: 4, name: 'Hà Giang', tag: 'Công viên Địa chất Toàn cầu Đồng Văn', image: '/uploads/avatars/hagiang-1.jpg' },
-  { id: 5, name: 'Phong Nha - Kẻ Bàng', tag: 'Vương quốc hang động thạch nhũ', image: '/uploads/avatars/sapa.jpg' },
-  { id: 6, name: 'Côn Đảo', tag: 'Biển đảo hoang sơ & Di tích thiêng liêng', image: '/uploads/avatars/phu-quoc.jpg' },
+  { id: 1, name: 'Vịnh Hạ Long', tag: 'Kỳ quan Thiên nhiên Thế giới (UNESCO)', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=300&q=80' },
+  { id: 2, name: 'Quần thể Tràng An', tag: 'Di sản Văn hóa & Thiên nhiên Kép', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=300&q=80' },
+  { id: 3, name: 'Phố cổ Hội An', tag: 'Di sản Văn hóa & Đèn lồng lung linh', image: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=300&q=80' },
+  { id: 4, name: 'Hà Giang', tag: 'Công viên Địa chất Toàn cầu Đồng Văn', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=300&q=80' },
+  { id: 5, name: 'Phong Nha - Kẻ Bàng', tag: 'Vương quốc hang động thạch nhũ', image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=300&q=80' },
+  { id: 6, name: 'Côn Đảo', tag: 'Biển đảo hoang sơ & Di tích thiêng liêng', image: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=300&q=80' },
 ];
 
 export default function MegaSearchBar() {
@@ -266,9 +267,12 @@ export default function MegaSearchBar() {
                     className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-cyan-50/70 dark:hover:bg-cyan-950/40 border border-transparent hover:border-cyan-200 dark:hover:border-cyan-800/50 cursor-pointer transition group"
                   >
                     <img
-                      src={dest.image}
+                      src={getAuthenticImage(dest.image, dest.name, searchMode === 'hotels' ? 'hotel' : 'destination')}
                       alt={dest.name}
                       className="w-12 h-12 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-transform"
+                      onError={(e) => {
+                        handleImageError(e, dest.name, searchMode === 'hotels' ? 'hotel' : 'destination');
+                      }}
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-sm text-gray-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 truncate">

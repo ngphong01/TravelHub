@@ -63,69 +63,23 @@ function normalizeDestinationName(name: string): string {
   return normalized;
 }
 
-// Get image URL for a destination
+import { getAuthenticImage } from './imageFallback';
+
+// Helper function to get destination image
 export function getDestinationImage(destinationName: string, fallback?: string): string {
-  // First try exact match
-  let imageInfo = destinationImageMap[destinationName];
-  
-  // If not found, try normalized match
-  if (!imageInfo) {
-    const normalized = normalizeDestinationName(destinationName);
-    // Try finding in map with normalized name
-    const found = Object.keys(destinationImageMap).find(
-      key => normalizeDestinationName(key) === normalized
-    );
-    if (found) {
-      imageInfo = destinationImageMap[found];
-    } else {
-      // Fallback: use normalized name with default extension
-      imageInfo = { filename: normalized, extension: '.jpg' };
-    }
-  }
-  
-  // Base URL - use relative path since proxy handles it
-  // Frontend can access /uploads through the proxy
-  const baseUrl = process.env.REACT_APP_API_URL || '';
-  
-  // Files are in uploads/avatars with exact names
-  const imagePath = imageInfo.filename.replace(/\s+/g, ' '); // Keep spaces as-is for URL encoding
-  
-  // Return path with correct extension
-  return `${baseUrl}/uploads/avatars/${encodeURIComponent(imagePath)}${imageInfo.extension}`;
+  return getAuthenticImage(fallback, destinationName, 'destination');
 }
 
 // Helper to check if image exists (used by components)
 export function getDestinationImageUrl(destination: { name: string; image?: string | null }): string {
-  // If destination already has image URL from database, use it
-  if (destination.image) {
-    // Check if it's already a full URL
-    if (destination.image.startsWith('http')) {
-      return destination.image;
-    }
-    // If it's a relative path starting with /uploads, use it directly
-    // Frontend proxy will route it to backend
-    if (destination.image.startsWith('/uploads')) {
-      // Return as relative path - proxy will handle it
-      return destination.image;
-    }
-    // If it's other relative path, return as-is
+  if (destination.image && (destination.image.startsWith('http://') || destination.image.startsWith('https://'))) {
     return destination.image;
   }
-  // Fallback: Try to get from uploads folder based on destination name
-  const imageUrl = getDestinationImage(destination.name);
-  return imageUrl || '';
+  return getAuthenticImage(destination.image, destination.name, 'destination');
 }
 
-// Helper to get tour image URL with appropriate fallback
-export function getTourImageUrl(image?: string | null): string {
-  if (!image) {
-    return '/uploads/tours/halong-bay-karsts.jpg';
-  }
-  if (image.startsWith('http://') || image.startsWith('https://')) {
-    return image;
-  }
-  if (image.startsWith('/')) {
-    return image;
-  }
-  return `/uploads/tours/${image}`;
+// Helper to get tour image URL with authentic fallback matching tour name
+export function getTourImageUrl(image?: string | null, tourTitle?: string): string {
+  return getAuthenticImage(image, tourTitle, 'tour');
 }
+

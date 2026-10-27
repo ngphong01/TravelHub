@@ -8,6 +8,7 @@ import {
   ArrowRightIcon,
   StarIcon
 } from '@heroicons/react/24/solid';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 export interface CompareTourItem {
   id: number;
@@ -52,7 +53,14 @@ export default function FloatingCompareDrawer({
                 key={t.id}
                 className="relative w-11 h-11 rounded-2xl overflow-hidden border-2 border-slate-900 shadow-md flex-shrink-0 group"
               >
-                <img src={t.image || '/uploads/tours/halong-bay-karsts.jpg'} alt={t.name} className="w-full h-full object-cover" />
+                <img
+                  src={getAuthenticImage(t.image, t.name, 'tour')}
+                  alt={t.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    handleImageError(e, t.name, 'tour');
+                  }}
+                />
                 <button
                   type="button"
                   onClick={() => onRemoveTour(t.id)}
@@ -131,11 +139,11 @@ export default function FloatingCompareDrawer({
                     {/* Image */}
                     <div className="relative h-44 rounded-xl overflow-hidden mb-4 shadow-sm">
                       <img
-                        src={tour.image || '/uploads/tours/halong-bay-karsts.jpg'}
+                        src={getAuthenticImage(tour.image, tour.name, 'tour')}
                         alt={tour.name}
                         className="w-full h-full object-cover"
-                        onError={(e: any) => {
-                          e.target.src = '/uploads/tours/halong-bay-karsts.jpg';
+                        onError={(e) => {
+                          handleImageError(e, tour.name, 'tour');
                         }}
                       />
                       <button

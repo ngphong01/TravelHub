@@ -7,6 +7,7 @@ import {
   SparklesIcon,
   ClockIcon
 } from '@heroicons/react/24/solid';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 interface MapPin {
   id: string;
@@ -30,7 +31,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'north',
     top: '12%',
     left: '32%',
-    image: '/uploads/avatars/sapa.jpg',
+    image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=800&q=80',
     priceFrom: '1.990.000 đ',
     rating: 4.9,
     toursCount: 6,
@@ -43,7 +44,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'north',
     top: '18%',
     left: '46%',
-    image: '/uploads/avatars/ha-noi.jpg',
+    image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80',
     priceFrom: '950.000 đ',
     rating: 4.8,
     toursCount: 12,
@@ -56,7 +57,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'north',
     top: '20%',
     left: '58%',
-    image: '/uploads/avatars/ha-long4.jpg',
+    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
     priceFrom: '2.490.000 đ',
     rating: 5.0,
     toursCount: 8,
@@ -69,7 +70,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'north',
     top: '24%',
     left: '49%',
-    image: '/uploads/avatars/ninh-binh.jpg',
+    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=800&q=80',
     priceFrom: '1.250.000 đ',
     rating: 4.9,
     toursCount: 5,
@@ -84,7 +85,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'central',
     top: '42%',
     left: '52%',
-    image: '/uploads/avatars/hue.jpg',
+    image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80',
     priceFrom: '1.890.000 đ',
     rating: 4.8,
     toursCount: 7,
@@ -97,7 +98,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'central',
     top: '47%',
     left: '58%',
-    image: '/uploads/avatars/da-nang.png',
+    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80',
     priceFrom: '2.850.000 đ',
     rating: 5.0,
     toursCount: 15,
@@ -110,7 +111,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'central',
     top: '64%',
     left: '68%',
-    image: '/uploads/avatars/nha-trang.jpg',
+    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
     priceFrom: '2.690.000 đ',
     rating: 4.9,
     toursCount: 9,
@@ -123,7 +124,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'central',
     top: '68%',
     left: '59%',
-    image: '/uploads/avatars/da-lat.jpg',
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
     priceFrom: '2.190.000 đ',
     rating: 4.9,
     toursCount: 11,
@@ -138,7 +139,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'south',
     top: '78%',
     left: '51%',
-    image: '/uploads/avatars/ha-noi.jpg',
+    image: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=800&q=80',
     priceFrom: '1.490.000 đ',
     rating: 4.8,
     toursCount: 14,
@@ -151,7 +152,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'south',
     top: '88%',
     left: '30%',
-    image: '/uploads/avatars/phu-quoc.jpg',
+    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=800&q=80',
     priceFrom: '3.490.000 đ',
     rating: 5.0,
     toursCount: 10,
@@ -268,9 +269,12 @@ export default function InteractiveTravelMap() {
             {/* Top Image */}
             <div className="relative h-56 rounded-2xl overflow-hidden mb-6 shadow-md">
               <img
-                src={selectedPin.image}
+                src={getAuthenticImage(selectedPin.image, selectedPin.name, 'destination')}
                 alt={selectedPin.name}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  handleImageError(e, selectedPin.name, 'destination');
+                }}
               />
               <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold">
                 {selectedPin.tag}

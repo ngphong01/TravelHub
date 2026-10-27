@@ -870,12 +870,9 @@ function InlineNameEditor({ current, onSaved }: { current: string; onSaved: (nam
                   <div className="p-5 sm:p-6 flex flex-col md:flex-row gap-5 items-start md:items-center justify-between">
                     <div className="flex gap-4 items-center">
                       <img
-                        src="/uploads/tours/halong-bay-karsts.jpg"
+                        src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80"
                         alt="Hạ Long Cruise"
                         className="w-20 h-20 rounded-2xl object-cover shadow-sm flex-shrink-0"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/placeholder.jpg';
-                        }}
                       />
                       <div className="space-y-1">
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300">

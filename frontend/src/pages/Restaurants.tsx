@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getRestaurantsPaged } from '../services/restaurant';
 import Skeleton from '../components/Skeleton';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 import {
   MapPinIcon,
   StarIcon,
@@ -191,11 +192,11 @@ export default function Restaurants() {
                 >
                   <div className="relative h-48 overflow-hidden bg-slate-100">
                     <img
-                      src={restaurant.image && restaurant.image.startsWith('http') ? restaurant.image : (restaurant.image && restaurant.image.startsWith('/uploads') ? restaurant.image : `/uploads/restaurants/${restaurant.image}`) || '/uploads/restaurants/pho-batdan.jpg'}
+                      src={getAuthenticImage(restaurant.image, restaurant.name || restaurant.slug, 'restaurant')}
                       alt={restaurant.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/uploads/restaurants/pho-batdan.jpg';
+                        handleImageError(e, restaurant.name || restaurant.slug, 'restaurant');
                       }}
                     />
                     {restaurant.featured && (

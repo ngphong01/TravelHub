@@ -7,6 +7,7 @@ import { getHotelsPaged } from '../services/hotel';
 import { getRestaurantsPaged } from '../services/restaurant';
 import { getToursPaged } from '../services/tour';
 import { getDestinationImageUrl } from '../utils/imageHelper';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 import MapEmbed from '../components/MapEmbed';
 import ReviewSection from '../components/ReviewSection';
 import Skeleton from '../components/Skeleton';
@@ -88,15 +89,7 @@ export default function DestinationDetail() {
       price: 2490000,
       featured: true,
       description: 'Được UNESCO vinh danh là Di sản Thiên nhiên Thế giới, nơi đây mê hoặc du khách bởi hàng ngàn hòn đảo đá vôi kỳ vĩ nhô lên giữa làn nước xanh ngọc bích, các hang động huyền bí và những làng chài nổi bình yên.',
-      image: slug?.includes('phu-quoc')
-        ? '/uploads/avatars/phu-quoc.jpg'
-        : slug?.includes('da-nang')
-        ? '/uploads/avatars/da-nang.png'
-        : slug?.includes('sa-pa')
-        ? '/uploads/avatars/sapa.jpg'
-        : slug?.includes('ninh-binh')
-        ? '/uploads/avatars/ninh-binh.jpg'
-        : '/uploads/avatars/ha-long4.jpg',
+      image: getAuthenticImage(null, slug, 'destination'),
     };
   }, [dbDestination, slug]);
 
@@ -264,8 +257,7 @@ export default function DestinationDetail() {
               alt={destination.name}
               className="w-full h-full object-cover"
               onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = '/uploads/avatars/ha-long4.jpg';
+                handleImageError(e, destination.name || destination.slug, 'destination');
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
@@ -681,12 +673,11 @@ export default function DestinationDetail() {
                     >
                       <div className="relative h-48 overflow-hidden">
                         <img
-                          src={tourImage}
+                          src={getAuthenticImage(tour.image, tour.name || tour.slug, 'tour')}
                           alt={tour.name}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/uploads/tours/tour-du-thuyen-ha-long-5-sao-2n1d.jpg';
+                            handleImageError(e, tour.name || tour.slug, 'tour');
                           }}
                         />
                         {tourPrice < 5000000 && (

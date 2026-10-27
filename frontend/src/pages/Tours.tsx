@@ -20,6 +20,7 @@ import {
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import FloatingCompareDrawer, { CompareTourItem } from '../components/FloatingCompareDrawer';
 import toast from 'react-hot-toast';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 const FALLBACK_TOURS: Tour[] = [
   {
@@ -32,7 +33,7 @@ const FALLBACK_TOURS: Tour[] = [
     rating: 4.9,
     reviewCount: 1420,
     featured: true,
-    image: '/uploads/tours/halong-bay-karsts.jpg',
+    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
     transport: 'Xe Limousine Dcar',
     departurePoint: 'Hà Nội',
     destination: { id: 1, name: 'Vịnh Hạ Long', slug: 'ha-long' },
@@ -47,7 +48,7 @@ const FALLBACK_TOURS: Tour[] = [
     rating: 4.85,
     reviewCount: 980,
     featured: true,
-    image: '/uploads/tours/danang-cauvang.jpg',
+    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
     transport: 'Máy bay khứ hồi + Ô tô',
     departurePoint: 'TP. Hồ Chí Minh',
     destination: { id: 2, name: 'Đà Nẵng & Hội An', slug: 'da-nang' },
@@ -62,7 +63,7 @@ const FALLBACK_TOURS: Tour[] = [
     rating: 4.92,
     reviewCount: 1650,
     featured: true,
-    image: '/uploads/tours/phuquoc-sao-beach.jpg',
+    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
     transport: 'Máy bay + Resort 5 Sao',
     departurePoint: 'Hà Nội / TP.HCM',
     destination: { id: 3, name: 'Đảo Ngọc Phú Quốc', slug: 'phu-quoc' },
@@ -77,7 +78,7 @@ const FALLBACK_TOURS: Tour[] = [
     rating: 4.8,
     reviewCount: 760,
     featured: true,
-    image: '/uploads/tours/sapa-fansipan-peak.jpg',
+    image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80',
     transport: 'Xe giường nằm Cabin đôi',
     departurePoint: 'Hà Nội',
     destination: { id: 4, name: 'Sa Pa - Fansipan', slug: 'sa-pa' },
@@ -92,7 +93,7 @@ const FALLBACK_TOURS: Tour[] = [
     rating: 4.9,
     reviewCount: 1120,
     featured: true,
-    image: '/uploads/tours/ninhbinh-trangan.jpg',
+    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
     transport: 'Xe du lịch máy lạnh cao cấp',
     departurePoint: 'Hà Nội',
     destination: { id: 5, name: 'Ninh Bình - Tràng An', slug: 'ninh-binh' },
@@ -107,7 +108,7 @@ const FALLBACK_TOURS: Tour[] = [
     rating: 4.95,
     reviewCount: 890,
     featured: true,
-    image: '/uploads/tours/hagiang-mapileng.jpg',
+    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
     transport: 'Xe Limousine + Xe máy bản địa',
     departurePoint: 'Hà Nội',
     destination: { id: 10, name: 'Cao Nguyên Hà Giang', slug: 'ha-giang' },
@@ -122,7 +123,7 @@ const FALLBACK_TOURS: Tour[] = [
     rating: 4.88,
     reviewCount: 820,
     featured: true,
-    image: '/uploads/tours/dalat-camtucau.jpg',
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
     transport: 'Xe Limousine cao cấp',
     departurePoint: 'TP. Hồ Chí Minh',
     destination: { id: 6, name: 'Đà Lạt Mộng Mơ', slug: 'da-lat' },
@@ -137,7 +138,7 @@ const FALLBACK_TOURS: Tour[] = [
     rating: 4.91,
     reviewCount: 640,
     featured: true,
-    image: '/uploads/tours/hanoi-tran-quoc.jpg',
+    image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80',
     transport: 'Xe ô tô du lịch + Du thuyền',
     departurePoint: 'Hà Nội',
     destination: { id: 7, name: 'Thủ Đô Hà Nội', slug: 'ha-noi' },
@@ -427,11 +428,11 @@ export default function ToursPage() {
                   {/* Image with badges & compare button */}
                   <div className="relative h-56 w-full overflow-hidden bg-gray-100 dark:bg-slate-800">
                     <img
-                      src={tour.image || '/uploads/tours/halong-bay-karsts.jpg'}
+                      src={getAuthenticImage(tour.image, tour.name || tour.slug, 'tour')}
                       alt={tour.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e: any) => {
-                        e.target.src = '/uploads/tours/halong-bay-karsts.jpg';
+                        handleImageError(e, tour.name || tour.slug, 'tour');
                       }}
                     />
                     {tour.featured && (

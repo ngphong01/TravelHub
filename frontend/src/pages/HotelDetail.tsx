@@ -5,6 +5,7 @@ import { getHotelBySlug } from '../services/hotel';
 import Skeleton from '../components/Skeleton';
 import SEOHead from '../components/SEOHead';
 import MapEmbed from '../components/MapEmbed';
+import { getAuthenticImage, getAuthenticGallery, handleImageError } from '../utils/imageFallback';
 import {
   MapPinIcon,
   StarIcon,
@@ -106,24 +107,17 @@ export default function HotelDetail() {
       rating: 4.9,
       reviewCount: 1420,
       description: 'Tọa lạc trên bãi biển Mỹ Khê tuyệt đẹp, khu nghỉ dưỡng sở hữu không gian biển xanh thơ mộng, hồ bơi vô cực rộng lớn và hệ thống ẩm thực quốc tế 5 sao đẳng cấp.',
-      image: '/uploads/hotels/danang-beach.jpg',
+      image: getAuthenticImage(null, slug, 'hotel'),
       amenities: ['wifi', 'pool', 'spa', 'gym', 'restaurant', 'beach', 'breakfast'],
       contact: '0236 395 8888',
       website: 'https://vinpearl.com',
     };
   }, [dbHotel, slug]);
 
-  // Photo Gallery (Chuẩn 5-photo mosaic layout Booking.com)
+  // Photo Gallery (Authentic unique gallery)
   const hotelPhotos = useMemo(() => {
-    const defaultPhoto = hotel.image || '/uploads/hotels/halong-luxury.jpg';
-    return [
-      defaultPhoto,
-      '/uploads/hotels/halong-view.jpg',
-      '/uploads/hotels/emerald-halong.jpg',
-      '/uploads/hotels/danang-beach.jpg',
-      '/uploads/hotels/phuquoc-sunset.jpg',
-    ];
-  }, [hotel.image]);
+    return getAuthenticGallery([hotel.image], hotel.name || hotel.city || slug, 'hotel');
+  }, [hotel.image, hotel.name, hotel.city, slug]);
 
   // Dynamic Amenities Processing from DB
   const parsedAmenities = useMemo(() => {
@@ -406,7 +400,7 @@ export default function HotelDetail() {
                 alt={hotel.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/uploads/hotels/halong-luxury.jpg';
+                  handleImageError(e, hotel.name || hotel.city || slug, 'hotel');
                 }}
               />
               <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
@@ -423,7 +417,7 @@ export default function HotelDetail() {
                   alt="Gallery 2"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/uploads/hotels/halong-view.jpg';
+                    handleImageError(e, hotel.name || hotel.city || slug, 'hotel');
                   }}
                 />
               </div>
@@ -436,7 +430,7 @@ export default function HotelDetail() {
                   alt="Gallery 3"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/uploads/hotels/emerald-halong.jpg';
+                    handleImageError(e, hotel.name || hotel.city || slug, 'hotel');
                   }}
                 />
               </div>
@@ -453,7 +447,7 @@ export default function HotelDetail() {
                   alt="Gallery 4"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/uploads/hotels/danang-beach.jpg';
+                    handleImageError(e, hotel.name || hotel.city || slug, 'hotel');
                   }}
                 />
               </div>
@@ -466,7 +460,7 @@ export default function HotelDetail() {
                   alt="Gallery 5"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/uploads/hotels/phuquoc-sunset.jpg';
+                    handleImageError(e, hotel.name || hotel.city || slug, 'hotel');
                   }}
                 />
                 <div className="absolute inset-0 bg-black/50 hover:bg-black/40 flex items-center justify-center text-white font-extrabold text-sm gap-1.5 transition">
@@ -492,7 +486,7 @@ export default function HotelDetail() {
               alt="Phóng to"
               className="max-w-5xl max-h-[85vh] rounded-2xl object-contain shadow-2xl"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/uploads/hotels/halong-luxury.jpg';
+                handleImageError(e, hotel.name || hotel.city || slug, 'hotel');
               }}
             />
           </div>
@@ -584,11 +578,11 @@ export default function HotelDetail() {
                       {/* Room Photo & Core Spec */}
                       <div className="w-full md:w-56 flex-shrink-0">
                         <img
-                          src={room.image}
+                          src={getAuthenticImage(room.image, hotel.name || hotel.city, 'hotel')}
                           alt={room.name}
                           className="w-full h-40 object-cover rounded-2xl shadow-sm mb-2"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/uploads/hotels/halong-luxury.jpg';
+                            handleImageError(e, hotel.name || hotel.city, 'hotel');
                           }}
                         />
                         <div className="text-xs text-slate-500 space-y-1">

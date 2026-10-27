@@ -5,6 +5,7 @@ import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { useQuery } from '@tanstack/react-query';
 import { getDestinations } from '../services/destination';
 import { getDestinationImageUrl } from '../utils/imageHelper';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 import { useTranslation } from 'react-i18next';
 
 interface CheckIn {
@@ -74,29 +75,24 @@ export default function CheckInSection({ checkIns }: CheckInSectionProps) {
     'Hồ Chí Minh': 'Hồ Chí Minh, Việt Nam',
   };
 
-  // Lấy ảnh thực tế từ destinations trong database
+  // Lấy ảnh thực tế từ destinations trong database hoặc Unsplash CDN
   const getDestinationImage = (destinationName: string): string => {
-    // Nếu chưa có data từ API, dùng ảnh theo tên điểm đến trên Unsplash
-    if (!destinationsData || !Array.isArray(destinationsData)) {
-      return '/uploads/avatars/ha-long4.jpg';
-    }
+    if (destinationsData && Array.isArray(destinationsData)) {
+      const destination = destinationsData.find((d: any) => 
+        d.name === destinationName || 
+        d.name.includes(destinationName) ||
+        destinationName.includes(d.name)
+      );
 
-    // Tìm destination trong database theo tên
-    const destination = destinationsData.find((d: any) => 
-      d.name === destinationName || 
-      d.name.includes(destinationName) ||
-      destinationName.includes(d.name)
-    );
-
-    if (destination) {
-      const imageUrl = getDestinationImageUrl(destination);
-      if (imageUrl) {
-        return imageUrl;
+      if (destination) {
+        const imageUrl = getDestinationImageUrl(destination);
+        if (imageUrl) {
+          return getAuthenticImage(imageUrl, destinationName, 'destination');
+        }
       }
     }
 
-    // Fallback: dùng ảnh Hạ Long chuẩn mực
-    return '/uploads/avatars/ha-long4.jpg';
+    return getAuthenticImage(null, destinationName, 'destination');
   };
 
   // Danh sách tên điểm đến phổ biến
@@ -185,7 +181,7 @@ export default function CheckInSection({ checkIns }: CheckInSectionProps) {
                     alt={checkIn.destination}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/uploads/avatars/ha-long4.jpg';
+                      handleImageError(e, checkIn.destination, 'destination');
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

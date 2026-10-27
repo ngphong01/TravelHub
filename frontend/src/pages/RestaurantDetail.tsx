@@ -4,6 +4,7 @@ import { getRestaurantBySlug } from '../services/restaurant';
 import Skeleton from '../components/Skeleton';
 import SEOHead from '../components/SEOHead';
 import MapEmbed from '../components/MapEmbed';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 import {
   MapPinIcon,
   StarIcon,
@@ -68,15 +69,7 @@ export default function RestaurantDetail() {
         : 'Nhà Hàng Ẩm Thực Cung Đình Heritage',
       slug: slug || 'nha-hang-am-thuc-heritage',
       description: 'Không gian ẩm thực ven biển sang trọng với nguồn hải sản tươi sống đánh bắt trong ngày. Bếp trưởng giàu kinh nghiệm chế biến các món đặc sản địa phương kết hợp phong cách ẩm thực Á - Âu tinh tế.',
-      image: slug?.includes('ha-long')
-        ? '/uploads/restaurants/haisan-cuavang.jpg'
-        : slug?.includes('da-nang')
-        ? '/uploads/restaurants/banhtrang-tran.jpg'
-        : slug?.includes('phu-quoc')
-        ? '/uploads/restaurants/bunquay-phuquoc.jpg'
-        : slug?.includes('hoi-an')
-        ? '/uploads/restaurants/comga-babuoi.jpg'
-        : '/uploads/restaurants/pho-batdan.jpg',
+      image: getAuthenticImage(null, slug, 'restaurant'),
       address: 'Đường bờ biển du lịch, Trung tâm ẩm thực',
       city: 'Đà Nẵng',
       country: 'Việt Nam',
@@ -224,11 +217,11 @@ export default function RestaurantDetail() {
         {/* Hero Banner */}
         <div className="relative h-72 md:h-96 overflow-hidden bg-slate-900">
           <img
-            src={restaurant.image || '/uploads/restaurants/haisan-cuavang.jpg'}
+            src={getAuthenticImage(restaurant.image, restaurant.name || restaurant.slug, 'restaurant')}
             alt={restaurant.name}
             className="w-full h-full object-cover opacity-80"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = '/uploads/restaurants/haisan-cuavang.jpg';
+              handleImageError(e, restaurant.name || restaurant.slug, 'restaurant');
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />

@@ -9,6 +9,7 @@ import {
   ShieldCheckIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 interface CartSlideDrawerProps {
   isOpen: boolean;
@@ -96,11 +97,11 @@ export default function CartSlideDrawer({ isOpen, onClose }: CartSlideDrawerProp
                 >
                   <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-200 dark:bg-slate-700 flex-shrink-0">
                     <img
-                      src={item.image || '/uploads/tours/halong-bay-karsts.jpg'}
+                      src={getAuthenticImage(item.image, item.title, item.type === 'hotel' ? 'hotel' : 'tour')}
                       alt={item.title}
                       className="w-full h-full object-cover"
-                      onError={(e: any) => {
-                        e.target.src = '/uploads/tours/halong-bay-karsts.jpg';
+                      onError={(e) => {
+                        handleImageError(e, item.title, item.type === 'hotel' ? 'hotel' : 'tour');
                       }}
                     />
                   </div>

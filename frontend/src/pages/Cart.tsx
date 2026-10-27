@@ -13,6 +13,7 @@ import {
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 export default function CartPage() {
   const { items, removeItem, updateGuests, clearCart, totalPrice } = useCart();
@@ -130,11 +131,11 @@ export default function CartPage() {
                     <div className="flex items-center gap-4 flex-1">
                       <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-slate-800 flex-shrink-0 border border-gray-100 dark:border-slate-800">
                         <img
-                          src={item.image || '/uploads/tours/halong-bay-karsts.jpg'}
+                          src={getAuthenticImage(item.image, item.title, item.type === 'hotel' ? 'hotel' : 'tour')}
                           alt={item.title}
                           className="w-full h-full object-cover"
-                          onError={(e: any) => {
-                            e.target.src = '/uploads/tours/halong-bay-karsts.jpg';
+                          onError={(e) => {
+                            handleImageError(e, item.title, item.type === 'hotel' ? 'hotel' : 'tour');
                           }}
                         />
                       </div>
