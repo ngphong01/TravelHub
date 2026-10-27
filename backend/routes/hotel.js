@@ -21,11 +21,11 @@ router.get('/', async (req, res) => {
   const where = {
     ...(typeof minPrice === 'number' ? { pricePerNight: { gte: minPrice } } : {}),
     ...(typeof maxPrice === 'number' ? { pricePerNight: { lte: maxPrice } } : {}),
-    ...(city ? { city: { contains: city, mode: 'insensitive' } } : {}),
-    ...(country ? { country: { contains: country, mode: 'insensitive' } } : {}),
+    ...(city ? { city: { contains: city } } : {}),
+    ...(country ? { country: { contains: country } } : {}),
     ...(destinationId ? { destinationId } : {}),
     ...(featured !== undefined ? { featured } : {}),
-    ...(q ? { OR: [{ name: { contains: q, mode: 'insensitive' } }, { description: { contains: q, mode: 'insensitive' } }, { address: { contains: q, mode: 'insensitive' } }] } : {}),
+    ...(q ? { OR: [{ name: { contains: q } }, { description: { contains: q } }, { address: { contains: q } }] } : {}),
   };
 
   let orderBy;

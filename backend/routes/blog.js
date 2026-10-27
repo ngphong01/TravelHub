@@ -15,9 +15,9 @@ router.get('/', async (req, res) => {
       ...(category && { category }),
       ...(search && {
         OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { excerpt: { contains: search, mode: 'insensitive' } },
-          { content: { contains: search, mode: 'insensitive' } },
+          { title: { contains: search } },
+          { excerpt: { contains: search } },
+          { content: { contains: search } },
         ],
       }),
     };
@@ -93,8 +93,8 @@ router.get('/admin/list', authRequired, isAdmin, async (req, res) => {
     const where = {
       ...(search && {
         OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { excerpt: { contains: search, mode: 'insensitive' } },
+          { title: { contains: search } },
+          { excerpt: { contains: search } },
         ],
       }),
       ...(published !== undefined && { published: published === 'true' }),

@@ -744,7 +744,7 @@ router.post('/predict-peak-season', authRequired, isAdmin, aiLimiter, async (req
       const destinationData = await prisma.destination.findFirst({
         where: {
           OR: [
-            { name: { contains: destination, mode: 'insensitive' } },
+            { name: { contains: destination } },
             { slug: destination },
           ],
         },

@@ -16,7 +16,7 @@ import toast from 'react-hot-toast';
 import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
 export default function CartPage() {
-  const { items, removeItem, updateGuests, clearCart, totalPrice } = useCart();
+  const { items, removeItem, updateGuests, updateTourGuests, clearCart, totalPrice } = useCart();
   const navigate = useNavigate();
   const [couponCode, setCouponCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
@@ -28,10 +28,24 @@ export default function CartPage() {
   };
 
   const getItemLink = (item: any) => {
-    if (item.type === 'tour') return `/tours/${item.slug}`;
-    if (item.type === 'hotel') return `/hotels/${item.slug}`;
-    if (item.type === 'restaurant') return `/restaurants/${item.slug}`;
-    return `/destinations/${item.slug}`;
+    const slug = item.slug || '';
+    if (item.type === 'tour') return `/tours/${slug}`;
+    if (item.type === 'hotel') return `/hotels/${slug}`;
+    if (item.type === 'restaurant' || item.type === 'dining' || item.type === 'food') return `/restaurants/${slug}`;
+    const title = (item.title || '').toLowerCase();
+    if (
+      title.includes('nhà hàng') ||
+      title.includes('quán') ||
+      title.includes('phở') ||
+      title.includes('đặt bàn') ||
+      title.includes('bát đàn')
+    ) {
+      return `/restaurants/${slug}`;
+    }
+    if (title.includes('khách sạn') || title.includes('hotel') || title.includes('resort') || title.includes('phòng')) {
+      return `/hotels/${slug}`;
+    }
+    return `/destinations/${slug}`;
   };
 
   const getItemUnitLabel = (item: any) => {
@@ -39,6 +53,20 @@ export default function CartPage() {
     if (item.type === 'hotel') return 'phòng';
     if (item.type === 'restaurant') return 'khách';
     return 'khách';
+  };
+
+  const getItemSubtotal = (item: any) => {
+    if (item.type === 'restaurant') {
+      return 0; // Đặt bàn nhà hàng miễn phí 0đ
+    }
+    if (item.type === 'tour' && (item.adults !== undefined || item.children !== undefined)) {
+      const a = item.adults ?? item.guests;
+      const c = item.children ?? 0;
+      const pa = item.pricePerAdult ?? item.price;
+      const pc = item.pricePerChild ?? Math.round(pa * 0.7);
+      return Math.max(0, a * pa + c * pc - (item.discount || 0));
+    }
+    return (item.price || 0) * (item.guests || 1);
   };
 
   const handleApplyCoupon = (e: React.FormEvent) => {
@@ -205,51 +233,171 @@ export default function CartPage() {
                             </span>
                           </p>
                         )}
-                        <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                          <p className="text-sm font-bold text-cyan-600 dark:text-cyan-400">
-                            {formatPrice(item.price)}{' '}
-                            <span className="text-xs font-normal text-gray-500 dark:text-slate-400">
-                              / {getItemUnitLabel(item)}
-                            </span>
-                          </p>
-                          {item.discount && item.discount > 0 && (
-                            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
-                              Đã giảm ưu đãi online: -{formatPrice(item.discount)}
-                            </span>
-                          )}
-                        </div>
+                        {/* Pricing details */}
+                        {item.type === 'restaurant' ? (
+                          <div className="pt-0.5 space-y-1">
+                            <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                              <span>0 đ</span>
+                              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                Đặt chỗ miễn phí
+                              </span>
+                            </p>
+                            <p className="text-[11px] text-gray-500 dark:text-slate-400">
+                              Không thu phí đặt trước • Thanh toán trực tiếp tại quán theo thực đơn
+                            </p>
+                          </div>
+                        ) : item.type === 'tour' && (item.adults !== undefined || item.children !== undefined) ? (
+                          <div className="space-y-1 pt-1">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600 dark:text-slate-300">
+                              <span className="font-semibold text-cyan-700 dark:text-cyan-300">
+                                {item.adults ?? item.guests} Người lớn × {formatPrice(item.pricePerAdult ?? item.price)}
+                              </span>
+                              {(item.children || 0) > 0 && (
+                                <span className="font-semibold text-amber-600 dark:text-amber-400">
+                                  • {item.children} Trẻ em (70%) × {formatPrice(item.pricePerChild ?? Math.round((item.pricePerAdult ?? item.price) * 0.7))}
+                                </span>
+                              )}
+                            </div>
+                            {item.discount && item.discount > 0 ? (
+                              <span className="inline-block text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                                Ưu đãi đặt trực tuyến: -{formatPrice(item.discount)}
+                              </span>
+                            ) : null}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                            <p className="text-sm font-bold text-cyan-600 dark:text-cyan-400">
+                              {formatPrice(item.price)}{' '}
+                              <span className="text-xs font-normal text-gray-500 dark:text-slate-400">
+                                / {getItemUnitLabel(item)}
+                              </span>
+                            </p>
+                            {item.discount && item.discount > 0 && (
+                              <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                                Đã giảm ưu đãi online: -{formatPrice(item.discount)}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     {/* Quantity & Actions */}
                     <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-3 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-slate-800">
                       {/* Counter */}
-                      <div className="flex items-center border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-slate-800">
-                        <button
-                          onClick={() => updateGuests(item.id, Math.max(1, item.guests - 1))}
-                          className="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition"
-                          title={`Giảm 1 ${getItemUnitLabel(item)}`}
-                        >
-                          -
-                        </button>
-                        <span className="px-2.5 text-center font-semibold text-xs text-gray-800 dark:text-white whitespace-nowrap">
-                          {item.guests} {getItemUnitLabel(item)}
-                        </span>
-                        <button
-                          onClick={() => updateGuests(item.id, item.guests + 1)}
-                          className="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition"
-                          title={`Thêm 1 ${getItemUnitLabel(item)}`}
-                        >
-                          +
-                        </button>
-                      </div>
+                      {item.type === 'tour' && (item.adults !== undefined || item.children !== undefined) ? (
+                        <div className="flex flex-col sm:items-end gap-1.5">
+                          {/* Adults counter */}
+                          <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-slate-300">
+                            <span className="text-[11px] font-medium">Người lớn:</span>
+                            <div className="flex items-center border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-slate-800">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateTourGuests?.(
+                                    item.id,
+                                    Math.max(1, (item.adults ?? item.guests) - 1),
+                                    item.children ?? 0
+                                  )
+                                }
+                                className="w-6 h-6 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition text-xs"
+                                title="Giảm 1 người lớn"
+                              >
+                                -
+                              </button>
+                              <span className="px-2 text-center font-bold text-xs text-gray-800 dark:text-white">
+                                {item.adults ?? item.guests}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateTourGuests?.(
+                                    item.id,
+                                    (item.adults ?? item.guests) + 1,
+                                    item.children ?? 0
+                                  )
+                                }
+                                className="w-6 h-6 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition text-xs"
+                                title="Thêm 1 người lớn"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Children counter */}
+                          <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-slate-300">
+                            <span className="text-[11px] font-medium">Trẻ em:</span>
+                            <div className="flex items-center border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-slate-800">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateTourGuests?.(
+                                    item.id,
+                                    item.adults ?? item.guests,
+                                    Math.max(0, (item.children ?? 0) - 1)
+                                  )
+                                }
+                                className="w-6 h-6 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition text-xs"
+                                title="Giảm 1 trẻ em"
+                              >
+                                -
+                              </button>
+                              <span className="px-2 text-center font-bold text-xs text-gray-800 dark:text-white">
+                                {item.children ?? 0}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateTourGuests?.(
+                                    item.id,
+                                    item.adults ?? item.guests,
+                                    (item.children ?? 0) + 1
+                                  )
+                                }
+                                className="w-6 h-6 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition text-xs"
+                                title="Thêm 1 trẻ em"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-slate-800">
+                          <button
+                            type="button"
+                            onClick={() => updateGuests(item.id, Math.max(1, item.guests - 1))}
+                            className="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition"
+                            title={`Giảm 1 ${getItemUnitLabel(item)}`}
+                          >
+                            -
+                          </button>
+                          <span className="px-2.5 text-center font-semibold text-xs text-gray-800 dark:text-white whitespace-nowrap">
+                            {item.guests} {getItemUnitLabel(item)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateGuests(item.id, item.guests + 1)}
+                            className="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition"
+                            title={`Thêm 1 ${getItemUnitLabel(item)}`}
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
 
                       {/* Subtotal for Item */}
                       <div className="text-right">
                         <span className="text-xs text-gray-400 dark:text-slate-500 block">Thành tiền</span>
                         <span className="font-bold text-base text-gray-900 dark:text-white">
-                          {formatPrice(item.price * item.guests)}
+                          {formatPrice(getItemSubtotal(item))}
                         </span>
+                        {item.type === 'restaurant' && (
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-medium">
+                            (Thanh toán tại quán)
+                          </span>
+                        )}
                       </div>
 
                       {/* Remove Button */}

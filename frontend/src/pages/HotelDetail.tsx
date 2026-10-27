@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getHotelBySlug } from '../services/hotel';
@@ -80,7 +80,16 @@ export default function HotelDetail() {
     suite: 0,
     villa: 0,
   });
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('travelgo:wishlist');
+      if (saved && slug) {
+        const list = JSON.parse(saved);
+        if (Array.isArray(list)) return list.includes(slug);
+      }
+    } catch {}
+    return false;
+  });
   const [activePhotoModal, setActivePhotoModal] = useState<number | null>(null);
 
   // Fetch real hotel data from backend
@@ -336,16 +345,42 @@ export default function HotelDetail() {
   };
 
   const handleToggleWishlist = () => {
-    setIsFavorite((prev) => {
-      const next = !prev;
-      if (next) {
-        toast.success(`Đã lưu "${hotel.name}" vào danh sách yêu thích!`);
-      } else {
-        toast.success(`Đã bỏ "${hotel.name}" khỏi danh sách yêu thích`);
+    const nextState = !isFavorite;
+    setIsFavorite(nextState);
+    try {
+      const saved = localStorage.getItem('travelgo:wishlist');
+      let list: string[] = saved ? JSON.parse(saved) : [];
+      if (!Array.isArray(list)) list = [];
+      const currentSlug = slug || hotel?.slug;
+      if (currentSlug) {
+        if (nextState) {
+          if (!list.includes(currentSlug)) list.push(currentSlug);
+          toast.success(`Đã lưu "${hotel.name}" vào yêu thích trên thiết bị này! (Đăng nhập để đồng bộ vĩnh viễn)`, {
+            icon: '❤️',
+            duration: 4000,
+          });
+        } else {
+          list = list.filter((s) => s !== currentSlug);
+          toast(`Đã bỏ lưu "${hotel.name}" khỏi danh sách yêu thích`, { icon: '🤍' });
+        }
+        localStorage.setItem('travelgo:wishlist', JSON.stringify(list));
       }
-      return next;
-    });
+    } catch (e) {
+      console.error(e);
+    }
   };
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('travelgo:wishlist');
+      if (saved && slug) {
+        const list = JSON.parse(saved);
+        if (Array.isArray(list)) {
+          setIsFavorite(list.includes(slug));
+        }
+      }
+    } catch {}
+  }, [slug]);
 
   const handleShareHotel = () => {
     navigator.clipboard.writeText(window.location.href);

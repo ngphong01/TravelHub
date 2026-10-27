@@ -82,7 +82,7 @@ export default function PrivacyPage() {
 
             <section className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Bộ phận Bảo vệ Dữ liệu TravelHub: <strong className="text-emerald-600 dark:text-emerald-400">privacy@daophong.id.vn</strong>
+                Bộ phận Bảo vệ Dữ liệu TravelHub: Hotline <strong className="text-emerald-600 dark:text-emerald-400">0868 156 027</strong> • Email <strong className="text-emerald-600 dark:text-emerald-400">phong@triennguyen.com</strong> (hoặc privacy@daophong.id.vn). Địa chỉ: 6/160 Tân Triều, Thanh Trì, Hà Nội.
               </p>
               <Link
                 to="/"

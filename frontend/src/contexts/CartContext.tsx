@@ -21,6 +21,8 @@ export interface CartItem {
   nights?: number;
   adults?: number;
   children?: number;
+  pricePerAdult?: number;
+  pricePerChild?: number;
   discount?: number;
 }
 
@@ -29,6 +31,7 @@ interface CartContextType {
   addItem: (item: Omit<CartItem, 'id'>) => void;
   removeItem: (id: string) => void;
   updateGuests: (id: string, guests: number) => void;
+  updateTourGuests?: (id: string, adults: number, children: number) => void;
   clearCart: () => void;
   totalCount: number;
   totalPrice: number;
@@ -62,7 +65,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const existingIndex = prev.findIndex((item) => item.id === id);
       if (existingIndex > -1) {
         const updated = [...prev];
-        updated[existingIndex].guests += newItem.guests || 1;
+        if (newItem.adults !== undefined || newItem.children !== undefined) {
+          updated[existingIndex].adults = (updated[existingIndex].adults || 1) + (newItem.adults || 0);
+          updated[existingIndex].children = (updated[existingIndex].children || 0) + (newItem.children || 0);
+          updated[existingIndex].guests = (updated[existingIndex].adults || 1) + (updated[existingIndex].children || 0);
+        } else {
+          updated[existingIndex].guests += newItem.guests || 1;
+        }
         toast.success(`Đã cập nhật số lượng cho: ${newItem.title}`);
         return updated;
       } else {
@@ -89,12 +98,50 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const updateTourGuests = (id: string, adults: number, children: number) => {
+    if (adults < 1 && children < 1) return;
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const newAdults = Math.max(1, adults);
+          const newChildren = Math.max(0, children);
+          const totalGuests = newAdults + newChildren;
+          const pa = item.pricePerAdult ?? item.price;
+          const pc = item.pricePerChild ?? Math.round(pa * 0.7);
+          const rawTotal = newAdults * pa + newChildren * pc;
+          const newDiscount = rawTotal >= 5000000 ? 150000 : (rawTotal >= 2000000 ? 80000 : 0);
+          return {
+            ...item,
+            adults: newAdults,
+            children: newChildren,
+            guests: totalGuests,
+            discount: newDiscount > 0 ? newDiscount : undefined,
+          };
+        }
+        return item;
+      })
+    );
+  };
+
   const clearCart = () => {
     setItems([]);
   };
 
-  const totalCount = items.reduce((acc, item) => acc + item.guests, 0);
-  const totalPrice = items.reduce((acc, item) => acc + item.price * item.guests, 0);
+  const totalCount = items.reduce((acc, item) => acc + (item.guests || 1), 0);
+  const totalPrice = items.reduce((acc, item) => {
+    if (item.type === 'restaurant') {
+      return acc; // Đặt bàn nhà hàng hoàn toàn miễn phí 0đ
+    }
+    if (item.type === 'tour' && (item.adults !== undefined || item.children !== undefined)) {
+      const a = item.adults ?? item.guests;
+      const c = item.children ?? 0;
+      const pa = item.pricePerAdult ?? item.price;
+      const pc = item.pricePerChild ?? Math.round(pa * 0.7);
+      const sub = a * pa + c * pc - (item.discount || 0);
+      return acc + Math.max(0, sub);
+    }
+    return acc + (Number(item.price) || 0) * (Number(item.guests) || 1);
+  }, 0);
 
   return (
     <CartContext.Provider
@@ -103,6 +150,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         addItem,
         removeItem,
         updateGuests,
+        updateTourGuests,
         clearCart,
         totalCount,
         totalPrice,
@@ -121,6 +169,7 @@ export function useCart(): CartContextType {
       addItem: () => {},
       removeItem: () => {},
       updateGuests: () => {},
+      updateTourGuests: () => {},
       clearCart: () => {},
       totalCount: 0,
       totalPrice: 0,

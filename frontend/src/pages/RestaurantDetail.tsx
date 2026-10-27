@@ -31,7 +31,7 @@ import {
   HeartIcon as HeartIconSolid,
   CheckBadgeIcon,
 } from '@heroicons/react/24/solid';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 export default function RestaurantDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -45,7 +45,16 @@ export default function RestaurantDetail() {
   const [reservationDate, setReservationDate] = useState(defaultDate);
   const [reservationTime, setReservationTime] = useState('18:30');
   const [partySize, setPartySize] = useState(2);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('travelgo:wishlist');
+      if (saved && slug) {
+        const list = JSON.parse(saved);
+        if (Array.isArray(list)) return list.includes(slug);
+      }
+    } catch {}
+    return false;
+  });
 
   const { data: dbRestaurant, isLoading } = useQuery({
     queryKey: ['restaurant', slug],
@@ -137,8 +146,8 @@ export default function RestaurantDetail() {
       toast.error('Không thể đặt bàn vào ngày trong quá khứ!');
       return;
     }
-    const estimatedAmount = partySize * 300000;
-    navigate(`/checkout?type=restaurant&id=${restaurant?.id}&slug=${restaurant?.slug}&date=${reservationDate}&time=${reservationTime}&partySize=${partySize}&amount=${estimatedAmount}`);
+    // Đặt chỗ nhà hàng là miễn phí, không thu phí trước, thanh toán trực tiếp theo món tại quán
+    navigate(`/checkout?type=restaurant&id=${restaurant?.id}&slug=${restaurant?.slug}&date=${reservationDate}&time=${reservationTime}&partySize=${partySize}&amount=0`);
   };
 
   const handleAddToCart = () => {
@@ -152,31 +161,64 @@ export default function RestaurantDetail() {
       toast.error('Không thể đặt bàn vào ngày trong quá khứ!');
       return;
     }
-    const estimatedAmount = partySize * 300000;
+    // Giữ chỗ miễn phí 0đ theo cam kết trên trang chi tiết
     addItem({
       type: 'restaurant',
       itemId: restaurant.id,
-      title: `${restaurant.name} (Bàn ${partySize} khách)`,
+      title: `${restaurant.name} (Đặt bàn ${partySize} khách)`,
       slug: restaurant.slug,
-      price: estimatedAmount,
+      price: 0,
+      originalPrice: 0,
       date: `${reservationDate} lúc ${reservationTime}`,
       guests: partySize,
+      unitLabel: 'khách',
       location: restaurant.city || 'Việt Nam',
       image: restaurant.image || undefined,
+      adults: partySize,
+      children: 0,
+      pricePerAdult: 0,
+      pricePerChild: 0,
+      discount: 0,
     });
   };
 
   const handleToggleWishlist = () => {
-    setIsFavorite((prev) => {
-      const next = !prev;
-      if (next) {
-        toast.success(`Đã lưu "${restaurant.name}" vào danh sách yêu thích!`);
-      } else {
-        toast.success(`Đã bỏ "${restaurant.name}" khỏi danh sách yêu thích`);
+    const nextState = !isFavorite;
+    setIsFavorite(nextState);
+    try {
+      const saved = localStorage.getItem('travelgo:wishlist');
+      let list: string[] = saved ? JSON.parse(saved) : [];
+      if (!Array.isArray(list)) list = [];
+      const currentSlug = slug || restaurant?.slug;
+      if (currentSlug) {
+        if (nextState) {
+          if (!list.includes(currentSlug)) list.push(currentSlug);
+          toast.success(`Đã lưu "${restaurant.name}" vào yêu thích trên thiết bị này! (Đăng nhập để đồng bộ vĩnh viễn)`, {
+            icon: '❤️',
+            duration: 4000,
+          });
+        } else {
+          list = list.filter((s) => s !== currentSlug);
+          toast(`Đã bỏ lưu "${restaurant.name}" khỏi danh sách yêu thích`, { icon: '🤍' });
+        }
+        localStorage.setItem('travelgo:wishlist', JSON.stringify(list));
       }
-      return next;
-    });
+    } catch (e) {
+      console.error(e);
+    }
   };
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('travelgo:wishlist');
+      if (saved && slug) {
+        const list = JSON.parse(saved);
+        if (Array.isArray(list)) {
+          setIsFavorite(list.includes(slug));
+        }
+      }
+    } catch {}
+  }, [slug]);
 
   const handleShareRestaurant = () => {
     navigator.clipboard.writeText(window.location.href);

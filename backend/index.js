@@ -130,8 +130,11 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/loyalty', loyaltyRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/hotel', hotelRoutes);
+app.use('/api/hotels', hotelRoutes);
 app.use('/api/restaurant', restaurantRoutes);
+app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/tour', tourRoutes);
+app.use('/api/tours', tourRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 
 // Chat routes

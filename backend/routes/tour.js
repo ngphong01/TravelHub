@@ -75,14 +75,14 @@ router.get('/', async (req, res) => {
     // Tag filter
     if (tag && typeof tag === 'string' && tag.trim()) {
       whereConditions.push({
-        tags: { contains: tag.trim(), mode: 'insensitive' },
+        tags: { contains: tag.trim() },
       });
     }
 
     // Transport filter
     if (transport && typeof transport === 'string' && transport.trim()) {
       whereConditions.push({
-        transport: { contains: transport.trim(), mode: 'insensitive' },
+        transport: { contains: transport.trim() },
       });
     }
 
@@ -96,7 +96,7 @@ router.get('/', async (req, res) => {
       const keywords = pointKeywords[departurePoint.toLowerCase()] || [departurePoint];
       whereConditions.push({
         OR: keywords.map((kw) => ({
-          departurePoint: { contains: kw, mode: 'insensitive' },
+          departurePoint: { contains: kw },
         })),
       });
     }

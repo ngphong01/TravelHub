@@ -141,7 +141,18 @@ export default function TourDetail() {
   const [isHighlightsExpanded, setIsHighlightsExpanded] = useState(true);
   const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('travelgo:wishlist');
+      if (saved) {
+        const list = JSON.parse(saved);
+        if (Array.isArray(list) && slug) {
+          return list.includes(slug);
+        }
+      }
+    } catch {}
+    return false;
+  });
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [showGallery, setShowGallery] = useState(false);
@@ -641,8 +652,6 @@ export default function TourDetail() {
       return;
     }
     const totalGuests = Math.max(1, adults + children);
-    // Tính đơn giá thực tế mỗi người sau khi đã trừ ưu đãi đặt trực tuyến (đảm bảo tổng giỏ hàng khớp grandTotal)
-    const effectivePricePerGuest = Math.round(grandTotal / totalGuests);
 
     addItem({
       type: 'tour',
@@ -650,8 +659,8 @@ export default function TourDetail() {
       title: `${tour.name} [${activePackage.name}]`,
       image: tour.image || undefined,
       slug: tour.slug,
-      price: effectivePricePerGuest,
-      originalPrice: pricePerAdult,
+      price: pricePerAdult,
+      originalPrice: tour.originalPrice ? (tour.originalPrice + activePackage.priceDelta) : undefined,
       date: selectedDate,
       guests: totalGuests,
       unitLabel: 'khách',
@@ -659,6 +668,8 @@ export default function TourDetail() {
       location: tour.destination?.name,
       adults,
       children,
+      pricePerAdult,
+      pricePerChild,
       discount: memberDiscount > 0 ? memberDiscount : undefined,
     });
   };
@@ -684,6 +695,44 @@ export default function TourDetail() {
   const scrollToBooking = () => {
     bookingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+
+  const handleToggleWishlist = () => {
+    const nextState = !isFavorite;
+    setIsFavorite(nextState);
+    try {
+      const saved = localStorage.getItem('travelgo:wishlist');
+      let list: string[] = saved ? JSON.parse(saved) : [];
+      if (!Array.isArray(list)) list = [];
+      const currentSlug = slug || tour?.slug;
+      if (currentSlug) {
+        if (nextState) {
+          if (!list.includes(currentSlug)) list.push(currentSlug);
+          toast.success('Đã lưu vào yêu thích trên thiết bị này! (Đăng nhập để đồng bộ vĩnh viễn)', {
+            icon: '❤️',
+            duration: 4000,
+          });
+        } else {
+          list = list.filter((s) => s !== currentSlug);
+          toast('Đã bỏ lưu khỏi danh sách yêu thích.', { icon: '🤍' });
+        }
+        localStorage.setItem('travelgo:wishlist', JSON.stringify(list));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('travelgo:wishlist');
+      if (saved && slug) {
+        const list = JSON.parse(saved);
+        if (Array.isArray(list)) {
+          setIsFavorite(list.includes(slug));
+        }
+      }
+    } catch {}
+  }, [slug]);
 
   const handleShare = () => {
     if (navigator.share) {
@@ -810,7 +859,7 @@ export default function TourDetail() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsFavorite(!isFavorite)}
+                  onClick={handleToggleWishlist}
                   className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-semibold shadow-sm transition-all ${
                     isFavorite
                       ? 'border-red-200 bg-red-50 text-red-600 dark:bg-red-950/30 dark:border-red-800'
@@ -1961,17 +2010,30 @@ export default function TourDetail() {
                           }}
                         />
                         <button
+                          type="button"
                           onClick={(e) => {
                             e.preventDefault();
-                            setIsFavorite(!isFavorite);
+                            e.stopPropagation();
+                            try {
+                              const saved = localStorage.getItem('travelgo:wishlist');
+                              let list: string[] = saved ? JSON.parse(saved) : [];
+                              if (!Array.isArray(list)) list = [];
+                              const rSlug = relatedTour.slug;
+                              if (rSlug) {
+                                if (list.includes(rSlug)) {
+                                  list = list.filter((s) => s !== rSlug);
+                                  toast('Đã bỏ lưu khỏi danh sách yêu thích.', { icon: '🤍' });
+                                } else {
+                                  list.push(rSlug);
+                                  toast.success('Đã lưu vào yêu thích trên thiết bị này!', { icon: '❤️' });
+                                }
+                                localStorage.setItem('travelgo:wishlist', JSON.stringify(list));
+                              }
+                            } catch {}
                           }}
                           className="absolute top-3 left-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors shadow-md"
                         >
-                          {isFavorite ? (
-                            <HeartIconSolid className="h-5 w-5 text-red-500" />
-                          ) : (
-                            <HeartIcon className="h-5 w-5 text-gray-500" />
-                          )}
+                          <HeartIcon className="h-5 w-5 text-gray-500 hover:text-red-500" />
                         </button>
                         <div className="absolute bottom-3 left-3 bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">
                           Tiết kiệm

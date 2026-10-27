@@ -157,8 +157,8 @@ router.get('/admin', authRequired, isAdmin, async (req, res) => {
     const where = search
       ? {
           OR: [
-            { code: { contains: search, mode: 'insensitive' } },
-            { description: { contains: search, mode: 'insensitive' } },
+            { code: { contains: search } },
+            { description: { contains: search } },
           ],
         }
       : {};

@@ -90,7 +90,7 @@ export default function TermsPage() {
 
             <section className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Mọi thắc mắc cần hỗ trợ, vui lòng liên hệ hotline: <strong className="text-cyan-600 dark:text-cyan-400">1900 232389</strong> hoặc email <strong className="text-cyan-600 dark:text-cyan-400">support@daophong.id.vn</strong>
+                Mọi thắc mắc cần hỗ trợ, vui lòng liên hệ hotline: <strong className="text-cyan-600 dark:text-cyan-400">0868 156 027</strong> hoặc email <strong className="text-cyan-600 dark:text-cyan-400">phong@triennguyen.com</strong> (hoặc support@daophong.id.vn). Địa chỉ: 6/160 Tân Triều, Thanh Trì, Hà Nội.
               </p>
               <Link
                 to="/"

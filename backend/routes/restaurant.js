@@ -19,13 +19,13 @@ router.get('/', async (req, res) => {
   const sort = (req.query.sort || 'created_desc').toString();
 
   const where = {
-    ...(city ? { city: { contains: city, mode: 'insensitive' } } : {}),
-    ...(country ? { country: { contains: country, mode: 'insensitive' } } : {}),
-    ...(cuisine ? { cuisine: { contains: cuisine, mode: 'insensitive' } } : {}),
+    ...(city ? { city: { contains: city } } : {}),
+    ...(country ? { country: { contains: country } } : {}),
+    ...(cuisine ? { cuisine: { contains: cuisine } } : {}),
     ...(priceRange ? { priceRange } : {}),
     ...(destinationId ? { destinationId } : {}),
     ...(featured !== undefined ? { featured } : {}),
-    ...(q ? { OR: [{ name: { contains: q, mode: 'insensitive' } }, { description: { contains: q, mode: 'insensitive' } }, { address: { contains: q, mode: 'insensitive' } }, { cuisine: { contains: q, mode: 'insensitive' } }] } : {}),
+    ...(q ? { OR: [{ name: { contains: q } }, { description: { contains: q } }, { address: { contains: q } }, { cuisine: { contains: q } }] } : {}),
   };
 
   let orderBy;

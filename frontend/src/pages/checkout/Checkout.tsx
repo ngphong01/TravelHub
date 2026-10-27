@@ -529,18 +529,16 @@ export default function CheckoutPage() {
       setDestinationId((res as any)?.id ?? null);
 
       const guestsCount = partySize || 2;
-      const total = qAmount && Number(qAmount) > 0 ? Number(qAmount) : guestsCount * 300000;
-
-      setBasePrice(total);
-      setAmount(String(total));
-      setDescription(`Đặt bàn ẩm thực: ${name} cho ${guestsCount} khách vào lúc ${time || '18:30'} ngày ${date || 'hôm nay'}`);
+      // Đặt bàn ẩm thực là giữ chỗ miễn phí 0đ
+      setBasePrice(0);
+      setAmount('0');
+      setDescription(`Đặt bàn ẩm thực: ${name} cho ${guestsCount} khách vào lúc ${time || '18:30'} ngày ${date || 'hôm nay'} (Giữ chỗ miễn phí 0đ)`);
       setErrorMsg(null);
     } catch (err: any) {
-      const fallbackPrice = qAmount ? Number(qAmount) : 600000;
-      setBasePrice(fallbackPrice);
-      setAmount(String(fallbackPrice));
+      setBasePrice(0);
+      setAmount('0');
       setDestinationName('Nhà hàng ẩm thực');
-      setDescription(`Đặt bàn nhà hàng (${slug}) cho ${partySize || 2} khách`);
+      setDescription(`Đặt bàn nhà hàng (${slug}) cho ${partySize || 2} khách (Giữ chỗ miễn phí 0đ)`);
     } finally {
       setIsLoadingData(false);
     }
@@ -617,9 +615,21 @@ export default function CheckoutPage() {
       if (qCoupon) setCoupon(qCoupon);
 
       const items = activeCartItems;
-      const total = items.reduce((sum: number, it: any) => sum + (Number(it.price) || 0) * (Number(it.guests) || 1), 0);
+      const total = items.reduce((sum: number, it: any) => {
+        if (it.type === 'restaurant') {
+          return sum; // Đặt bàn nhà hàng miễn phí 0đ
+        }
+        if (it.type === 'tour' && (it.adults !== undefined || it.children !== undefined)) {
+          const a = it.adults ?? it.guests;
+          const c = it.children ?? 0;
+          const pa = it.pricePerAdult ?? it.price;
+          const pc = it.pricePerChild ?? Math.round(pa * 0.7);
+          return sum + Math.max(0, a * pa + c * pc - (it.discount || 0));
+        }
+        return sum + (Number(it.price) || 0) * (Number(it.guests) || 1);
+      }, 0);
 
-      setAmount(String(total || cartTotalPrice || 0));
+      setAmount(String(total));
       setBasePrice(0); // Cố định bằng 0 để không bị ô khách nhân biến dạng số tiền
       setDescription(`Thanh toán giỏ hàng TravelHub (${items.length} dịch vụ)`);
       setIsLoadingData(false);
@@ -765,7 +775,17 @@ export default function CheckoutPage() {
         const totalGuestsCount = activeCartItems.reduce((acc: number, it: any) => acc + (it.guests || 1), 0);
         const itemsSummary = activeCartItems.map((it: any, idx: number) => {
           const u = it.unitLabel || (it.type === 'hotel' ? 'phòng' : 'khách');
-          return `${idx + 1}. [${(it.type || 'TOUR').toUpperCase()}] ${it.title} | ${it.date || ''} | SL: ${it.guests} ${u} | Thành tiền: ${formatCurrency((it.price || 0) * (it.guests || 1))}đ`;
+          let sub = (Number(it.price) || 0) * (Number(it.guests) || 1);
+          if (it.type === 'restaurant') {
+            sub = 0;
+          } else if (it.type === 'tour' && (it.adults !== undefined || it.children !== undefined)) {
+            const a = it.adults ?? it.guests;
+            const c = it.children ?? 0;
+            const pa = it.pricePerAdult ?? it.price;
+            const pc = it.pricePerChild ?? Math.round(pa * 0.7);
+            sub = Math.max(0, a * pa + c * pc - (it.discount || 0));
+          }
+          return `${idx + 1}. [${(it.type || 'TOUR').toUpperCase()}] ${it.title} | ${it.date || ''} | SL: ${it.guests} ${u} | Thành tiền: ${formatCurrency(sub)}đ`;
         }).join('\n');
 
         const bookingPayload: any = {
@@ -1422,7 +1442,17 @@ export default function CheckoutPage() {
         <div className="space-y-3">
           {activeCartItems.map((item: any, idx: number) => {
             const unit = item.unitLabel || (item.type === 'hotel' ? 'phòng' : 'khách');
-            const sub = (Number(item.price) || 0) * (Number(item.guests) || 1);
+            let sub = (Number(item.price) || 0) * (Number(item.guests) || 1);
+            if (item.type === 'restaurant') {
+              sub = 0;
+            } else if (item.type === 'tour' && (item.adults !== undefined || item.children !== undefined)) {
+              const a = item.adults ?? item.guests;
+              const c = item.children ?? 0;
+              const pa = item.pricePerAdult ?? item.price;
+              const pc = item.pricePerChild ?? Math.round(pa * 0.7);
+              sub = Math.max(0, a * pa + c * pc - (item.discount || 0));
+            }
+
             return (
               <div
                 key={item.id || idx}
@@ -1472,7 +1502,12 @@ export default function CheckoutPage() {
                         </span>
                       )}
                       <span>
-                        Số lượng: <strong className="text-gray-700 dark:text-slate-200">{item.guests} {unit}</strong>
+                        Số lượng:{' '}
+                        <strong className="text-gray-700 dark:text-slate-200">
+                          {item.type === 'tour' && (item.adults !== undefined || item.children !== undefined)
+                            ? `${item.adults ?? item.guests} lớn${(item.children || 0) > 0 ? ` + ${item.children} trẻ em` : ''}`
+                            : `${item.guests} ${unit}`}
+                        </strong>
                       </span>
                     </div>
                   </div>
@@ -1481,9 +1516,20 @@ export default function CheckoutPage() {
                   <div className="font-bold text-sm text-gray-900 dark:text-white">
                     {formatCurrency(sub)} VNĐ
                   </div>
-                  <div className="text-[11px] text-gray-400">
-                    {formatCurrency(item.price)} VNĐ/{unit}
-                  </div>
+                  {item.type === 'restaurant' ? (
+                    <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                      Đặt chỗ miễn phí 0đ
+                    </div>
+                  ) : item.type === 'tour' && (item.adults !== undefined || item.children !== undefined) ? (
+                    <div className="text-[11px] text-gray-400">
+                      {formatCurrency(item.pricePerAdult ?? item.price)}đ/lớn
+                      {(item.children || 0) > 0 ? ` • ${formatCurrency(item.pricePerChild ?? Math.round((item.pricePerAdult ?? item.price) * 0.7))}đ/trẻ` : ''}
+                    </div>
+                  ) : (
+                    <div className="text-[11px] text-gray-400">
+                      {formatCurrency(item.price)} VNĐ/{unit}
+                    </div>
+                  )}
                   {item.discount && item.discount > 0 && (
                     <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
                       - {formatCurrency(item.discount)}đ ưu đãi
