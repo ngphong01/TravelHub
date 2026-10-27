@@ -130,10 +130,9 @@ export default function BlogDetail() {
             )}
 
             {/* Content */}
-            <div
-              className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: blog.content.replace(/\n/g, '<br />') }}
-            />
+            <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed whitespace-pre-line">
+              {blog.content}
+            </div>
 
             {/* Tags */}
             {blog.tags && Array.isArray(blog.tags) && blog.tags.length > 0 && (

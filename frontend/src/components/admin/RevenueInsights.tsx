@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartBarIcon, ArrowTrendingUpIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { formatSafeMarkdown } from '../../utils/sanitizeHtml';
 
 interface RevenueInsightsProps {
   revenue: number;
@@ -93,14 +94,7 @@ export default function RevenueInsights({
           <div
             className="prose prose-sm max-w-none text-gray-700"
             dangerouslySetInnerHTML={{
-              __html: analysis
-                .replace(/\n/g, '<br>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/^### (.*$)/gm, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>')
-                .replace(/^## (.*$)/gm, '<h2 class="text-xl font-bold mt-4 mb-2">$1</h2>')
-                .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-4 mb-2">$1</h1>')
-                .replace(/^- (.*$)/gm, '<li class="ml-4">$1</li>'),
+              __html: formatSafeMarkdown(analysis),
             }}
           />
         </div>

@@ -9,26 +9,44 @@ const prisma = require('./lib/prisma');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Security: Hide Express footprint
+app.disable('x-powered-by');
+
 // Trust proxy for rate limiting behind reverse proxy
 app.set('trust proxy', 1);
 
+// HTTP Security Headers middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
+
 // Middlewares
-// CORS configuration - allow localhost and Dev Tunnels URLs
+// CORS configuration
 const allowedOrigins = [
+  'http://localhost:3000',
   'http://localhost:3001',
   'http://localhost:3002',
   'http://localhost:3003',
   'https://daophong.id.vn',
   'https://www.daophong.id.vn',
   /^https:\/\/.*\.vercel\.app$/,
-  /^https:\/\/.*\.trycloudflare\.com$/,
-  /^https:\/\/.*\.devtunnels\.ms$/,
+  ...(process.env.NODE_ENV !== 'production' ? [
+    /^https:\/\/.*\.trycloudflare\.com$/,
+    /^https:\/\/.*\.devtunnels\.ms$/
+  ] : []),
   ...(process.env.ALLOWED_ORIGIN ? [process.env.ALLOWED_ORIGIN] : []),
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, Postman, etc.)
+    // Allow requests with no origin (like mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
     
     // Check if origin matches allowed origins
@@ -50,9 +68,10 @@ app.use(cors({
   },
   credentials: true
 }));
-// Increase limit for JSON payload and URL encoded data
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Safe limit for JSON payload and URL encoded data (5MB prevents memory exhaustion DoS)
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
 app.use(cookieParser());
 
 // Apply sanitization middleware globally
@@ -360,6 +379,18 @@ app.get('/api/account/loyalty', authRequired, async (req, res) => {
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
+});
+
+// Centralized error handler (OWASP: prevents stack trace & internals leakage)
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  if (res.headersSent) return next(err);
+  const isProd = process.env.NODE_ENV === 'production';
+  res.status(err.status || 500).json({
+    success: false,
+    message: isProd ? 'Internal server error' : (err.message || 'Internal server error'),
+    ...(isProd ? {} : { stack: err.stack }),
+  });
 });
 
 // Test database connection before starting server

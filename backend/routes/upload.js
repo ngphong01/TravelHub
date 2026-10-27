@@ -3,8 +3,19 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { authRequired } = require('../middleware/auth');
+const { authRequired, isAdminOrStaff } = require('../middleware/auth');
 const router = express.Router();
+
+// Whitelist extensions and mime types
+const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
+const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+
+const getSafeFilename = (prefix, originalname) => {
+  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+  const ext = path.extname(originalname).toLowerCase();
+  const safeExt = ALLOWED_EXTENSIONS.has(ext) ? ext : '.jpg';
+  return `${prefix}-${uniqueSuffix}${safeExt}`;
+};
 
 // Đảm bảo thư mục uploads tồn tại
 const uploadsDir = path.join(__dirname, '..', 'uploads');
@@ -29,9 +40,7 @@ const avatarStorage = multer.diskStorage({
     cb(null, avatarsDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `avatar-${uniqueSuffix}${ext}`);
+    cb(null, getSafeFilename('avatar', file.originalname));
   }
 });
 
@@ -41,9 +50,7 @@ const destinationStorage = multer.diskStorage({
     cb(null, destinationsDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `destination-${uniqueSuffix}${ext}`);
+    cb(null, getSafeFilename('destination', file.originalname));
   }
 });
 
@@ -53,9 +60,7 @@ const hotelStorage = multer.diskStorage({
     cb(null, hotelsDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `hotel-${uniqueSuffix}${ext}`);
+    cb(null, getSafeFilename('hotel', file.originalname));
   }
 });
 
@@ -65,9 +70,7 @@ const restaurantStorage = multer.diskStorage({
     cb(null, restaurantsDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `restaurant-${uniqueSuffix}${ext}`);
+    cb(null, getSafeFilename('restaurant', file.originalname));
   }
 });
 
@@ -77,9 +80,7 @@ const blogStorage = multer.diskStorage({
     cb(null, blogsDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `blog-${uniqueSuffix}${ext}`);
+    cb(null, getSafeFilename('blog', file.originalname));
   }
 });
 
@@ -89,9 +90,7 @@ const reviewStorage = multer.diskStorage({
     cb(null, reviewsDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `review-${uniqueSuffix}${ext}`);
+    cb(null, getSafeFilename('review', file.originalname));
   }
 });
 
@@ -101,18 +100,17 @@ const bannerStorage = multer.diskStorage({
     cb(null, bannersDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `banner-${uniqueSuffix}${ext}`);
+    cb(null, getSafeFilename('banner', file.originalname));
   }
 });
 
-// File filter - chỉ cho phép ảnh
+// File filter - chỉ cho phép ảnh hợp lệ
 const imageFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (ALLOWED_EXTENSIONS.has(ext) && ALLOWED_MIME_TYPES.has(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Chỉ cho phép upload file ảnh!'), false);
+    cb(new Error('Chỉ cho phép upload file ảnh hợp lệ (.jpg, .jpeg, .png, .webp, .gif)!'), false);
   }
 };
 
@@ -164,9 +162,7 @@ const tourStorage = multer.diskStorage({
     cb(null, toursDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `tour-${uniqueSuffix}${ext}`);
+    cb(null, getSafeFilename('tour', file.originalname));
   }
 });
 
@@ -207,7 +203,7 @@ const uploadAvatarHandler = async (req, res) => {
 router.post('/avatar', authRequired, uploadAvatar.single('file'), uploadAvatarHandler);
 
 // POST /api/upload/destination - Upload destination image
-router.post('/destination', authRequired, uploadDestination.single('file'), async (req, res) => {
+router.post('/destination', authRequired, isAdminOrStaff, uploadDestination.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Không có file được upload' });
@@ -233,7 +229,7 @@ router.post('/destination', authRequired, uploadDestination.single('file'), asyn
 });
 
 // POST /api/upload/hotel - Upload hotel image
-router.post('/hotel', authRequired, uploadHotel.single('file'), async (req, res) => {
+router.post('/hotel', authRequired, isAdminOrStaff, uploadHotel.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Không có file được upload' });
@@ -259,7 +255,7 @@ router.post('/hotel', authRequired, uploadHotel.single('file'), async (req, res)
 });
 
 // POST /api/upload/restaurant - Upload restaurant image
-router.post('/restaurant', authRequired, uploadRestaurant.single('file'), async (req, res) => {
+router.post('/restaurant', authRequired, isAdminOrStaff, uploadRestaurant.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Không có file được upload' });
@@ -285,7 +281,7 @@ router.post('/restaurant', authRequired, uploadRestaurant.single('file'), async 
 });
 
 // POST /api/upload/blog - Upload blog featured image
-router.post('/blog', authRequired, uploadBlog.single('image'), async (req, res) => {
+router.post('/blog', authRequired, isAdminOrStaff, uploadBlog.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Không có file được upload' });
@@ -336,7 +332,7 @@ router.post('/review', uploadReview.single('image'), async (req, res) => {
 });
 
 // POST /api/upload/banner - Upload banner image
-router.post('/banner', authRequired, uploadBanner.single('image'), async (req, res) => {
+router.post('/banner', authRequired, isAdminOrStaff, uploadBanner.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Không có file được upload' });
@@ -362,7 +358,7 @@ router.post('/banner', authRequired, uploadBanner.single('image'), async (req, r
 });
 
 // POST /api/upload/tour - Upload tour image
-router.post('/tour', authRequired, uploadTour.single('file'), async (req, res) => {
+router.post('/tour', authRequired, isAdminOrStaff, uploadTour.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Không có file được upload' });

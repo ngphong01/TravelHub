@@ -6,6 +6,7 @@ const { createCheckoutSession: createStripeSession, isStripeConfigured } = requi
 const { createPaymentUrl: createVNPayUrl, isVNPayConfigured, verifyCallback: verifyVNPayCallback } = require('../services/vnpay');
 const { createPaymentRequest: createMoMoRequest, isMoMoConfigured, verifyCallback: verifyMoMoCallback } = require('../services/momo');
 const { createPaymentRequest: createZaloPayRequest, isZaloPayConfigured, verifyCallback: verifyZaloPayCallback } = require('../services/zalopay');
+const { authRequired, isAdmin } = require('../middleware/auth');
 const router = express.Router();
 
 // POST /api/payment/create (stub for now)
@@ -354,8 +355,11 @@ router.post('/paypal/cancel', async (req, res) => {
 });
 
 // GET /api/payment/user/:id - list payments by user via Booking relation
-router.get('/user/:id', async (req, res) => {
+router.get('/user/:id', authRequired, async (req, res) => {
   const userId = Number(req.params.id);
+  if (req.user.id !== userId && req.user.role !== 'ADMIN') {
+    return res.status(403).json({ message: 'Không có quyền xem thông tin thanh toán này' });
+  }
   const payments = await prisma.payment.findMany({
     where: { booking: { userId } },
     include: { booking: true },
@@ -366,7 +370,7 @@ router.get('/user/:id', async (req, res) => {
 
 // GET /api/payment/test/paypal
 // Test PayPal credentials (for debugging)
-router.get('/test/paypal', async (req, res) => {
+router.get('/test/paypal', authRequired, isAdmin, async (req, res) => {
   try {
     if (!isPaypalConfigured()) {
       return res.status(400).json({

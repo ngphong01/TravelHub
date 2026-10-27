@@ -204,10 +204,10 @@ router.post('/', async (req, res) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    if (token) {
+    if (token && process.env.JWT_SECRET) {
       try {
         const jwt = require('jsonwebtoken');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
         userId = decoded.userId || decoded.id;
         console.log('✅ User authenticated:', userId);
       } catch (err) {
@@ -431,13 +431,27 @@ router.get('/code/:code', async (req, res) => {
 });
 
 // POST /api/booking/:id/cancel - Hủy đặt chỗ
-router.post('/:id/cancel', async (req, res) => {
+router.post('/:id/cancel', authRequired, async (req, res) => {
   try {
-    const { id } = req.params;
-    const { reason } = req.body;
+    const bookingId = parseInt(req.params.id);
+    if (isNaN(bookingId)) {
+      return res.status(400).json({ message: 'Mã booking không hợp lệ' });
+    }
+
+    const existing = await prisma.booking.findUnique({
+      where: { id: bookingId }
+    });
+
+    if (!existing) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    if (existing.userId !== req.user.id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Không có quyền hủy đặt chỗ này' });
+    }
 
     const booking = await prisma.booking.update({
-      where: { id: parseInt(id) },
+      where: { id: bookingId },
       data: { status: 'CANCELLED' },
       include: { destination: true, payment: true }
     });
@@ -450,12 +464,15 @@ router.post('/:id/cancel', async (req, res) => {
 });
 
 // GET /api/booking/:id - Lấy chi tiết booking
-router.get('/:id', async (req, res) => {
+router.get('/:id', authRequired, async (req, res) => {
   try {
-    const { id } = req.params;
+    const bookingId = parseInt(req.params.id);
+    if (isNaN(bookingId)) {
+      return res.status(400).json({ message: 'Mã booking không hợp lệ' });
+    }
 
     const booking = await prisma.booking.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: bookingId },
       include: {
         destination: true,
         payment: true,
@@ -467,6 +484,10 @@ router.get('/:id', async (req, res) => {
 
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    if (booking.userId !== req.user.id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Không có quyền xem chi tiết booking này' });
     }
 
     res.json(booking);

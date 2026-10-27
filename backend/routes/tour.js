@@ -346,36 +346,38 @@ router.post('/:tourId/review', async (req, res) => {
     const header = req.headers.authorization || '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
 
-    if (token) {
+    if (token && process.env.JWT_SECRET) {
       try {
         const jwt = require('jsonwebtoken');
-        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        const payload = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
         userId = payload.id;
       } catch {
-        return res.status(401).json({ message: 'Invalid token' });
+        return res.status(401).json({ message: 'Invalid or expired token' });
       }
     }
 
     if (!userId) {
-      if (req.body.author) {
-        let guestUser = await prisma.user.findFirst({ where: { name: req.body.author } });
-        if (!guestUser) {
-          guestUser = await prisma.user.create({
-            data: {
-              email: `guest-${Date.now()}-${Math.random().toString(36).substr(2, 6)}@travelgo.dev`,
-              passwordHash: 'guest-no-password',
-              name: req.body.author,
-              role: 'USER',
-              emailVerified: false,
-              phoneVerified: false,
-            },
-          });
-        }
-        userId = guestUser.id;
-      } else {
-        const firstUser = await prisma.user.findFirst();
-        userId = firstUser ? firstUser.id : 1;
+      const authorName = req.body.author ? String(req.body.author).trim() : null;
+      if (!authorName) {
+        return res.status(400).json({ message: 'Vui lòng đăng nhập hoặc nhập tên để gửi đánh giá' });
       }
+
+      let guestUser = await prisma.user.findFirst({ where: { name: authorName } });
+      if (!guestUser) {
+        const bcrypt = require('bcryptjs');
+        const randomPassword = await bcrypt.hash(Math.random().toString(36), 10);
+        guestUser = await prisma.user.create({
+          data: {
+            email: `guest-${Date.now()}-${Math.random().toString(36).substr(2, 6)}@travelgo.dev`,
+            passwordHash: randomPassword,
+            name: authorName,
+            role: 'USER',
+            emailVerified: false,
+            phoneVerified: false,
+          },
+        });
+      }
+      userId = guestUser.id;
     }
 
     const review = await prisma.tourReview.create({

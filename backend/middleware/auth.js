@@ -28,25 +28,25 @@ function authRequired(req, res, next) {
   }
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('❌ Server misconfiguration: JWT_SECRET is not set');
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    const payload = jwt.verify(token, secret, { algorithms: ['HS256'] });
     req.user = payload; // { id, role, email }
-    console.log('✅ Token verified - User:', payload);
     return next();
   } catch (e) {
     console.error('❌ Token verification failed:', e.message);
-    return res.status(401).json({ message: 'Invalid token', error: e.message });
+    return res.status(401).json({ message: 'Invalid or expired token' });
   }
 }
 
 function isAdmin(req, res, next) {
-  console.log('🔐 isAdmin check - User:', req.user);
-  console.log('🔐 isAdmin check - Role:', req.user?.role);
   if (req.user?.role === 'ADMIN') {
-    console.log('✅ Admin access granted');
     return next();
   }
-  console.log('❌ Admin access denied - User role:', req.user?.role);
-  return res.status(403).json({ message: 'Forbidden - Admin access required', userRole: req.user?.role });
+  return res.status(403).json({ message: 'Forbidden: Admin access required' });
 }
 
 function isStaff(req, res, next) {
@@ -54,7 +54,7 @@ function isStaff(req, res, next) {
   if (req.user?.role && allowedRoles.includes(req.user.role)) {
     return next();
   }
-  return res.status(403).json({ message: 'Forbidden - Staff access required', userRole: req.user?.role });
+  return res.status(403).json({ message: 'Forbidden: Staff access required' });
 }
 
 function isEditor(req, res, next) {
@@ -62,7 +62,7 @@ function isEditor(req, res, next) {
   if (req.user?.role && allowedRoles.includes(req.user.role)) {
     return next();
   }
-  return res.status(403).json({ message: 'Forbidden - Editor access required', userRole: req.user?.role });
+  return res.status(403).json({ message: 'Forbidden: Editor access required' });
 }
 
 function isAdminOrStaff(req, res, next) {
@@ -70,7 +70,7 @@ function isAdminOrStaff(req, res, next) {
   if (req.user?.role && allowedRoles.includes(req.user.role)) {
     return next();
   }
-  return res.status(403).json({ message: 'Forbidden - Admin or Staff access required', userRole: req.user?.role });
+  return res.status(403).json({ message: 'Forbidden: Admin or Staff access required' });
 }
 
 module.exports = { authRequired, isAdmin, isStaff, isEditor, isAdminOrStaff };

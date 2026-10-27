@@ -271,13 +271,9 @@ router.post('/login', authLimiter, async (req, res) => {
     });
     
     const ok = await bcrypt.compare(password, user.passwordHash);
-    console.log('🔐 Password comparison result:', ok);
     
     if (!ok) {
-      console.log('❌ Password mismatch for:', email);
-      console.log('   Tried password length:', password.length);
-      console.log('   Password first 3 chars:', password.substring(0, 3));
-      console.log('   Password last 3 chars:', password.substring(password.length - 3));
+      console.log('❌ Password mismatch for user');
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -384,7 +380,7 @@ router.post('/refresh', async (req, res) => {
     }
 
     // Verify refresh token
-    const payload = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const payload = jwt.verify(refreshToken, process.env.JWT_SECRET, { algorithms: ['HS256'] });
     
     // Check if token exists in database
     let tokenRecord = null;
@@ -579,7 +575,7 @@ router.post('/reset-password', authLimiter, async (req, res) => {
     let payload;
     try {
       console.log('🔐 Verifying JWT token...');
-      payload = jwt.verify(token, process.env.JWT_SECRET);
+      payload = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
       console.log('✅ JWT verified successfully. User ID:', payload.userId);
     } catch (jwtError) {
       console.error('❌ JWT verification failed:', jwtError.name, '-', jwtError.message);

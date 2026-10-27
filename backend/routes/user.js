@@ -7,8 +7,11 @@ const { authRequired } = require('../middleware/auth');
 const router = express.Router();
 
 // GET /api/user/:id
-router.get('/:id', async (req, res) => {
+router.get('/:id', authRequired, async (req, res) => {
   const id = Number(req.params.id);
+  if (req.user.id !== id && req.user.role !== 'ADMIN') {
+    return res.status(403).json({ message: 'Không có quyền truy cập thông tin này' });
+  }
   const user = await prisma.user.findUnique({
     where: { id },
     select: { id: true, email: true, name: true, role: true, createdAt: true, avatarUrl: true, settings: true },
@@ -20,6 +23,9 @@ router.get('/:id', async (req, res) => {
 // PUT /api/user/:id
 router.put('/:id', authRequired, async (req, res) => {
   const id = Number(req.params.id);
+  if (req.user.id !== id && req.user.role !== 'ADMIN') {
+    return res.status(403).json({ message: 'Không có quyền chỉnh sửa tài khoản này' });
+  }
   const { name, email, avatarUrl, settings } = req.body || {};
   const updated = await prisma.user.update({
     where: { id },
@@ -27,7 +33,7 @@ router.put('/:id', authRequired, async (req, res) => {
       ...(name ? { name } : {}),
       ...(email ? { email } : {}),
       ...(avatarUrl !== undefined ? { avatarUrl } : {}),
-      ...(settings !== undefined ? { settings } : {}),
+      ...(settings !== undefined ? { settings: typeof settings === 'string' ? settings : JSON.stringify(settings) } : {}),
     },
     select: { id: true, email: true, name: true, role: true, avatarUrl: true, settings: true },
   });
@@ -37,6 +43,9 @@ router.put('/:id', authRequired, async (req, res) => {
 // PUT /api/user/:id/settings
 router.put('/:id/settings', authRequired, async (req, res) => {
   const id = Number(req.params.id);
+  if (req.user.id !== id && req.user.role !== 'ADMIN') {
+    return res.status(403).json({ message: 'Không có quyền chỉnh sửa cài đặt này' });
+  }
   const { name, email, avatarUrl, settings } = req.body || {};
   const updated = await prisma.user.update({
     where: { id },
@@ -44,7 +53,7 @@ router.put('/:id/settings', authRequired, async (req, res) => {
       ...(name ? { name } : {}),
       ...(email ? { email } : {}),
       ...(avatarUrl !== undefined ? { avatarUrl } : {}),
-      ...(settings !== undefined ? { settings } : {}),
+      ...(settings !== undefined ? { settings: typeof settings === 'string' ? settings : JSON.stringify(settings) } : {}),
     },
     select: { id: true, email: true, name: true, role: true, avatarUrl: true, settings: true },
   });
@@ -54,11 +63,33 @@ router.put('/:id/settings', authRequired, async (req, res) => {
 // PUT /api/user/:id/password
 router.put('/:id/password', authRequired, async (req, res) => {
   const id = Number(req.params.id);
-  const { password } = req.body || {};
-  if (!password) return res.status(400).json({ message: 'Missing password' });
+  if (req.user.id !== id && req.user.role !== 'ADMIN') {
+    return res.status(403).json({ message: 'Không có quyền đổi mật khẩu tài khoản này' });
+  }
+  const { password, currentPassword } = req.body || {};
+  if (!password || password.length < 6) {
+    return res.status(400).json({ message: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+  }
+
+  // Nếu không phải ADMIN đổi hộ, bắt buộc phải kiểm tra currentPassword
+  if (req.user.role !== 'ADMIN' || req.user.id === id) {
+    if (!currentPassword) {
+      return res.status(400).json({ message: 'Vui lòng cung cấp mật khẩu hiện tại' });
+    }
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { passwordHash: true }
+    });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const isCurrentValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isCurrentValid) {
+      return res.status(400).json({ message: 'Mật khẩu hiện tại không chính xác' });
+    }
+  }
+
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.update({ where: { id }, data: { passwordHash } });
-  res.json({ message: 'Password changed' });
+  res.json({ message: 'Đổi mật khẩu thành công' });
 });
 
 // 🎨 POST /api/user/:id/avatar/generate - Tạo avatar ngẫu nhiên mới
