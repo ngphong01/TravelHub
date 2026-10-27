@@ -11,144 +11,52 @@ const prisma = require('../lib/prisma');
 
 // 1. Bản đồ ảnh cho 46 Destinations
 const destinationPhotos = {
-  1: { // Ninh Bình
-    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80', // Tràng An
-  },
-  2: { // Hạ Long
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', // Vịnh Hạ Long karsts
-  },
-  3: { // Đà Lạt
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80', // Đồi thông sương mù Đà Lạt
-  },
-  4: { // Phú Quốc
-    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80', // Bãi biển cát trắng Phú Quốc
-  },
-  5: { // Hà Nội
-    image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80', // Chùa Trấn Quốc Hà Nội
-  },
-  6: { // Đà Nẵng
-    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80', // Cầu Vàng Đà Nẵng
-  },
-  7: { // Sa Pa
-    image: 'https://images.unsplash.com/photo-1571401835393-8c5f35328320?auto=format&fit=crop&w=1200&q=80', // Ruộng bậc thang Sa Pa
-  },
-  8: { // Hội An
-    image: 'https://images.unsplash.com/photo-1568084680786-a84f91d1153c?auto=format&fit=crop&w=1200&q=80', // Phố cổ Hội An đèn lồng đêm
-  },
-  9: { // Huế
-    image: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80', // Cung đình Đại Nội Huế
-  },
-  10: { // Cần Thơ
-    image: 'https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1200&q=80', // Chợ nổi miền Tây Cần Thơ
-  },
-  11: { // Vũng Tàu
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', // Biển Vũng Tàu
-  },
-  12: { // Nha Trang
-    image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80', // Vịnh biển Nha Trang
-  },
-  13: { // Quy Nhơn
-    image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80', // Eo Gió Kỳ Co Quy Nhơn
-  },
-  14: { // Hà Giang
-    image: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1200&q=80', // Đèo Mã Pí Lèng Hà Giang
-  },
-  15: { // Mù Cang Chải
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', // Đồi mâm xôi Mù Cang Chải
-  },
-  16: { // Phuket
-    image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=1200&q=80', // Phuket vịnh biển
-  },
-  17: { // Bangkok
-    image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=1200&q=80', // Chùa Wat Arun Bangkok
-  },
-  18: { // Bali
-    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80', // Đền Bali Indonesia
-  },
-  19: { // Singapore
-    image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=80', // Marina Bay Sands Singapore
-  },
-  20: { // Kuala Lumpur
-    image: 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1200&q=80', // Tháp đôi Petronas KL
-  },
-  21: { // Tokyo
-    image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80', // Tokyo Tháp & Núi Phú Sĩ
-  },
-  22: { // Kyoto
-    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80', // Cổng Fushimi Inari Kyoto
-  },
-  23: { // Seoul
-    image: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=1200&q=80', // Cung điện Gyeongbokgung Seoul
-  },
-  24: { // Busan
-    image: 'https://images.unsplash.com/photo-1617854818583-09e7f077a156?auto=format&fit=crop&w=1200&q=80', // Biển Haeundae Busan
-  },
-  25: { // Bắc Kinh
-    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80', // Vạn Lý Trường Thành Bắc Kinh
-  },
-  26: { // Thượng Hải
-    image: 'https://images.unsplash.com/photo-1538428494232-9c0d8a3ab403?auto=format&fit=crop&w=1200&q=80', // Bến Thượng Hải The Bund
-  },
-  27: { // Hồng Kông
-    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80', // Cảng Victoria Hong Kong
-  },
-  28: { // Đài Bắc
-    image: 'https://images.unsplash.com/photo-1470004914212-259972391527?auto=format&fit=crop&w=1200&q=80', // Tòa tháp Taipei 101 Đài Bắc
-  },
-  29: { // Paris
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80', // Tháp Eiffel Paris
-  },
-  30: { // London
-    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1200&q=80', // Tháp Big Ben & Cầu London
-  },
-  31: { // Rome
-    image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80', // Đấu trường Colosseum Rome
-  },
-  32: { // Barcelona
-    image: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1200&q=80', // Sagrada Familia Barcelona
-  },
-  33: { // Amsterdam
-    image: 'https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=1200&q=80', // Kênh đào Amsterdam Hà Lan
-  },
-  34: { // Prague
-    image: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1200&q=80', // Cầu Charles Prague Séc
-  },
-  35: { // Vienna
-    image: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?auto=format&fit=crop&w=1200&q=80', // Cung điện Vienna Áo
-  },
-  36: { // Santorini
-    image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=1200&q=80', // Làng Oia mái vòm Santorini
-  },
-  37: { // Istanbul
-    image: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1200&q=80', // Blue Mosque Istanbul
-  },
-  38: { // New York
-    image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=1200&q=80', // Skyline New York Manhattan
-  },
-  39: { // Los Angeles
-    image: 'https://images.unsplash.com/photo-1580655653885-65763b2597d0?auto=format&fit=crop&w=1200&q=80', // Biển Santa Monica Los Angeles
-  },
-  40: { // Grand Canyon
-    image: 'https://images.unsplash.com/photo-1474044159687-1ee9f3a51722?auto=format&fit=crop&w=1200&q=80', // Hẻm núi Grand Canyon Arizona
-  },
-  41: { // Sydney
-    image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80', // Nhà hát Opera Sydney
-  },
-  42: { // Melbourne
-    image: 'https://images.unsplash.com/photo-1514395462725-fb4566210144?auto=format&fit=crop&w=1200&q=80', // Thành phố Melbourne
-  },
-  43: { // Dubai
-    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80', // Burj Khalifa Dubai
-  },
-  44: { // Cairo
-    image: 'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?auto=format&fit=crop&w=1200&q=80', // Kim tự tháp Giza Cairo
-  },
-  45: { // Cape Town
-    image: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1200&q=80', // Bàn Table Mountain Cape Town
-  },
-  46: { // Marrakech
-    image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80', // Phố cổ Marrakech Morocco
-  },
+  1: { image: '/images/destinations/ninh-binh.jpg' }, // Ninh Bình
+  2: { image: '/images/destinations/ha-long.jpg' }, // Hạ Long
+  3: { image: '/images/destinations/da-lat.jpg' }, // Đà Lạt
+  4: { image: '/images/destinations/phu-quoc.jpg' }, // Phú Quốc
+  5: { image: '/images/destinations/ha-noi.jpg' }, // Hà Nội
+  6: { image: '/images/destinations/da-nang.jpg' }, // Đà Nẵng
+  7: { image: '/images/destinations/sa-pa.jpg' }, // Sa Pa
+  8: { image: '/images/destinations/hoi-an.jpg' }, // Hội An
+  9: { image: '/images/destinations/hue.jpg' }, // Huế
+  10: { image: '/images/destinations/can-tho.jpg' }, // Cần Thơ
+  11: { image: '/images/destinations/vung-tau.jpg' }, // Vũng Tàu
+  12: { image: '/images/destinations/nha-trang.jpg' }, // Nha Trang
+  13: { image: '/images/destinations/quy-nhon.jpg' }, // Quy Nhơn
+  14: { image: '/images/destinations/ha-giang.jpg' }, // Hà Giang
+  15: { image: '/images/destinations/mu-cang-chai.jpg' }, // Mù Cang Chải
+  16: { image: '/images/destinations/phuket.jpg' }, // Phuket
+  17: { image: '/images/destinations/bangkok.jpg' }, // Bangkok
+  18: { image: '/images/destinations/bali.jpg' }, // Bali
+  19: { image: '/images/destinations/singapore.jpg' }, // Singapore
+  20: { image: '/images/destinations/kuala-lumpur.jpg' }, // Kuala Lumpur
+  21: { image: '/images/destinations/tokyo.jpg' }, // Tokyo
+  22: { image: '/images/destinations/kyoto.jpg' }, // Kyoto
+  23: { image: '/images/destinations/seoul.jpg' }, // Seoul
+  24: { image: '/images/destinations/busan.jpg' }, // Busan
+  25: { image: '/images/destinations/beijing.jpg' }, // Bắc Kinh
+  26: { image: '/images/destinations/shanghai.jpg' }, // Thượng Hải
+  27: { image: '/images/destinations/hong-kong.jpg' }, // Hồng Kông
+  28: { image: '/images/destinations/taipei.jpg' }, // Đài Bắc
+  29: { image: '/images/destinations/paris.jpg' }, // Paris
+  30: { image: '/images/destinations/london.jpg' }, // London
+  31: { image: '/images/destinations/rome.jpg' }, // Rome
+  32: { image: '/images/destinations/barcelona.jpg' }, // Barcelona
+  33: { image: '/images/destinations/amsterdam.jpg' }, // Amsterdam
+  34: { image: '/images/destinations/prague.jpg' }, // Prague
+  35: { image: '/images/destinations/vienna.jpg' }, // Vienna
+  36: { image: '/images/destinations/santorini.jpg' }, // Santorini
+  37: { image: '/images/destinations/istanbul.jpg' }, // Istanbul
+  38: { image: '/images/destinations/new-york.jpg' }, // New York
+  39: { image: '/images/destinations/los-angeles.jpg' }, // Los Angeles
+  40: { image: '/images/destinations/grand-canyon.jpg' }, // Grand Canyon
+  41: { image: '/images/destinations/sydney.jpg' }, // Sydney
+  42: { image: '/images/destinations/melbourne.jpg' }, // Melbourne
+  43: { image: '/images/destinations/dubai.jpg' }, // Dubai
+  44: { image: '/images/destinations/cairo.jpg' }, // Cairo
+  45: { image: '/images/destinations/cape-town.jpg' }, // Cape Town
+  46: { image: '/images/destinations/marrakech.jpg' }, // Marrakech
 };
 
 // 2. Bản đồ ảnh độc nhất cho 43 Tours (Mỗi tour có ảnh đại diện và 5 ảnh gallery khác biệt hoàn toàn)
@@ -164,19 +72,19 @@ const tourPhotos = {
     ]
   },
   2: { // City Tour Hà Nội 1 ngày
-    image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/ha-noi.jpg',
     photos: [
-      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80', // Chùa Trấn Quốc
+      '/images/destinations/ha-noi.jpg', // Tháp Rùa Hồ Gươm
       'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80', // Phố cổ Hà Nội
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1000&q=80', // Văn Miếu
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', // Hồ Hoàn Kiếm
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1000&q=80', // Hồ Hoàn Kiếm
+      'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=1000&q=80', // Phở Hà Nội
       'https://images.unsplash.com/photo-1509785307050-d4066910ec1e?auto=format&fit=crop&w=1000&q=80', // Cafe trứng
     ]
   },
   3: { // Khám phá Phú Quốc 3N2Đ
-    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/phu-quoc.jpg',
     photos: [
-      'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80', // Bãi Sao cát trắng
+      '/images/destinations/phu-quoc.jpg', // Bãi Sao cát trắng Phú Quốc
       'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1000&q=80', // Resort Phú Quốc
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80', // Hoàng hôn bãi Trường
       'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1000&q=80', // Thuyền cano ra đảo
@@ -204,20 +112,20 @@ const tourPhotos = {
     ]
   },
   6: { // Tour 4 đảo Phú Quốc (Khác Tour 3: tập trung lặn biển, san hô)
-    image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80', // Lặn biển san hô
+    image: '/images/destinations/phu-quoc.jpg', // Lặn biển san hô
     photos: [
+      '/images/destinations/phu-quoc.jpg', // Bãi biển Phú Quốc
       'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80', // Lặn ngắm san hô Hòn Gầm Ghì
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80', // Hòn Mây Rút
       'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1000&q=80', // Cano cao tốc vượt sóng
       'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=1000&q=80', // Bữa trưa hải sản trên đảo
-      'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1000&q=80', // Check-in Cáp treo Hòn Thơm
     ]
   },
   7: { // Đà Lạt Classic 2N1Đ
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80', // Đồi thông
+    image: '/images/destinations/da-lat.jpg', // Đồi thông
     photos: [
+      '/images/destinations/da-lat.jpg', // Hồ Xuân Hương & Vườn hoa Đà Lạt
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80', // Rừng thông
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', // Hồ Xuân Hương
       'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=1000&q=80', // Vườn hoa cẩm tú cầu
       'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=80', // Biệt thự cổ Pháp
       'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=80', // Lẩu gà lá é đêm
@@ -234,19 +142,19 @@ const tourPhotos = {
     ]
   },
   9: { // Đà Nẵng - Hội An 3N2Đ
-    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80', // Cầu Vàng
+    image: '/images/destinations/da-nang.jpg', // Cầu Vàng
     photos: [
-      'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80', // Cầu Vàng Bà Nà
-      'https://images.unsplash.com/photo-1568084680786-a84f91d1153c?auto=format&fit=crop&w=1000&q=80', // Phố cổ Hội An
+      '/images/destinations/da-nang.jpg', // Cầu Vàng Bà Nà
+      '/images/destinations/hoi-an.jpg', // Phố cổ Hội An
       'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1000&q=80', // Biển Mỹ Khê
       'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=1000&q=80', // Cầu Rồng phun lửa
       'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80', // Mì Quảng Đà Nẵng
     ]
   },
   10: { // Sa Pa Trekking 3N2Đ
-    image: 'https://images.unsplash.com/photo-1571401835393-8c5f35328320?auto=format&fit=crop&w=1200&q=80', // Ruộng bậc thang
+    image: '/images/destinations/sa-pa.jpg', // Ruộng bậc thang Sa Pa
     photos: [
-      'https://images.unsplash.com/photo-1571401835393-8c5f35328320?auto=format&fit=crop&w=1200&q=80', // Thung lũng Mường Hoa
+      '/images/destinations/sa-pa.jpg', // Thung lũng Mường Hoa Sa Pa
       'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1000&q=80', // Đỉnh Fansipan mây ngàn
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', // Thác Bạc suối nước
       'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=80', // Khách sạn view mây
@@ -254,59 +162,59 @@ const tourPhotos = {
     ]
   },
   11: { // Sa Pa Homestay 2N1Đ (Khác Tour 10: trải nghiệm bản làng)
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80', // Bản Tả Van
+    image: '/images/destinations/sa-pa.jpg', // Bản Tả Van
     photos: [
-      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80', // Bản Tả Van yên bình
+      '/images/destinations/sa-pa.jpg', // Bản Tả Van yên bình
       'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1000&q=80', // Nhà gỗ homestay ấm cúng
-      'https://images.unsplash.com/photo-1571401835393-8c5f35328320?auto=format&fit=crop&w=1000&q=80', // Khung dệt thổ cẩm H'Mông
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', // Ruộng bậc thang bản làng
       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80', // Cơm lam thịt nướng mắc khén
       'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&w=1000&q=80', // Bếp lửa vùng cao
     ]
   },
   12: { // Hội An Lantern Tour 1 ngày
-    image: 'https://images.unsplash.com/photo-1568084680786-a84f91d1153c?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/hoi-an.jpg',
     photos: [
-      'https://images.unsplash.com/photo-1568084680786-a84f91d1153c?auto=format&fit=crop&w=1200&q=80', // Phố đèn lồng
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1000&q=80', // Tường vàng cổ điển
+      '/images/destinations/hoi-an.jpg', // Chùa Cầu Hội An
+      'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80', // Phố đèn lồng
       'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80', // Chùa Cầu Hội An
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80', // Thả hoa đăng sông Hoài
       'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80', // Cao lầu Hội An
     ]
   },
   13: { // Nha Trang Beach 2N1Đ
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/nha-trang.jpg',
     photos: [
+      '/images/destinations/nha-trang.jpg', // Vịnh biển Nha Trang
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', // Biển Nha Trang
       'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1000&q=80', // Đảo Hòn Mun
       'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1000&q=80', // Vinpearl Resort Nha Trang
       'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1000&q=80', // Lặn ngắm san hô
-      'https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1000&q=80', // Hải sản tươi sống
     ]
   },
   14: { // Ninh Bình - Tràng An 2N1Đ
-    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/ninh-binh.jpg',
     photos: [
-      'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80', // Danh thắng Tràng An
-      'https://images.unsplash.com/photo-1571401835393-8c5f35328320?auto=format&fit=crop&w=1000&q=80', // Đỉnh Hang Múa view sông
+      '/images/destinations/ninh-binh.jpg', // Danh thắng Tràng An
+      'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80', // Hang động Tràng An
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', // Tam Cốc Bích Động
-      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80', // Chùa Bái Đính
+      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80', // Chùa Bái Đính
       'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80', // Dê núi cơm cháy Ninh Bình
     ]
   },
   15: { // Huế Heritage 2N1Đ
-    image: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/hue.jpg',
     photos: [
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80', // Đại Nội kinh thành Huế
-      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80', // Chùa Thiên Mụ
+      '/images/destinations/hue.jpg', // Đại Nội kinh thành Huế
+      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1000&q=80', // Chùa Thiên Mụ
       'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80', // Lăng Khải Định kiến trúc tinh xảo
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', // Thuyền rồng sông Hương
       'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=1000&q=80', // Bún bò Huế & Bánh bèo
     ]
   },
   16: { // Cần Thơ - Chợ nổi 2N1Đ
-    image: 'https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/can-tho.jpg',
     photos: [
-      'https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1200&q=80', // Chợ nổi Cái Răng
+      '/images/destinations/can-tho.jpg', // Chợ nổi Cái Răng Cần Thơ
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', // Cầu Cần Thơ hoàng hôn
       'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80', // Vườn trái cây miền Tây
       'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1000&q=80', // Nhà cổ Bình Thủy
@@ -314,41 +222,41 @@ const tourPhotos = {
     ]
   },
   17: { // Vũng Tàu Beach 2N1Đ
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/vung-tau.jpg',
     photos: [
+      '/images/destinations/vung-tau.jpg', // Toàn cảnh Vũng Tàu
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', // Bãi Sau Vũng Tàu
       'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1000&q=80', // Ngọn hải đăng
       'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1000&q=80', // Resort ven biển
       'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1000&q=80', // Bến thuyền Marina
-      'https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1000&q=80', // Bánh khọt Gốc Vú Sữa
     ]
   },
   18: { // Quy Nhơn Relax 3N2Đ
-    image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/quy-nhon.jpg',
     photos: [
-      'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80', // Eo Gió Quy Nhơn
-      'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1000&q=80', // Biển Kỳ Co trong vắt
+      '/images/destinations/quy-nhon.jpg', // Eo Gió Quy Nhơn
+      'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80', // Biển Kỳ Co trong vắt
       'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1000&q=80', // Resort FLC Quy Nhơn
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1000&q=80', // Tháp Đôi Champa
+      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1000&q=80', // Tháp Đôi Champa
       'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=1000&q=80', // Bánh xèo tôm nhảy
     ]
   },
   19: { // Hà Giang Loop 4N3Đ
-    image: 'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/ha-giang.jpg',
     photos: [
-      'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1200&q=80', // Đèo Mã Pí Lèng
-      'https://images.unsplash.com/photo-1571401835393-8c5f35328320?auto=format&fit=crop&w=1000&q=80', // Sông Nho Quế xanh ngọc
-      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80', // Cột cờ Lũng Cú
+      '/images/destinations/ha-giang.jpg', // Đèo Mã Pí Lèng
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80', // Sông Nho Quế xanh ngọc
+      'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1000&q=80', // Cột cờ Lũng Cú
       'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1000&q=80', // Dinh Thự Vua Mèo
       'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=80', // Thắng dền & bánh tam giác mạch
     ]
   },
   20: { // Mù Cang Chải mùa lúa chín 3N2Đ
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/mu-cang-chai.jpg',
     photos: [
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', // Đồi Mâm Xôi vàng óng
-      'https://images.unsplash.com/photo-1571401835393-8c5f35328320?auto=format&fit=crop&w=1000&q=80', // Đèo Khau Phạ dù lượn
-      'https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=1000&q=80', // Thung lũng lúa La Pán Tẩn
+      '/images/destinations/mu-cang-chai.jpg', // Đồi Mâm Xôi vàng óng
+      'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1000&q=80', // Đèo Khau Phạ dù lượn
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', // Thung lũng lúa La Pán Tẩn
       'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1000&q=80', // Homestay bản Thái
       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80', // Cốm Tú Lệ nức tiếng
     ]

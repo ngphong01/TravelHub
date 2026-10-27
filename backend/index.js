@@ -78,9 +78,11 @@ app.use(cookieParser());
 const { sanitizeBody } = require('./middleware/validation');
 app.use(sanitizeBody);
 
-// Serve static files from uploads directory
+// Serve static files from uploads and public/images directory
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Basic health route
 app.get('/', (req, res) => {

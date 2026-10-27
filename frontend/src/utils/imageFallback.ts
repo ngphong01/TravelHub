@@ -13,10 +13,10 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
   // --- VIỆT NAM ---
   {
     keywords: ['đà nẵng', 'da nang', 'danang', 'cầu vàng', 'bà nà', 'bana', 'mỹ khê'],
-    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80', // Cầu Vàng Bà Nà Hills
+    image: '/images/destinations/da-nang.jpg', // Cầu Vàng Bà Nà Hills
     gallery: [
+      '/images/destinations/da-nang.jpg',
       'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80'
@@ -24,90 +24,90 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
   },
   {
     keywords: ['phú quốc', 'phu quoc', 'phuquoc', 'bãi sao', 'hòn thơm', 'hòn mây rút', 'sunset sanato'],
-    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80', // Biển xanh Phú Quốc
+    image: '/images/destinations/phu-quoc.jpg', // Biển Bãi Sao Phú Quốc
     gallery: [
+      '/images/destinations/phu-quoc.jpg',
       'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['sa pa', 'sapa', 'fansipan', 'mù cang chải', 'ruộng bậc thang', 'y tý'],
-    image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80', // Ruộng bậc thang Sa Pa hùng vĩ
+    image: '/images/destinations/sa-pa.jpg', // Ruộng bậc thang Sa Pa hùng vĩ
     gallery: [
+      '/images/destinations/sa-pa.jpg',
       'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['đà lạt', 'da lat', 'dalat', 'hồ xuân hương', 'đồi chè', 'thành phố ngàn hoa', 'langbiang'],
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', // Đà Lạt đồi thông sương mù
+    image: '/images/destinations/da-lat.jpg', // Đà Lạt Hồ Xuân Hương & Vườn hoa
     gallery: [
+      '/images/destinations/da-lat.jpg',
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['hạ long', 'ha long', 'halong', 'bái tử long', 'lan hạ', 'du thuyền hạ long', 'tuần châu'],
-    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80', // Vịnh Hạ Long kỳ quan
+    image: '/images/destinations/ha-long.jpg', // Vịnh Hạ Long kỳ quan
     gallery: [
+      '/images/destinations/ha-long.jpg',
       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['hội an', 'hoi an', 'hoian', 'chùa cầu', 'sông hoài', 'phố cổ đèn lồng'],
-    image: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80', // Phố cổ Hội An đèn lồng vàng
+    image: '/images/destinations/hoi-an.jpg', // Phố cổ Hội An Chùa Cầu
     gallery: [
+      '/images/destinations/hoi-an.jpg',
       'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['hà nội', 'ha noi', 'hanoi', 'hồ gươm', 'tháp rùa', 'phố cổ hà nội', 'ba đình'],
-    image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80', // Hà Nội Hồ Gươm cổ kính
+    image: '/images/destinations/ha-noi.jpg', // Hà Nội Tháp Rùa Hồ Gươm cổ kính
     gallery: [
+      '/images/destinations/ha-noi.jpg',
       'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['huế', 'hue', 'đại nội', 'kinh thành huế', 'sông hương', 'thiên mụ', 'lăng tự đức'],
-    image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80', // Kinh thành Huế
+    image: '/images/destinations/hue.jpg', // Kinh thành Đại Nội Huế
     gallery: [
+      '/images/destinations/hue.jpg',
       'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['ninh bình', 'ninh binh', 'tràng an', 'tam cốc', 'bích động', 'hang múa', 'bái đính'],
-    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80', // Tràng An Ninh Bình
+    image: '/images/destinations/ninh-binh.jpg', // Tràng An Ninh Bình
     gallery: [
+      '/images/destinations/ninh-binh.jpg',
       'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
@@ -123,13 +123,32 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
   },
   {
     keywords: ['nha trang', 'nhatrang', 'hòn tằm', 'hòn mun', 'vinpearl nha trang', 'tháp bà ponagar'],
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80', // Biển Nha Trang
+    image: '/images/destinations/nha-trang.jpg', // Vịnh biển Nha Trang
     gallery: [
+      '/images/destinations/nha-trang.jpg',
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80'
+    ]
+  },
+  {
+    keywords: ['quy nhơn', 'quy nhon', 'quynhon', 'eo gió', 'kỳ co', 'hòn khô'],
+    image: '/images/destinations/quy-nhon.jpg', // Eo Gió Quy Nhơn
+    gallery: [
+      '/images/destinations/quy-nhon.jpg',
+      'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80'
+    ]
+  },
+  {
+    keywords: ['mù cang chải', 'mu cang chai', 'đồi mâm xôi', 'la pán tẩn', 'khau phạ'],
+    image: '/images/destinations/mu-cang-chai.jpg', // Đồi mâm xôi Mù Cang Chải
+    gallery: [
+      '/images/destinations/mu-cang-chai.jpg',
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
@@ -156,70 +175,55 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
   },
   {
     keywords: ['vũng tàu', 'vung tau', 'vungtau', 'bãi trước', 'bãi sau', 'hải đăng vũng tàu'],
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', // Biển Vũng Tàu
+    image: '/images/destinations/vung-tau.jpg', // Toàn cảnh Vịnh Vũng Tàu
     gallery: [
+      '/images/destinations/vung-tau.jpg',
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80'
-    ]
-  },
-  {
-    keywords: ['mũi né', 'mui ne', 'muine', 'phan thiết', 'đồi cát bay', 'bàu trắng'],
-    image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80', // Đồi cát Mũi Né
-    gallery: [
-      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['hà giang', 'ha giang', 'mã pí lèng', 'sông nho quế', 'đồng văn', 'mèo vạc', 'tây bắc'],
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80', // Cao nguyên đá Hà Giang
+    image: '/images/destinations/ha-giang.jpg', // Đèo Mã Pí Lèng Hà Giang
     gallery: [
+      '/images/destinations/ha-giang.jpg',
       'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['cần thơ', 'can tho', 'chợ nổi cái răng', 'miền tây', 'đồng bằng sông cửu long', 'bến tre'],
-    image: 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1200&q=80', // Sông nước Miền Tây Chợ Nổi
+    image: '/images/destinations/can-tho.jpg', // Chợ nổi Cái Răng Cần Thơ sông nước
     gallery: [
+      '/images/destinations/can-tho.jpg',
       'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80'
     ]
   },
 
   // --- QUỐC TẾ ---
   {
     keywords: ['tokyo', 'nhật bản', 'japan', 'phú sĩ', 'fuji', 'shibuya', 'shinjuku'],
-    image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80', // Tokyo Nhật Bản
+    image: '/images/destinations/tokyo.jpg', // Tokyo Nhật Bản
     gallery: [
+      '/images/destinations/tokyo.jpg',
       'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
     keywords: ['kyoto', 'cổng torii', 'fushimi inari', 'arashiyama', 'rừng trúc'],
-    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80', // Kyoto Cổ kính
+    image: '/images/destinations/kyoto.jpg', // Kyoto Cổ kính
     gallery: [
+      '/images/destinations/kyoto.jpg',
       'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=1200&q=80'
     ]
   },
   {
@@ -412,8 +416,18 @@ export function getAuthenticImage(
   nameOrSlug?: string | null,
   type: 'destination' | 'tour' | 'hotel' | 'restaurant' | 'avatar' = 'tour'
 ): string {
-  // If already an external CDN URL, verify it's not empty
-  if (rawUrl && (rawUrl.startsWith('http://') || rawUrl.startsWith('https://'))) {
+  // Filter out known mistaken Unsplash IDs
+  const isMismatched = rawUrl && (
+    rawUrl.includes('photo-1540959733332') || // Tokyo arcade mistakenly assigned to Phu Quoc
+    rawUrl.includes('photo-1509316975850') || // Pine forest mistakenly assigned to Ha Noi
+    rawUrl.includes('photo-1571401835393') || // Nepal Himalayas mistakenly assigned to Sa Pa
+    rawUrl.includes('photo-1568084680786') || // Resort mistakenly assigned to Hoi An
+    rawUrl.includes('photo-1583417319070') || // Bitexco HCMC mistakenly assigned to Hue
+    rawUrl.includes('photo-1559847844')    // Curry dish mistakenly assigned to Can Tho
+  );
+
+  // If already an authentic URL or local /images/ asset, verify it's not mismatched
+  if (rawUrl && !isMismatched && (rawUrl.startsWith('http://') || rawUrl.startsWith('https://') || rawUrl.startsWith('/images/'))) {
     return rawUrl;
   }
 
@@ -424,7 +438,7 @@ export function getAuthenticImage(
   }
 
   // If rawUrl contains location hints in its filename
-  if (rawUrl) {
+  if (rawUrl && !isMismatched) {
     const fileMatch = findAuthenticImageMatch(rawUrl);
     if (fileMatch) {
       return fileMatch.image;

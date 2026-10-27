@@ -72,7 +72,7 @@ export function getDestinationImage(destinationName: string, fallback?: string):
 
 // Helper to check if image exists (used by components)
 export function getDestinationImageUrl(destination: { name: string; image?: string | null }): string {
-  if (destination.image && (destination.image.startsWith('http://') || destination.image.startsWith('https://'))) {
+  if (destination.image && (destination.image.startsWith('http://') || destination.image.startsWith('https://') || destination.image.startsWith('/images/'))) {
     return destination.image;
   }
   return getAuthenticImage(destination.image, destination.name, 'destination');
