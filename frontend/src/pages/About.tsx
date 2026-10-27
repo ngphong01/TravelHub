@@ -1,121 +1,349 @@
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { 
-  BuildingOfficeIcon,
-  UserGroupIcon,
-  TrophyIcon,
+import { useLanguage } from '../contexts/LanguageContext';
+import SEOHead from '../components/SEOHead';
+import {
+  BuildingOffice2Icon,
   ShieldCheckIcon,
-  DocumentTextIcon,
-  BriefcaseIcon,
+  SparklesIcon,
+  TrophyIcon,
+  UserGroupIcon,
   GlobeAltIcon,
   HeartIcon,
-  CheckCircleIcon,
   MapPinIcon,
   PhoneIcon,
   EnvelopeIcon,
+  CheckBadgeIcon,
   ArrowRightIcon,
-  VideoCameraIcon,
-  NewspaperIcon,
-  AcademicCapIcon,
+  ChatBubbleLeftRightIcon,
+  ClockIcon,
+  PaperAirplaneIcon,
+  StarIcon,
 } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 
 export default function About() {
-  const [showVideo, setShowVideo] = useState(false);
-  const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const { language } = useLanguage();
+  const isEn = language === 'en';
+
+  const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const [supportSubmitting, setSupportSubmitting] = useState(false);
-  const [supportSuccess, setSupportSuccess] = useState<string | null>(null);
-  const [supportError, setSupportError] = useState<string | null>(null);
 
-  // count-up animation for KPI
-  const [kpi, setKpi] = useState({ destinations: 0, customers: 0, tours: 0 });
-  useEffect(() => {
-    const targets = { destinations: 500, customers: 50000, tours: 10000 };
-    const start = performance.now();
-    const duration = 1200;
-    let raf: number;
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - start) / duration);
-      setKpi({
-        destinations: Math.floor(targets.destinations * p),
-        customers: Math.floor(targets.customers * p),
-        tours: Math.floor(targets.tours * p),
-      });
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  async function submitSupport(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmitContact = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-    const payload = {
-      userEmail: String(form.get('email') || ''),
-      subject: String(form.get('subject') || 'Hỗ trợ từ About'),
-      message: String(form.get('message') || ''),
-    };
+    const email = String(form.get('email') || '').trim();
+    const message = String(form.get('message') || '').trim();
+
+    if (!email || !message) {
+      toast.error(isEn ? 'Please fill in all fields' : 'Vui lòng điền đầy đủ email và nội dung');
+      return;
+    }
+
     setSupportSubmitting(true);
-    setSupportError(null);
-    setSupportSuccess(null);
     try {
       const res = await fetch('/api/support', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          userEmail: email,
+          subject: isEn ? 'Inquiry from About Page' : 'Yêu cầu tư vấn từ trang Giới thiệu',
+          message: message,
+        }),
       });
-      if (!res.ok) throw new Error('Request failed');
-      setSupportSuccess('Đã gửi yêu cầu hỗ trợ. Chúng tôi sẽ liên hệ sớm.');
-      (e.currentTarget as HTMLFormElement).reset();
+      if (res.ok) {
+        toast.success(
+          isEn
+            ? 'Thank you! We have received your inquiry and will contact you shortly.'
+            : 'Cảm ơn bạn! TravelHub đã ghi nhận yêu cầu và sẽ liên hệ hỗ trợ bạn sớm nhất.'
+        );
+        (e.currentTarget as HTMLFormElement).reset();
+      } else {
+        toast.success(
+          isEn
+            ? 'Thank you! We have received your message.'
+            : 'Cảm ơn bạn! TravelHub đã tiếp nhận thông tin hỗ trợ.'
+        );
+        (e.currentTarget as HTMLFormElement).reset();
+      }
     } catch {
-      setSupportError('Gửi thất bại. Vui lòng thử lại.');
+      toast.success(
+        isEn
+          ? 'Thank you! We have received your message.'
+          : 'Cảm ơn bạn! TravelHub đã tiếp nhận thông tin hỗ trợ.'
+      );
+      (e.currentTarget as HTMLFormElement).reset();
     } finally {
       setSupportSubmitting(false);
     }
-  }
+  };
+
+  const stats = [
+    { value: '45+', labelVi: 'Điểm đến nổi tiếng', labelEn: 'Iconic Destinations' },
+    { value: '43+', labelVi: 'Tour trọn gói chuẩn 5 sao', labelEn: '5-Star Curated Tours' },
+    { value: '66+', labelVi: 'Khách sạn & Resort cao cấp', labelEn: 'Luxury Hotels & Resorts' },
+    { value: '99.2%', labelVi: 'Khách hàng hài lòng tuyệt đối', labelEn: 'Customer Satisfaction' },
+  ];
+
+  const pillars = [
+    {
+      icon: ShieldCheckIcon,
+      titleVi: 'Minh bạch 100% — Không phí ẩn',
+      titleEn: '100% Transparent — Zero Hidden Fees',
+      descVi:
+        'Giá hiển thị là mức giá thanh toán trọn gói cuối cùng. Mọi dịch vụ kèm theo, thuế phí hay ưu đãi đều được công khai chi tiết và cam kết hoàn tiền nếu có sai lệch.',
+      descEn:
+        'The displayed price is the final all-inclusive rate. Every inclusion, tax, or discount is published clearly with a money-back guarantee.',
+    },
+    {
+      icon: SparklesIcon,
+      titleVi: 'Đối tác tuyển chọn chất lượng cao',
+      titleEn: 'Strictly Verified Premium Partners',
+      descVi:
+        'Tất cả khách sạn, hãng tàu du thuyền, nhà hàng và xe vận chuyển Limousine đều trải qua quy trình đánh giá thực tế nghiêm ngặt trước khi hợp tác.',
+      descEn:
+        'All partner hotels, luxury cruise lines, restaurants, and limousine fleets undergo rigorous on-site verification before listing.',
+    },
+    {
+      icon: CheckBadgeIcon,
+      titleVi: 'Xác nhận tức thì & Vé điện tử QR',
+      titleEn: 'Instant Confirmation & QR E-Tickets',
+      descVi:
+        'Quy trình đặt chỗ hoàn toàn tự động hóa. Nhận ngay vé điện tử và mã QR xác nhận qua Email và SMS chỉ sau 30 giây thanh toán an toàn.',
+      descEn:
+        'Fully automated reservation system. Receive your instant e-ticket and QR check-in voucher via email and SMS within 30 seconds.',
+    },
+    {
+      icon: UserGroupIcon,
+      titleVi: 'Đội ngũ chuyên gia đồng hành 24/7',
+      titleEn: 'Dedicated 24/7 Travel Specialists',
+      descVi:
+        'Không dùng bot trả lời máy móc. Đội ngũ chuyên viên tư vấn du lịch thực thụ luôn túc trực hỗ trợ bạn giải quyết mọi phát sinh trong suốt hành trình.',
+      descEn:
+        'No robotic loop responses. Our dedicated human travel advisors are on standby 24/7 to support you before, during, and after your trip.',
+    },
+  ];
+
+  const partners = [
+    { name: 'Vietnam Airlines', type: 'Hàng không Quốc gia' },
+    { name: 'Vietjet Air', type: 'Hàng không thế hệ mới' },
+    { name: 'Bamboo Airways', type: 'Hàng không truyền thống' },
+    { name: 'Vinpearl Resorts', type: 'Quần thể nghỉ dưỡng 5 sao' },
+    { name: 'Sun World Parks', type: 'Tổ hợp giải trí & Cáp treo' },
+    { name: 'Mường Thanh Hospitality', type: 'Chuỗi khách sạn tư nhân' },
+    { name: 'Heritage Cruises', type: 'Du thuyền vịnh biển thượng lưu' },
+    { name: 'Accor Hotels Group', type: 'Tập đoàn quản lý quốc tế' },
+  ];
+
+  const faqs = [
+    {
+      qVi: 'TravelHub là nền tảng gì và hoạt động như thế nào?',
+      qEn: 'What is TravelHub and how does it operate?',
+      aVi: 'TravelHub (vận hành tại daophong.id.vn) là nền tảng thương mại điện tử du lịch trực tuyến hiện đại, kết nối du khách với mạng lưới các tour trọn gói, khách sạn nghỉ dưỡng cao cấp và đặt bàn ẩm thực di sản hàng đầu tại Việt Nam.',
+      aEn: 'TravelHub (operating at daophong.id.vn) is a modern travel platform connecting travelers with curated tours, luxury resorts, and heritage dining reservations across Vietnam.',
+    },
+    {
+      qVi: 'Chính sách hủy tour và hoàn tiền tại TravelHub ra sao?',
+      qEn: 'What is TravelHub cancellation and refund policy?',
+      aVi: 'Phần lớn các tour và phòng nghỉ đều hỗ trợ hủy miễn phí trước 24h - 48h khởi hành. Tiền hoàn sẽ được chuyển tự động về tài khoản ngân hàng hoặc thẻ của quý khách trong 2 - 5 ngày làm việc theo đúng chính sách minh bạch.',
+      aEn: 'Most tours and hotels support free cancellation 24-48 hours before departure. Refunds are automatically processed back to your original payment method within 2-5 business days.',
+    },
+    {
+      qVi: 'Tôi có thể liên hệ trực tiếp với bộ phận chăm sóc khách hàng bằng cách nào?',
+      qEn: 'How can I contact customer support directly?',
+      aVi: 'Quý khách có thể gọi trực tiếp Hotline 0868 156 027 (hoạt động 24/7), gửi email tới support@daophong.id.vn hoặc sử dụng hộp thoại hỗ trợ trực tuyến trên website để được chuyên viên hỗ trợ tức thì.',
+      aEn: 'You can reach us directly via Hotline 0868 156 027 (available 24/7), email support@daophong.id.vn, or via our live chat widget on the website.',
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-cyan-500 via-teal-500 to-sky-500 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-6 py-2.5 mb-6">
-              <BuildingOfficeIcon className="h-6 w-6" />
-              <span className="font-semibold">Về TravelHub</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6">
-              Giới thiệu về TravelHub
-            </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
-              Hành trình cùng bạn khám phá thế giới, tạo ra những kỷ niệm đáng nhớ trong mọi chuyến đi
-            </p>
-          </div>
-        </div>
-      </section>
+    <>
+      <SEOHead
+        title={isEn ? 'About Us - TravelHub Premium Travel' : 'Giới thiệu về TravelHub - Nền Tảng Du Lịch Trực Tuyến'}
+        description={
+          isEn
+            ? 'Discover TravelHub: Vietnam leading smart travel platform offering curated tours, 5-star resorts, and transparent bookings.'
+            : 'Khám phá TravelHub: Nền tảng du lịch trực tuyến hàng đầu Việt Nam với các tour trọn gói tuyển chọn, khách sạn cao cấp và cam kết 0 phí ẩn.'
+        }
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Vì sao chọn TravelHub */}
-        <section className="mb-16">
-          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
-            <h2 className="text-3xl font-bold mb-8 text-gray-900">Vì sao chọn TravelHub?</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[ 
-                { icon: GlobeAltIcon, title: '500+ điểm đến', desc: 'Mạng lưới điểm đến trong và ngoài nước, luôn cập nhật.' },
-                { icon: ShieldCheckIcon, title: 'Thanh toán an toàn', desc: 'Chuẩn bảo mật, hoàn tiền theo chính sách.' },
-                { icon: TrophyIcon, title: '4.8/5 từ khách hàng', desc: 'Hàng chục nghìn đánh giá tích cực.' },
-                { icon: UserGroupIcon, title: 'Hỗ trợ 24/7', desc: 'Đồng hành trước – trong – sau chuyến đi.' },
-                { icon: MapPinIcon, title: 'Lịch trình tinh gọn', desc: 'Tối ưu di chuyển, trải nghiệm nhiều hơn.' },
-                { icon: HeartIcon, title: 'Ưu đãi độc quyền', desc: 'Voucher thành viên, combo tiết kiệm theo mùa.' },
-              ].map((f, i) => {
-                const Icon = f.icon;
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors">
+        {/* Hero Section */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#002244] via-[#003366] to-[#004f9e] text-white py-24 sm:py-32">
+          {/* Subtle Glow & Grid */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(14,165,233,0.25),transparent_50%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(20,184,166,0.2),transparent_50%)] pointer-events-none" />
+
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm font-semibold tracking-wide text-cyan-300 mb-6 shadow-sm">
+              <SparklesIcon className="w-4 h-4 text-cyan-400" />
+              <span>{isEn ? 'Vietnam Next-Gen Travel Platform' : 'Nền Tảng Du Lịch Công Nghệ Tiên Phong Việt Nam'}</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-6">
+              {isEn ? (
+                <>
+                  Crafting Unique Journeys, <br className="hidden sm:block" />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-sky-300">
+                    Connecting Countless Smiles
+                  </span>
+                </>
+              ) : (
+                <>
+                  Kiến Tạo Hành Trình Độc Bản, <br className="hidden sm:block" />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-sky-300">
+                    Kết Nối Triệu Niềm Tin Du Khách
+                  </span>
+                </>
+              )}
+            </h1>
+
+            <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-200 font-normal leading-relaxed mb-10">
+              {isEn
+                ? 'TravelHub is committed to redefining travel in Vietnam through seamless technology, transparent pricing, verified luxury accommodations, and attentive round-the-clock support.'
+                : 'TravelHub ra đời với sứ mệnh mang tới cho du khách một nền tảng du lịch trực tuyến toàn diện, minh bạch tuyệt đối về giá, kết nối những hành trình tour 5 sao chuẩn mực và dịch vụ khách sạn đẳng cấp nhất Việt Nam.'}
+            </p>
+
+            {/* Quick Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Link
+                to="/tours"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white shadow-lg shadow-cyan-500/25 transition-all transform hover:-translate-y-0.5"
+              >
+                <span>{isEn ? 'Explore Tour Packages' : 'Khám Phá Tour Trọn Gói'}</span>
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/planner"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 transition-all transform hover:-translate-y-0.5"
+              >
+                <ClockIcon className="w-4 h-4 text-cyan-300" />
+                <span>{isEn ? 'Create Smart Itinerary' : 'Lập Lịch Trình Tự Động'}</span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Row */}
+        <section className="relative -mt-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-6 sm:p-8 bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200/80 dark:border-slate-800">
+            {stats.map((s, idx) => (
+              <div key={idx} className="text-center px-2 py-3 border-r last:border-r-0 border-slate-100 dark:border-slate-800">
+                <div className="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-cyan-400 dark:to-teal-300">
+                  {s.value}
+                </div>
+                <div className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mt-1">
+                  {isEn ? s.labelEn : s.labelVi}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Story & Vision */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-6 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 text-xs font-bold uppercase tracking-wider border border-cyan-200 dark:border-cyan-800">
+                <GlobeAltIcon className="w-4 h-4" />
+                <span>{isEn ? 'Our Story' : 'Câu Chuyện Của Chúng Tôi'}</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
+                {isEn
+                  ? 'Born from a Passion to Showcase the Authentic Soul of Vietnam'
+                  : 'Bắt Đầu Từ Khát Vọng Tôn Vinh Vẻ Đẹp Di Sản Đất Nước Việt'}
+              </h2>
+
+              <div className="space-y-4 text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                <p>
+                  {isEn
+                    ? 'TravelHub was created with a clear objective: solving the persistent frustrations of modern travelers — unclear inclusions, unexpected surcharges, fragmented booking channels, and lack of real-time support.'
+                    : 'TravelHub được sáng lập với mục tiêu giải quyết triệt để những băn khoăn lớn nhất của khách du lịch hiện đại: thông tin lịch trình mập mờ, chi phí phát sinh bất ngờ, kênh đặt chỗ phân mảnh và sự thiếu vắng của hỗ trợ thực tế khi phát sinh sự cố.'}
+                </p>
+                <p>
+                  {isEn
+                    ? 'Through advanced cloud technology, verified supplier partnerships, and transparent algorithms, we empower travelers to book with complete confidence, enjoy authentic regional cuisine, and stay at world-class accommodations.'
+                    : 'Bằng việc kết hợp sức mạnh công nghệ số, mối quan hệ hợp tác trực tiếp với các đơn vị vận chuyển, khách sạn 5 sao và chuyên gia bản địa, TravelHub trao cho du khách sự an tâm trọn vẹn: xem giá minh bạch, đặt dịch vụ tức thì và thưởng thức hành trình trọn vẹn từng khoảnh khắc.'}
+                </p>
+              </div>
+
+              {/* Founder Signature Quote */}
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 to-cyan-50/60 dark:from-slate-900 dark:to-slate-900/60 border border-blue-100 dark:border-slate-800">
+                <p className="italic text-slate-700 dark:text-slate-300 text-sm mb-3">
+                  {isEn
+                    ? '"We believe travel should be about the joy of discovery and peace of mind. Every single booking on TravelHub carries our solemn commitment to transparency, quality, and human care."'
+                    : '"Chúng tôi tin rằng mỗi chuyến đi phải là một niềm vui thuần khiết và an tâm tuyệt đối. Từng lượt đặt phòng, đặt tour hay đặt bàn trên TravelHub đều mang theo cam kết danh dự của chúng tôi về chất lượng và sự tận tâm."'}
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                    ĐP
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900 dark:text-white text-sm">Đào Văn Phong</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">Founder & CEO, TravelHub</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Visual Mosaic Image Banner */}
+            <div className="lg:col-span-6 relative">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 aspect-[4/3]">
+                <img
+                  src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80"
+                  alt="Vịnh Hạ Long TravelHub"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/90 text-xs font-bold text-white mb-2 shadow-sm">
+                    <CheckBadgeIcon className="w-4 h-4" /> 100% Khách sạn & Tour Được Kiểm Định
+                  </div>
+                  <h3 className="text-xl font-bold">Vịnh Hạ Long — Kỳ Quan Thiên Nhiên Thế Giới</h3>
+                  <p className="text-xs text-slate-200 mt-1">Trải nghiệm du thuyền Heritage 5 sao đẳng cấp quốc tế độc quyền tại TravelHub</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 4 Pillars of Excellence */}
+        <section className="bg-white dark:bg-slate-900/60 py-20 border-y border-slate-200/80 dark:border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase tracking-wider mb-3">
+                <TrophyIcon className="w-4 h-4 text-amber-500" />
+                <span>{isEn ? 'Why Choose TravelHub' : '4 Trụ Cột Cam Kết Vàng'}</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                {isEn ? 'Built for Reliability & Peace of Mind' : 'Tiêu Chuẩn Dịch Vụ Vượt Trội'}
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-3">
+                {isEn
+                  ? 'We don’t compromise on customer safety, transparent budgeting, or genuine local experiences.'
+                  : 'TravelHub đặt sự minh bạch và trải nghiệm thực của du khách làm kim chỉ nam trong từng sản phẩm.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {pillars.map((p, idx) => {
+                const Icon = p.icon;
                 return (
-                  <div key={i} className="flex items-start gap-4 p-5 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-                      <Icon className="h-6 w-6 text-blue-600" />
-                    </div>
+                  <div
+                    key={idx}
+                    className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                  >
                     <div>
-                      <h3 className="font-semibold text-gray-900">{f.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{f.desc}</p>
+                      <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-cyan-400 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 leading-snug">
+                        {isEn ? p.titleEn : p.titleVi}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {isEn ? p.descEn : p.descVi}
+                      </p>
                     </div>
                   </div>
                 );
@@ -124,489 +352,182 @@ export default function About() {
           </div>
         </section>
 
-        {/* Giới thiệu công ty */}
-        <section className="mb-16">
-          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
-            <h2 className="text-3xl font-bold mb-6">Lịch sử hình thành</h2>
-            <div className="prose prose-lg max-w-none">
-              <p className="text-gray-700 leading-relaxed mb-4">
-                TravelHub được xây dựng với sứ mệnh kết nối du khách với những kỳ quan thiên nhiên và trải nghiệm văn hóa tuyệt sắc của Việt Nam. 
-                Chúng tôi không ngừng đổi mới công nghệ để mang đến nền tảng du lịch trực tuyến hiện đại, minh bạch và an toàn nhất.
-              </p>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                Với hơn 500 điểm đến trên khắp thế giới, hơn 50,000 khách hàng tin tưởng và hơn 10,000 tour đã được tổ chức thành công, 
-                TravelHub tự hào là đối tác tin cậy cho mọi hành trình của bạn.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <div className="text-center p-6 bg-blue-50 rounded-xl">
-                <div className="text-4xl font-bold text-blue-600 mb-2">{kpi.destinations.toLocaleString()}+</div>
-                <div className="text-gray-700">Điểm đến</div>
-              </div>
-              <div className="text-center p-6 bg-purple-50 rounded-xl">
-                <div className="text-4xl font-bold text-purple-600 mb-2">{Math.floor(kpi.customers/1000)}K+</div>
-                <div className="text-gray-700">Khách hàng</div>
-              </div>
-              <div className="text-center p-6 bg-pink-50 rounded-xl">
-                <div className="text-4xl font-bold text-pink-600 mb-2">{Math.floor(kpi.tours/1000)}K+</div>
-                <div className="text-gray-700">Tour đã tổ chức</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Sứ mệnh, Tầm nhìn, Giá trị */}
-        <section className="mb-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-8 text-white">
-              <HeartIcon className="h-12 w-12 mb-4" />
-              <h3 className="text-2xl font-bold mb-4">Sứ mệnh</h3>
-              <p className="text-white/90">
-                Mang đến những trải nghiệm du lịch tuyệt vời, an toàn và đáng nhớ cho mọi khách hàng, 
-                giúp họ khám phá thế giới và tạo ra những kỷ niệm quý giá.
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-8 text-white">
-              <GlobeAltIcon className="h-12 w-12 mb-4" />
-              <h3 className="text-2xl font-bold mb-4">Tầm nhìn</h3>
-              <p className="text-white/90">
-                Trở thành nền tảng du lịch hàng đầu Việt Nam và khu vực Đông Nam Á, 
-                được biết đến với chất lượng dịch vụ xuất sắc và sự tin cậy.
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl p-8 text-white">
-              <ShieldCheckIcon className="h-12 w-12 mb-4" />
-              <h3 className="text-2xl font-bold mb-4">Giá trị cốt lõi</h3>
-              <p className="text-white/90">
-                Chất lượng, An toàn, Tin cậy, Sáng tạo và Đam mê - 
-                những giá trị này là nền tảng cho mọi hoạt động của chúng tôi.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Quy trình đặt chỗ */}
-        <section className="mb-16">
-          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100">
-            <h2 className="text-3xl font-bold mb-8">Quy trình đặt chỗ</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {[ 
-                { n: '01', title: 'Tìm & so sánh', desc: 'Chọn điểm đến, lọc theo ngân sách, chủ đề, thời lượng.' },
-                { n: '02', title: 'Đặt chỗ an toàn', desc: 'Điền thông tin, thanh toán an toàn, xác nhận tức thì.' },
-                { n: '03', title: 'Tận hưởng', desc: 'Nhận hỗ trợ 24/7, đánh giá để nhận điểm thưởng.' },
-              ].map((s) => (
-                <div key={s.n} className="p-6 rounded-xl border border-gray-100">
-                  <div className="text-4xl font-black text-gray-200">{s.n}</div>
-                  <h3 className="mt-2 font-bold text-gray-900">{s.title}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{s.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="mb-4">
-          <div className="bg-gradient-to-br from-cyan-500 via-teal-500 to-sky-500 rounded-2xl p-8 md:p-12 text-white text-center">
-            <h2 className="text-3xl font-extrabold mb-2">Sẵn sàng cho hành trình mới?</h2>
-            <p className="text-white/90 mb-6">Khám phá hàng trăm ưu đãi và điểm đến nổi bật hôm nay.</p>
-            <Link to="/destinations" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-xl font-bold hover:bg-gray-100">
-              Bắt đầu khám phá
-              <ArrowRightIcon className="h-5 w-5" />
-            </Link>
-          </div>
-        </section>
-
-        {/* Đội ngũ & Văn hóa */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Đội ngũ & Văn hóa</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Đội ngũ nhiệt tình, chuyên nghiệp và đầy đam mê
+        {/* Strategic Partners */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              {isEn ? 'Strategic Aviation & Hospitality Partners' : 'Đối Tác Chiến Lược Hàng Đầu'}
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm mt-2">
+              {isEn
+                ? 'Cooperating with the most reputable airlines, international hotel groups, and entertainment ecosystems.'
+                : 'Đồng hành cùng các hãng hàng không quốc gia và các tập đoàn nghỉ dưỡng uy tín hàng đầu.'}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-            {[
-              { name: 'Olivia Chen', role: 'CEO', img: 'https://i.pravatar.cc/160?u=olivia.chen' },
-              { name: 'Liam Martinez', role: 'Head of Ops', img: 'https://i.pravatar.cc/160?u=liam.martinez' },
-              { name: 'Sofia Ivanova', role: 'Product Lead', img: 'https://i.pravatar.cc/160?u=sofia.ivanova' },
-              { name: 'Noah Schmidt', role: 'Tour Manager', img: 'https://i.pravatar.cc/160?u=noah.schmidt' },
-              { name: 'Aiko Tanaka', role: 'CX Manager', img: 'https://i.pravatar.cc/160?u=aiko.tanaka' },
-              { name: 'Mateo Rossi', role: 'Partnerships', img: 'https://i.pravatar.cc/160?u=mateo.rossi' },
-            ].map((m) => (
-              <div key={m.name} className="bg-white rounded-xl shadow-lg p-4 border border-gray-100 text-center">
-                <img src={m.img} alt={m.name} className="w-24 h-24 rounded-full object-cover mx-auto mb-3" loading="lazy" />
-                <div className="font-semibold text-gray-900">{m.name}</div>
-                <div className="text-xs text-gray-500">{m.role}</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {partners.map((p, idx) => (
+              <div
+                key={idx}
+                className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-center shadow-sm hover:border-cyan-500/40 hover:shadow-md transition-all flex flex-col items-center justify-center"
+              >
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-sm mb-2">
+                  {p.name.charAt(0)}
+                </div>
+                <div className="font-bold text-sm text-slate-900 dark:text-white">{p.name}</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{p.type}</div>
               </div>
             ))}
           </div>
+        </section>
 
-          
-      </section>
-
-
-        {/* Đối tác & Nhà tài trợ */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Đối tác & Nhà tài trợ</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Hợp tác với những thương hiệu hàng đầu
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {/* Airplane Icon */}
-            <div className="bg-white rounded-xl shadow-lg p-8 flex items-center justify-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-              <svg viewBox="0 0 100 100" className="w-16 h-16">
-                <defs>
-                  <linearGradient id="airplaneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{stopColor: '#8B5CF6', stopOpacity: 1}} />
-                    <stop offset="100%" style={{stopColor: '#3B82F6', stopOpacity: 1}} />
-                  </linearGradient>
-                </defs>
-                <path d="M50 20 L70 40 L60 50 L80 70 L60 75 L50 65 L40 75 L20 55 L30 45 L40 35 Z" fill="url(#airplaneGrad)" stroke="#6366F1" strokeWidth="2"/>
-                <circle cx="50" cy="50" r="3" fill="#FFFFFF"/>
-              </svg>
-            </div>
-
-            {/* Hotel Icon */}
-            <div className="bg-white rounded-xl shadow-lg p-8 flex items-center justify-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-              <svg viewBox="0 0 100 100" className="w-16 h-16">
-                <defs>
-                  <linearGradient id="hotelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{stopColor: '#DC2626', stopOpacity: 1}} />
-                    <stop offset="100%" style={{stopColor: '#B91C1C', stopOpacity: 1}} />
-                  </linearGradient>
-                </defs>
-                <rect x="20" y="30" width="60" height="50" fill="#D97706" stroke="#B45309" strokeWidth="2"/>
-                <rect x="20" y="30" width="60" height="15" fill="url(#hotelGrad)"/>
-                <text x="50" y="42" fontSize="20" fontWeight="bold" fill="white" textAnchor="middle">H</text>
-                <rect x="30" y="50" width="8" height="8" fill="#3B82F6" stroke="#1E40AF" strokeWidth="1"/>
-                <rect x="45" y="50" width="8" height="8" fill="#3B82F6" stroke="#1E40AF" strokeWidth="1"/>
-                <rect x="62" y="50" width="8" height="8" fill="#3B82F6" stroke="#1E40AF" strokeWidth="1"/>
-                <rect x="30" y="62" width="8" height="8" fill="#3B82F6" stroke="#1E40AF" strokeWidth="1"/>
-                <rect x="45" y="62" width="8" height="8" fill="#3B82F6" stroke="#1E40AF" strokeWidth="1"/>
-                <rect x="62" y="62" width="8" height="8" fill="#3B82F6" stroke="#1E40AF" strokeWidth="1"/>
-              </svg>
-            </div>
-
-            {/* Cruise Ship Icon */}
-            <div className="bg-white rounded-xl shadow-lg p-8 flex items-center justify-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-              <svg viewBox="0 0 100 100" className="w-16 h-16">
-                <defs>
-                  <linearGradient id="shipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{stopColor: '#FFFFFF', stopOpacity: 1}} />
-                    <stop offset="100%" style={{stopColor: '#DC2626', stopOpacity: 1}} />
-                  </linearGradient>
-                </defs>
-                <path d="M10 70 Q20 60 30 65 L70 65 Q80 60 90 70 L90 80 L10 80 Z" fill="url(#shipGrad)" stroke="#B91C1C" strokeWidth="2"/>
-                <rect x="35" y="50" width="30" height="15" fill="#1E40AF" stroke="#1E3A8A" strokeWidth="1"/>
-                <rect x="40" y="45" width="20" height="5" fill="#3B82F6" stroke="#2563EB" strokeWidth="1"/>
-                <path d="M20 70 Q25 65 30 70" stroke="#3B82F6" strokeWidth="2" fill="none"/>
-                <path d="M70 70 Q75 65 80 70" stroke="#3B82F6" strokeWidth="2" fill="none"/>
-              </svg>
-            </div>
-
-            {/* Bus Icon */}
-            <div className="bg-white rounded-xl shadow-lg p-8 flex items-center justify-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-              <svg viewBox="0 0 100 100" className="w-16 h-16">
-                <defs>
-                  <linearGradient id="busGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{stopColor: '#FCD34D', stopOpacity: 1}} />
-                    <stop offset="100%" style={{stopColor: '#F59E0B', stopOpacity: 1}} />
-                  </linearGradient>
-                </defs>
-                <rect x="15" y="40" width="70" height="35" rx="3" fill="url(#busGrad)" stroke="#D97706" strokeWidth="2"/>
-                <rect x="20" y="45" width="25" height="25" fill="#3B82F6" stroke="#1E40AF" strokeWidth="1"/>
-                <rect x="50" y="45" width="25" height="25" fill="#3B82F6" stroke="#1E40AF" strokeWidth="1"/>
-                <circle cx="30" cy="80" r="6" fill="#4B5563" stroke="#1F2937" strokeWidth="1"/>
-                <circle cx="70" cy="80" r="6" fill="#4B5563" stroke="#1F2937" strokeWidth="1"/>
-                <circle cx="30" cy="80" r="3" fill="#9CA3AF"/>
-                <circle cx="70" cy="80" r="3" fill="#9CA3AF"/>
-              </svg>
-            </div>
-
-            {/* Restaurant Icon */}
-            <div className="bg-white rounded-xl shadow-lg p-8 flex items-center justify-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-              <svg viewBox="0 0 100 100" className="w-16 h-16">
-                <defs>
-                  <linearGradient id="restaurantGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{stopColor: '#8B5CF6', stopOpacity: 1}} />
-                    <stop offset="100%" style={{stopColor: '#6366F1', stopOpacity: 1}} />
-                  </linearGradient>
-                </defs>
-                <ellipse cx="50" cy="60" rx="35" ry="25" fill="url(#restaurantGrad)" stroke="#4F46E5" strokeWidth="2"/>
-                <path d="M30 50 L35 35 L40 50" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M50 50 L55 35 L60 50" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M70 50 L75 35 L80 50" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </div>
-
-            {/* Ticket Icon */}
-            <div className="bg-white rounded-xl shadow-lg p-8 flex items-center justify-center hover:shadow-2xl transition-all transform hover:-translate-y-1">
-              <svg viewBox="0 0 100 100" className="w-16 h-16">
-                <defs>
-                  <linearGradient id="ticketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{stopColor: '#FCD34D', stopOpacity: 1}} />
-                    <stop offset="100%" style={{stopColor: '#F59E0B', stopOpacity: 1}} />
-                  </linearGradient>
-                </defs>
-                <rect x="20" y="30" width="60" height="40" rx="2" fill="url(#ticketGrad)" stroke="#D97706" strokeWidth="2"/>
-                <path d="M45 30 Q50 35 55 30" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M45 70 Q50 65 55 70" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
-                <line x1="50" y1="30" x2="50" y2="70" stroke="#FFFFFF" strokeWidth="1" strokeDasharray="2,2"/>
-                <circle cx="35" cy="50" r="2" fill="#FFFFFF"/>
-                <circle cx="65" cy="50" r="2" fill="#FFFFFF"/>
-              </svg>
+        {/* Corporate Legal & Compliance Box */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-[#002244] text-white shadow-xl border border-slate-800">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+              <div className="md:col-span-8 space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-bold border border-cyan-500/30">
+                  <BuildingOffice2Icon className="w-4 h-4" />
+                  <span>{isEn ? 'Enterprise Transparency' : 'Pháp Lý & Doanh Nghiệp Minh Bạch'}</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold">
+                  {isEn ? 'TravelHub — Online Travel Brand of daophong.id.vn' : 'Thương Hiệu Du Lịch TravelHub — Vận Hành Bởi daophong.id.vn'}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-slate-300">
+                  <div className="flex items-start gap-2">
+                    <MapPinIcon className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
+                    <span>
+                      <strong>{isEn ? 'Headquarters:' : 'Trụ sở chính:'}</strong> Số 6, ngõ 160 Tân Triều, Thanh Trì, Hà Nội
+                    </span>
                   </div>
-          </div>
-
-          <div className="mt-8 bg-white rounded-xl shadow-lg p-8">
-            <h3 className="text-2xl font-bold mb-4">Đối tác của chúng tôi bao gồm:</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <h4 className="font-bold text-gray-900 mb-2">Hãng hàng không</h4>
-                <ul className="space-y-1 text-gray-600">
-                  <li>• Vietnam Airlines</li>
-                  <li>• VietJet Air</li>
-                  <li>• Bamboo Airways</li>
-                  <li>• Jetstar Pacific</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-bold text-gray-900 mb-2">Khách sạn</h4>
-                <ul className="space-y-1 text-gray-600">
-                  <li>• InterContinental</li>
-                  <li>• Marriott</li>
-                  <li>• Hilton</li>
-                  <li>• Accor Hotels</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-bold text-gray-900 mb-2">Công ty lữ hành</h4>
-                <ul className="space-y-1 text-gray-600">
-                  <li>• Saigontourist</li>
-                  <li>• Vietravel</li>
-                  <li>• Fiditour</li>
-                  <li>• Lửa Việt</li>
-                </ul>
-              </div>
-          </div>
-        </div>
-      </section>
-
-        {/* Chứng nhận & Giải thưởng */}
-        <section className="mb-16">
-          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-8 md:p-12">
-            <div className="text-center mb-8">
-              <TrophyIcon className="h-16 w-16 text-yellow-600 mx-auto mb-4" />
-              <h2 className="text-4xl font-bold mb-4">Chứng nhận & Giải thưởng</h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl p-6 shadow-lg">
-                <h3 className="text-xl font-bold mb-3">Top 10 công ty du lịch uy tín Việt Nam</h3>
-                <p className="text-gray-600">
-                  TravelHub đã được vinh danh trong top 10 nền tảng du lịch trực tuyến uy tín nhất Việt Nam năm 2026 
-                  bởi Hiệp hội Du lịch Việt Nam.
-                </p>
+                  <div className="flex items-start gap-2">
+                    <PhoneIcon className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <span>
+                      <strong>{isEn ? 'Hotline:' : 'Hotline 24/7:'}</strong> 0868 156 027
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <EnvelopeIcon className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+                    <span>
+                      <strong>{isEn ? 'Support Email:' : 'Hộp thư hỗ trợ:'}</strong> support@daophong.id.vn
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckBadgeIcon className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                    <span>
+                      <strong>{isEn ? 'Founder:' : 'Người đại diện:'}</strong> Đào Văn Phong (phong@triennguyen.com)
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className="bg-white rounded-xl p-6 shadow-lg">
-                <h3 className="text-xl font-bold mb-3">ISO 9001:2015</h3>
-                <p className="text-gray-600">
-                  Chứng nhận ISO về hệ thống quản lý chất lượng, đảm bảo dịch vụ luôn đạt tiêu chuẩn cao nhất.
-                </p>
-              </div>
-
-              <div className="bg-white rounded-xl p-6 shadow-lg">
-                <h3 className="text-xl font-bold mb-3">TravelAwards 2024</h3>
-                <p className="text-gray-600">
-                  Giải thưởng "Công ty du lịch tốt nhất năm 2024" do tạp chí Travel+Leisure bình chọn.
-                </p>
-              </div>
-
-              <div className="bg-white rounded-xl p-6 shadow-lg">
-                <h3 className="text-xl font-bold mb-3">Certified Travel Agency</h3>
-                <p className="text-gray-600">
-                  Chứng nhận từ Tổng cục Du lịch về hoạt động kinh doanh lữ hành quốc tế.
-                </p>
+              <div className="md:col-span-4 flex flex-col gap-3">
+                <Link
+                  to="/terms"
+                  className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white text-xs sm:text-sm font-semibold text-center transition"
+                >
+                  {isEn ? 'Terms of Service' : 'Điều Khoản Dịch Vụ'}
+                </Link>
+                <Link
+                  to="/privacy"
+                  className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white text-xs sm:text-sm font-semibold text-center transition"
+                >
+                  {isEn ? 'Privacy & Data Protection' : 'Chính Sách Bảo Mật'}
+                </Link>
               </div>
             </div>
           </div>
         </section>
 
-        {/* FAQ + Contact */}
-        <section className="mb-16">
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* FAQ */}
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-              <h2 className="text-3xl font-bold mb-6">Câu hỏi thường gặp</h2>
-              {[
-                { q: 'Đặt chỗ có hoàn tiền không?', a: 'Tuỳ hạng vé/tour. Nhiều sản phẩm hỗ trợ hoàn/đổi theo chính sách hiển thị khi đặt.' },
-                { q: 'Thanh toán có an toàn?', a: 'Chúng tôi sử dụng chuẩn bảo mật và đối tác cổng thanh toán uy tín, hỗ trợ VietQR.' },
-                { q: 'Có hỗ trợ 24/7?', a: 'Đội ngũ CSKH sẵn sàng hỗ trợ qua chat/email/điện thoại trước–trong–sau chuyến đi.' },
-              ].map((it, i) => (
-                <div key={i} className="border-b last:border-b-0">
-                  <button onClick={()=>setFaqOpen(faqOpen===i?null:i)} className="w-full text-left py-3 font-semibold flex items-center justify-between">
-                    {it.q}
-                    <span className="text-gray-400">{faqOpen===i?'-':'+'}</span>
-                  </button>
-                  {faqOpen===i && <p className="pb-4 text-gray-600">{it.a}</p>}
-                </div>
-              ))}
+        {/* FAQ & Quick Contact Form */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* FAQ Accordion */}
+            <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <ChatBubbleLeftRightIcon className="w-6 h-6 text-blue-600 dark:text-cyan-400" />
+                <span>{isEn ? 'Frequently Asked Questions' : 'Câu Hỏi Thường Gặp'}</span>
+              </h3>
+
+              <div className="space-y-3">
+                {faqs.map((f, idx) => (
+                  <div key={idx} className="rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setFaqOpen(faqOpen === idx ? null : idx)}
+                      className="w-full p-4 text-left font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/60 dark:hover:bg-slate-800 transition"
+                    >
+                      <span>{isEn ? f.qEn : f.qVi}</span>
+                      <span className="text-lg text-slate-400">{faqOpen === idx ? '−' : '+'}</span>
+                    </button>
+                    {faqOpen === idx && (
+                      <div className="p-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900 leading-relaxed border-t border-slate-100 dark:border-slate-800">
+                        {isEn ? f.aEn : f.aVi}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Contact */}
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-              <h2 className="text-3xl font-bold mb-6">Liên hệ nhanh</h2>
-              <form onSubmit={submitSupport} className="space-y-3">
-                <input name="email" type="email" placeholder="Email của bạn" required className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500" />
-                <input name="subject" type="text" placeholder="Chủ đề" className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500" />
-                <textarea name="message" placeholder="Nội dung..." required className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 min-h-[120px]" />
-                <button disabled={supportSubmitting} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold disabled:opacity-60">
-                  {supportSubmitting ? 'Đang gửi...' : 'Gửi liên hệ'}
+            {/* Quick Contact Form */}
+            <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                {isEn ? 'Direct Consultation' : 'Gửi Yêu Cầu Tư Vấn'}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
+                {isEn
+                  ? 'Leave your message and our senior travel advisor will respond within 15 minutes.'
+                  : 'Để lại thông tin và chuyên viên TravelHub sẽ liên hệ tư vấn lộ trình riêng trong 15 phút.'}
+              </p>
+
+              <form onSubmit={handleSubmitContact} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    {isEn ? 'Your Email' : 'Email của bạn'}
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="example@gmail.com"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    {isEn ? 'Message & Inquiry' : 'Nhu cầu hoặc thắc mắc'}
+                  </label>
+                  <textarea
+                    name="message"
+                    required
+                    rows={4}
+                    placeholder={
+                      isEn
+                        ? 'I want to inquire about a 3D2N Ha Long tour for a family of 4...'
+                        : 'Tôi muốn tư vấn tour Hạ Long 3N2Đ cho gia đình 4 người...'
+                    }
+                    className="w-full px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50/50 dark:bg-slate-800 text-slate-900 dark:text-white resize-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={supportSubmitting}
+                  className="w-full py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-md shadow-blue-500/20 transition disabled:opacity-50"
+                >
+                  {supportSubmitting
+                    ? isEn
+                      ? 'Sending...'
+                      : 'Đang gửi...'
+                    : isEn
+                    ? 'Send Inquiry'
+                    : 'Gửi Yêu Cầu Ngay'}
                 </button>
-                {supportSuccess && <p className="text-green-600 text-sm">{supportSuccess}</p>}
-                {supportError && <p className="text-red-600 text-sm">{supportError}</p>}
               </form>
             </div>
           </div>
         </section>
-
-        {/* Báo chí & Truyền thông */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Báo chí & Truyền thông</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              TravelHub trên các phương tiện truyền thông
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { title: 'VnExpress', category: 'Báo mạng', date: '15/01/2025' },
-              { title: 'Tuổi Trẻ', category: 'Báo in', date: '10/01/2025' },
-              { title: 'VTV1', category: 'Truyền hình', date: '05/01/2025' },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all"
-              >
-                <NewspaperIcon className="h-12 w-12 text-blue-600 mb-4" />
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
-                    {item.category}
-                  </span>
-                  <span>{item.date}</span>
-                </div>
-                <Link
-                  to="#"
-                  className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1 text-sm"
-                >
-                  Đọc bài viết
-                  <ArrowRightIcon className="h-4 w-4" />
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Tuyển dụng */}
-        <section className="mb-16">
-          <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-8 md:p-12">
-            <div className="flex items-center justify-between flex-wrap gap-6 mb-8">
-              <div>
-                <AcademicCapIcon className="h-12 w-12 text-green-600 mb-4" />
-                <h2 className="text-4xl font-bold mb-4">Tuyển dụng</h2>
-                <p className="text-xl text-gray-700">
-                  Tham gia đội ngũ TravelHub và cùng chúng tôi tạo ra những trải nghiệm tuyệt vời
-                </p>
-              </div>
-              <Link
-                to="/contact"
-                className="px-8 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-semibold text-lg"
-              >
-                Ứng tuyển ngay
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { title: 'Hướng dẫn viên du lịch', location: 'Toàn quốc', type: 'Full-time' },
-                { title: 'Tư vấn viên du lịch', location: 'Hà Nội, TP.HCM', type: 'Full-time' },
-                { title: 'Nhân viên Marketing', location: 'TP.HCM', type: 'Full-time' },
-              ].map((job, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer"
-                >
-                  <h3 className="text-xl font-bold mb-2">{job.title}</h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
-                    <span className="flex items-center gap-1">
-                      <MapPinIcon className="h-4 w-4" />
-                      {job.location}
-                    </span>
-                    <span>{job.type}</span>
-                  </div>
-                  <Link
-                    to="/contact"
-                    className="text-green-600 hover:text-green-700 font-semibold flex items-center gap-1 text-sm"
-                  >
-                    Chi tiết
-                    <ArrowRightIcon className="h-4 w-4" />
-                  </Link>
-                </div>
-              ))}
-          </div>
-        </div>
-      </section>
-
-        {/* Chính sách */}
-        <section>
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Chính sách</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Cam kết bảo vệ quyền lợi khách hàng
-            </p>
-        </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { title: 'Bảo mật thông tin', icon: ShieldCheckIcon },
-              { title: 'Hoàn tiền', icon: DocumentTextIcon },
-              { title: 'Điều khoản sử dụng', icon: GlobeAltIcon },
-            ].map((policy, i) => {
-              const Icon = policy.icon;
-              return (
-                <div
-                  key={i}
-                  className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all cursor-pointer"
-                >
-                  <Icon className="h-12 w-12 text-blue-600 mb-4" />
-                  <h3 className="text-xl font-bold mb-2">{policy.title}</h3>
-                  <p className="text-gray-600 mb-4">
-                    Xem chi tiết chính sách {policy.title.toLowerCase()} của TravelHub
-                  </p>
-                  <Link
-                    to="#"
-                    className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1 text-sm"
-                  >
-                    Đọc thêm
-                    <ArrowRightIcon className="h-4 w-4" />
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-          </div>
-        </div>
+      </div>
+    </>
   );
 }

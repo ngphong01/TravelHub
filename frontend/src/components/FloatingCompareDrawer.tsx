@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   XMarkIcon,
   ScaleIcon,
@@ -9,6 +9,7 @@ import {
   StarIcon
 } from '@heroicons/react/24/solid';
 import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export interface CompareTourItem {
   id: number;
@@ -34,10 +35,16 @@ export default function FloatingCompareDrawer({
   onClearAll,
 }: FloatingCompareDrawerProps) {
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const { language } = useLanguage();
+  const location = useLocation();
+  const isEn = language === 'en' || location.pathname.startsWith('/en/');
 
   if (selectedTours.length === 0) return null;
 
   const formatPrice = (val?: number) => {
+    if (isEn) {
+      return (val || 0).toLocaleString('en-US') + ' VND';
+    }
     return (val || 0).toLocaleString('vi-VN') + ' đ';
   };
 
@@ -76,9 +83,13 @@ export default function FloatingCompareDrawer({
           {/* Info text */}
           <div className="hidden sm:block">
             <p className="text-xs font-bold text-slate-200">
-              Đang chọn <span className="text-cyan-400 font-extrabold">{selectedTours.length}/3</span> tour
+              {isEn ? 'Selected ' : 'Đang chọn '}
+              <span className="text-cyan-400 font-extrabold">{selectedTours.length}/3</span>
+              {isEn ? ' tours' : ' tour'}
             </p>
-            <span className="text-[11px] text-slate-400">So sánh đối chiếu chi tiết</span>
+            <span className="text-[11px] text-slate-400">
+              {isEn ? 'Compare side-by-side specs' : 'So sánh đối chiếu chi tiết'}
+            </span>
           </div>
 
           {/* Action buttons */}
@@ -88,12 +99,12 @@ export default function FloatingCompareDrawer({
               className="px-4 py-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white font-bold text-xs shadow-md shadow-cyan-500/25 flex items-center gap-1.5 transition"
             >
               <ScaleIcon className="w-4 h-4" />
-              <span>So sánh ngay</span>
+              <span>{isEn ? 'Compare Now' : 'So sánh ngay'}</span>
             </button>
             <button
               onClick={onClearAll}
               className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition"
-              title="Xóa tất cả"
+              title={isEn ? 'Clear all' : 'Xóa tất cả'}
             >
               <XMarkIcon className="w-4 h-4" />
             </button>
@@ -113,10 +124,12 @@ export default function FloatingCompareDrawer({
                 </div>
                 <div>
                   <h3 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
-                    Bảng Đối Chiếu So Sánh Tour
+                    {isEn ? 'Tour Comparison Matrix' : 'Bảng Đối Chiếu So Sánh Tour'}
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-slate-400">
-                    Phân tích chi tiết giá vé, lịch trình và tiêu chuẩn dịch vụ để chọn hành trình tối ưu.
+                    {isEn
+                      ? 'Detailed breakdown of prices, schedules, and service standards to find your optimal trip.'
+                      : 'Phân tích chi tiết giá vé, lịch trình và tiêu chuẩn dịch vụ để chọn hành trình tối ưu.'}
                   </p>
                 </div>
               </div>
@@ -161,33 +174,47 @@ export default function FloatingCompareDrawer({
                     {/* Criteria Breakdown */}
                     <div className="space-y-3 text-xs mb-6">
                       <div className="flex justify-between py-1.5 border-b border-gray-200/60 dark:border-slate-700">
-                        <span className="text-gray-500 dark:text-slate-400">Giá vé người lớn</span>
+                        <span className="text-gray-500 dark:text-slate-400">
+                          {isEn ? 'Adult Ticket Price' : 'Giá vé người lớn'}
+                        </span>
                         <strong className="text-cyan-600 dark:text-cyan-400 font-black text-sm">
                           {formatPrice(tour.price)}
                         </strong>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-gray-200/60 dark:border-slate-700">
-                        <span className="text-gray-500 dark:text-slate-400">Thời lượng</span>
-                        <strong className="text-gray-800 dark:text-slate-200">{tour.duration || 3} ngày</strong>
+                        <span className="text-gray-500 dark:text-slate-400">
+                          {isEn ? 'Duration' : 'Thời lượng'}
+                        </span>
+                        <strong className="text-gray-800 dark:text-slate-200">
+                          {tour.duration || 3} {isEn ? 'Days' : 'ngày'}
+                        </strong>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-gray-200/60 dark:border-slate-700">
-                        <span className="text-gray-500 dark:text-slate-400">Điểm đến</span>
-                        <strong className="text-gray-800 dark:text-slate-200">{tour.destination || 'Việt Nam'}</strong>
+                        <span className="text-gray-500 dark:text-slate-400">
+                          {isEn ? 'Destination' : 'Điểm đến'}
+                        </span>
+                        <strong className="text-gray-800 dark:text-slate-200">{tour.destination || (isEn ? 'Vietnam' : 'Việt Nam')}</strong>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-gray-200/60 dark:border-slate-700">
-                        <span className="text-gray-500 dark:text-slate-400">Đánh giá</span>
+                        <span className="text-gray-500 dark:text-slate-400">
+                          {isEn ? 'Rating' : 'Đánh giá'}
+                        </span>
                         <span className="text-amber-500 font-bold flex items-center gap-1">
                           <StarIcon className="w-3.5 h-3.5" />
                           {tour.rating || 5.0} / 5.0
                         </span>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-gray-200/60 dark:border-slate-700">
-                        <span className="text-gray-500 dark:text-slate-400">Phương tiện</span>
-                        <strong className="text-gray-800 dark:text-slate-200">{tour.transport || 'Xe du lịch cao cấp'}</strong>
+                        <span className="text-gray-500 dark:text-slate-400">
+                          {isEn ? 'Transportation' : 'Phương tiện'}
+                        </span>
+                        <strong className="text-gray-800 dark:text-slate-200">{tour.transport || (isEn ? 'Premium Tourist Coach' : 'Xe du lịch cao cấp')}</strong>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-gray-200/60 dark:border-slate-700">
-                        <span className="text-gray-500 dark:text-slate-400">Tiêu chuẩn phòng</span>
-                        <strong className="text-gray-800 dark:text-slate-200">Khách sạn 3-4 sao</strong>
+                        <span className="text-gray-500 dark:text-slate-400">
+                          {isEn ? 'Hotel Standard' : 'Tiêu chuẩn phòng'}
+                        </span>
+                        <strong className="text-gray-800 dark:text-slate-200">{isEn ? '3 - 5 Star Hotel' : 'Khách sạn 3-5 sao'}</strong>
                       </div>
                     </div>
                   </div>
@@ -197,7 +224,7 @@ export default function FloatingCompareDrawer({
                     to={`/tours/${tour.slug}`}
                     className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/20 transition"
                   >
-                    <span>Xem chi tiết & Đặt</span>
+                    <span>{isEn ? 'View & Book' : 'Xem chi tiết & Đặt'}</span>
                     <ArrowRightIcon className="w-3.5 h-3.5" />
                   </Link>
                 </div>
