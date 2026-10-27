@@ -6,6 +6,7 @@ import { getTourById, getTourBySlug } from '../../services/tour';
 import { getHotelBySlug } from '../../services/hotel';
 import { getRestaurantBySlug } from '../../services/restaurant';
 import { useCart } from '../../contexts/CartContext';
+import { getAuthenticImage, handleImageError } from '../../utils/imageFallback';
 import {
   CreditCardIcon,
   BanknotesIcon,
@@ -17,6 +18,7 @@ import {
   TruckIcon,
   WifiIcon,
   SparklesIcon,
+  ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
 
 // Types
@@ -142,6 +144,19 @@ export default function CheckoutPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { items: cartItems, totalPrice: cartTotalPrice, clearCart } = useCart();
+
+  // Đọc danh sách giỏ hàng trực tiếp từ context hoặc fallback từ localStorage
+  const activeCartItems = useMemo(() => {
+    if (cartItems && cartItems.length > 0) return cartItems;
+    try {
+      const saved = localStorage.getItem('travelgo:cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  }, [cartItems]);
+
+  const isCartBooking = searchParams.get('from') === 'cart';
 
   // Form state
   const [amount, setAmount] = useState<string>('');
@@ -328,6 +343,7 @@ export default function CheckoutPage() {
   // Guest change handlers
   const handleGuestChange = useCallback(
     (newGuests: number) => {
+      if (isCartBooking) return; // Giỏ hàng giữ nguyên tổng tiền từng dịch vụ
       const g = Math.max(1, newGuests);
       setGuests(g);
       if (basePrice > 0) {
@@ -343,7 +359,7 @@ export default function CheckoutPage() {
         }
       }
     },
-    [basePrice, coupon]
+    [basePrice, coupon, isCartBooking]
   );
 
   // Copy to clipboard
@@ -600,9 +616,12 @@ export default function CheckoutPage() {
       if (qDiscount > 0) setDiscountPercent(qDiscount);
       if (qCoupon) setCoupon(qCoupon);
 
-      setAmount(String(cartTotalPrice || 0));
-      setBasePrice(cartTotalPrice || 0);
-      setDescription(`Thanh toán giỏ hàng TravelHub (${cartItems.length} dịch vụ)`);
+      const items = activeCartItems;
+      const total = items.reduce((sum: number, it: any) => sum + (Number(it.price) || 0) * (Number(it.guests) || 1), 0);
+
+      setAmount(String(total || cartTotalPrice || 0));
+      setBasePrice(0); // Cố định bằng 0 để không bị ô khách nhân biến dạng số tiền
+      setDescription(`Thanh toán giỏ hàng TravelHub (${items.length} dịch vụ)`);
       setIsLoadingData(false);
       return;
     }
@@ -740,7 +759,48 @@ export default function CheckoutPage() {
       // Create booking
       let bookingId: number;
 
-      if (isCombo) {
+      if (isCartBooking) {
+        // ========== CART BOOKING ==========
+        const totalItemsCount = activeCartItems.length;
+        const totalGuestsCount = activeCartItems.reduce((acc: number, it: any) => acc + (it.guests || 1), 0);
+        const itemsSummary = activeCartItems.map((it: any, idx: number) => {
+          const u = it.unitLabel || (it.type === 'hotel' ? 'phòng' : 'khách');
+          return `${idx + 1}. [${(it.type || 'TOUR').toUpperCase()}] ${it.title} | ${it.date || ''} | SL: ${it.guests} ${u} | Thành tiền: ${formatCurrency((it.price || 0) * (it.guests || 1))}đ`;
+        }).join('\n');
+
+        const bookingPayload: any = {
+          type: 'cart',
+          destination: 'cart',
+          destinationName: `Giỏ hàng (${totalItemsCount} dịch vụ)`,
+          guests: totalGuestsCount || 1,
+          name: userName,
+          email: userEmail,
+          price: finalAmount,
+          totalAmount: finalAmount,
+          paymentMethod: paymentMethodValue,
+          notes: `Đơn thanh toán giỏ hàng TravelHub:\n${itemsSummary}`,
+          items: activeCartItems,
+          addons: selectedAddonNames.length > 0 ? selectedAddonNames : undefined,
+        };
+
+        if (cardMeta) {
+          bookingPayload.cardInfo = cardMeta;
+        }
+
+        if (hasCoupon) {
+          bookingPayload.couponCode = appliedCoupon;
+          bookingPayload.discountAmount = discountAmount;
+        }
+
+        console.log('📦 Cart Booking Payload:', bookingPayload);
+
+        const booking = await BookingAPI.create(bookingPayload);
+        bookingId = (booking as any)?.id || (booking as any)?.booking?.id;
+
+        if (!bookingId) {
+          throw new Error('Không thể tạo đơn hàng giỏ hàng (thiếu mã đơn).');
+        }
+      } else if (isCombo) {
         // ========== COMBO BOOKING ==========
         const bookingPayload: any = {
           type: 'combo',
@@ -1344,6 +1404,100 @@ export default function CheckoutPage() {
     );
   };
 
+  // Render cart items breakdown
+  const renderCartBreakdown = () => {
+    if (!isCartBooking || activeCartItems.length === 0) return null;
+
+    return (
+      <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-5 border border-gray-200 dark:border-slate-700/80 mb-6">
+        <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-slate-700 mb-4">
+          <h4 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
+            <ShoppingBagIcon className="w-5 h-5 text-cyan-500" />
+            Chi tiết các dịch vụ trong đơn hàng ({activeCartItems.length} dịch vụ)
+          </h4>
+          <Link to="/cart" className="text-xs text-cyan-600 hover:text-cyan-500 font-semibold hover:underline">
+            Chỉnh sửa giỏ hàng
+          </Link>
+        </div>
+        <div className="space-y-3">
+          {activeCartItems.map((item: any, idx: number) => {
+            const unit = item.unitLabel || (item.type === 'hotel' ? 'phòng' : 'khách');
+            const sub = (Number(item.price) || 0) * (Number(item.guests) || 1);
+            return (
+              <div
+                key={item.id || idx}
+                className="flex items-center justify-between gap-4 p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 dark:bg-slate-800 flex-shrink-0 border border-gray-100 dark:border-slate-800">
+                    <img
+                      src={getAuthenticImage(item.image, item.title, item.type === 'hotel' ? 'hotel' : 'tour')}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => handleImageError(e, item.title, item.type === 'hotel' ? 'hotel' : 'tour')}
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-600 dark:bg-cyan-950/60 dark:text-cyan-400">
+                        {item.type === 'hotel'
+                          ? 'Khách sạn'
+                          : item.type === 'tour'
+                          ? 'Tour du lịch'
+                          : item.type === 'restaurant'
+                          ? 'Nhà hàng'
+                          : 'Dịch vụ'}
+                      </span>
+                      {item.roomType && (
+                        <span className="text-[11px] text-gray-500 dark:text-slate-400 font-medium">
+                          • {item.roomType}
+                        </span>
+                      )}
+                    </div>
+                    <h5 className="font-semibold text-sm text-gray-900 dark:text-white truncate mt-1">
+                      {item.title}
+                    </h5>
+                    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400 mt-1 flex-wrap">
+                      {item.date && (
+                        <span className="flex items-center gap-1">
+                          <CalendarDaysIcon className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                          <span>
+                            {item.type === 'hotel'
+                              ? 'Lưu trú: '
+                              : item.type === 'restaurant'
+                              ? 'Thời gian: '
+                              : 'Khởi hành: '}
+                            <strong className="text-gray-700 dark:text-slate-200">{item.date}</strong>
+                          </span>
+                        </span>
+                      )}
+                      <span>
+                        Số lượng: <strong className="text-gray-700 dark:text-slate-200">{item.guests} {unit}</strong>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <div className="font-bold text-sm text-gray-900 dark:text-white">
+                    {formatCurrency(sub)} VNĐ
+                  </div>
+                  <div className="text-[11px] text-gray-400">
+                    {formatCurrency(item.price)} VNĐ/{unit}
+                  </div>
+                  {item.discount && item.discount > 0 && (
+                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
+                      - {formatCurrency(item.discount)}đ ưu đãi
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   // Render booking info summary
   const renderBookingInfo = () => {
     if (!tourId && !destinationId && !isCombo) return null;
@@ -1397,11 +1551,13 @@ export default function CheckoutPage() {
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 overflow-hidden mb-6 transition-all">
           <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 px-8 py-6 text-white">
             <h1 className="text-3xl font-bold mb-2">
-              {isCombo ? 'Thanh toán combo' : 'Thanh toán tour'}
+              {isCombo ? 'Thanh toán combo' : isCartBooking ? 'Thanh toán giỏ hàng' : 'Thanh toán tour'}
             </h1>
             <p className="text-cyan-100 text-sm">
               {isCombo
                 ? 'Thanh toán trọn gói combo du lịch'
+                : isCartBooking
+                ? `Xác nhận và thanh toán trọn gói ${activeCartItems.length} dịch vụ trong giỏ hàng`
                 : 'Điền thông tin và xác nhận đặt dịch vụ'}
             </p>
           </div>
@@ -1485,7 +1641,10 @@ export default function CheckoutPage() {
           )}
 
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
-            {/* Booking Info Summary */}
+            {/* Cart Items Breakdown (nếu đặt từ giỏ hàng) */}
+            {renderCartBreakdown()}
+
+            {/* Booking Info Summary (nếu đặt lẻ) */}
             {renderBookingInfo()}
 
             {/* Amount Input */}
@@ -1513,7 +1672,7 @@ export default function CheckoutPage() {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500 dark:text-slate-400">
                   {isLoadingData ? (
-                    <span className="text-gray-400">Đang tải thông tin tour...</span>
+                    <span className="text-gray-400">Đang tải thông tin...</span>
                   ) : amount && Number(amount) > 0 ? (
                     <>
                       {discountPercent > 0 || totalAddons > 0 ? (
@@ -1539,13 +1698,18 @@ export default function CheckoutPage() {
                     <span className="text-gray-400">
                       {basePrice > 0
                         ? 'Vui lòng nhập số tiền'
-                        : 'Vui lòng nhập số tiền hoặc chọn tour từ trang chi tiết'}
+                        : 'Vui lòng chọn dịch vụ từ trang chi tiết'}
                     </span>
                   )}
                 </span>
-                {basePrice > 0 && !isLoadingData && amount && Number(amount) > 0 && (
+                {basePrice > 0 && !isLoadingData && amount && Number(amount) > 0 && !isCartBooking && (
                   <span className="text-gray-400">
                     (tự tính = giá tour × số khách)
+                  </span>
+                )}
+                {isCartBooking && amount && Number(amount) > 0 && (
+                  <span className="text-cyan-600 dark:text-cyan-400 font-semibold text-xs">
+                    (Tổng tiền {activeCartItems.length} dịch vụ trong giỏ)
                   </span>
                 )}
               </div>

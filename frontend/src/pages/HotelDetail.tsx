@@ -313,17 +313,23 @@ export default function HotelDetail() {
       target = roomTypes.find((r) => r.id === selectedId) || roomTypes[0];
     }
     const count = roomsCount[target.id] || 1;
-    const roomTotal = target.pricePerNight * count * totalNights;
+    const pricePerRoomStay = target.pricePerNight * totalNights;
+    const originalPricePerRoomStay = (target.originalPrice || target.pricePerNight) * totalNights;
 
     addItem({
       type: 'hotel',
       itemId: hotel.id,
       title: `${hotel.name} - ${target.name}`,
-      slug: hotel.slug,
-      price: roomTotal,
-      originalPrice: target.originalPrice * count * totalNights,
+      slug: hotel.slug || String(hotel.id),
+      price: pricePerRoomStay,
+      originalPrice: originalPricePerRoomStay,
       date: `${checkIn} đến ${checkOut} (${totalNights} đêm)`,
       guests: count,
+      unitLabel: 'phòng',
+      roomType: target.name,
+      checkIn,
+      checkOut,
+      nights: totalNights,
       location: hotel.city || 'Việt Nam',
       image: target.image || hotel.image || undefined,
     });

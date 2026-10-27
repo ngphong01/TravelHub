@@ -65,6 +65,19 @@ router.post('/', async (req, res) => {
         }
       });
     }
+    // ========== XỬ LÝ CART BOOKING ==========
+    else if (type === 'cart' || destination === 'cart') {
+      console.log('🎯 Processing CART booking');
+      dest = await prisma.destination.upsert({
+        where: { slug: 'cart' },
+        update: {},
+        create: {
+          name: 'Giỏ hàng TravelHub',
+          slug: 'cart',
+          description: 'Đơn đặt dịch vụ giỏ hàng'
+        }
+      });
+    }
     // ========== XỬ LÝ TOUR BOOKING ==========
     else if (tourId) {
       console.log('🎯 Processing TOUR booking with tourId:', tourId);

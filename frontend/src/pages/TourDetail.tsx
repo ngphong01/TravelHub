@@ -640,19 +640,26 @@ export default function TourDetail() {
       if (el) el.scrollIntoView({ behavior: 'smooth' });
       return;
     }
-    if (!tour) return;
+    const totalGuests = Math.max(1, adults + children);
+    // Tính đơn giá thực tế mỗi người sau khi đã trừ ưu đãi đặt trực tuyến (đảm bảo tổng giỏ hàng khớp grandTotal)
+    const effectivePricePerGuest = Math.round(grandTotal / totalGuests);
+
     addItem({
       type: 'tour',
       itemId: tour.id,
       title: `${tour.name} [${activePackage.name}]`,
       image: tour.image || undefined,
       slug: tour.slug,
-      price: pricePerAdult,
-      originalPrice: tour.originalPrice ? (tour.originalPrice + activePackage.priceDelta) : undefined,
+      price: effectivePricePerGuest,
+      originalPrice: pricePerAdult,
       date: selectedDate,
-      guests: adults + children,
+      guests: totalGuests,
+      unitLabel: 'khách',
       duration: tour.duration,
       location: tour.destination?.name,
+      adults,
+      children,
+      discount: memberDiscount > 0 ? memberDiscount : undefined,
     });
   };
 

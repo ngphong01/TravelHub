@@ -27,6 +27,20 @@ export default function CartPage() {
     return (amount || 0).toLocaleString('vi-VN') + ' đ';
   };
 
+  const getItemLink = (item: any) => {
+    if (item.type === 'tour') return `/tours/${item.slug}`;
+    if (item.type === 'hotel') return `/hotels/${item.slug}`;
+    if (item.type === 'restaurant') return `/restaurants/${item.slug}`;
+    return `/destinations/${item.slug}`;
+  };
+
+  const getItemUnitLabel = (item: any) => {
+    if (item.unitLabel) return item.unitLabel;
+    if (item.type === 'hotel') return 'phòng';
+    if (item.type === 'restaurant') return 'khách';
+    return 'khách';
+  };
+
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError(null);
@@ -150,16 +164,19 @@ export default function CartPage() {
                   >
                     {/* Item Image & Info */}
                     <div className="flex items-center gap-4 flex-1">
-                      <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-slate-800 flex-shrink-0 border border-gray-100 dark:border-slate-800">
+                      <Link
+                        to={getItemLink(item)}
+                        className="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-slate-800 flex-shrink-0 border border-gray-100 dark:border-slate-800 group"
+                      >
                         <img
                           src={getAuthenticImage(item.image, item.title, item.type === 'hotel' ? 'hotel' : 'tour')}
                           alt={item.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
                             handleImageError(e, item.title, item.type === 'hotel' ? 'hotel' : 'tour');
                           }}
                         />
-                      </div>
+                      </Link>
                       <div className="space-y-1">
                         <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 tracking-wider">
                           {item.type === 'tour'
@@ -171,20 +188,36 @@ export default function CartPage() {
                             : 'Điểm đến'}
                         </span>
                         <h3 className="font-bold text-gray-900 dark:text-white text-base line-clamp-1 hover:text-cyan-600 dark:hover:text-cyan-400 transition">
-                          <Link to={item.type === 'tour' ? `/tours/${item.slug}` : `/destinations/${item.slug}`}>
+                          <Link to={getItemLink(item)}>
                             {item.title}
                           </Link>
                         </h3>
                         {item.date && (
                           <p className="text-xs text-gray-500 dark:text-slate-400 flex items-center gap-1.5">
-                            <CalendarDaysIcon className="w-3.5 h-3.5 text-gray-400" />
-                            Ngày khởi hành: <span className="font-medium text-gray-700 dark:text-slate-200">{item.date}</span>
+                            <CalendarDaysIcon className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                            <span>
+                              {item.type === 'hotel'
+                                ? 'Thời gian lưu trú: '
+                                : item.type === 'restaurant'
+                                ? 'Thời gian dùng bữa: '
+                                : 'Ngày khởi hành: '}
+                              <strong className="font-medium text-gray-700 dark:text-slate-200">{item.date}</strong>
+                            </span>
                           </p>
                         )}
-                        <p className="text-sm font-bold text-cyan-600 dark:text-cyan-400">
-                          {formatPrice(item.price)}{' '}
-                          <span className="text-xs font-normal text-gray-500 dark:text-slate-400">/ người</span>
-                        </p>
+                        <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                          <p className="text-sm font-bold text-cyan-600 dark:text-cyan-400">
+                            {formatPrice(item.price)}{' '}
+                            <span className="text-xs font-normal text-gray-500 dark:text-slate-400">
+                              / {getItemUnitLabel(item)}
+                            </span>
+                          </p>
+                          {item.discount && item.discount > 0 && (
+                            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                              Đã giảm ưu đãi online: -{formatPrice(item.discount)}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -195,15 +228,17 @@ export default function CartPage() {
                         <button
                           onClick={() => updateGuests(item.id, Math.max(1, item.guests - 1))}
                           className="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition"
+                          title={`Giảm 1 ${getItemUnitLabel(item)}`}
                         >
                           -
                         </button>
-                        <span className="w-10 text-center font-semibold text-sm text-gray-800 dark:text-white">
-                          {item.guests}
+                        <span className="px-2.5 text-center font-semibold text-xs text-gray-800 dark:text-white whitespace-nowrap">
+                          {item.guests} {getItemUnitLabel(item)}
                         </span>
                         <button
                           onClick={() => updateGuests(item.id, item.guests + 1)}
                           className="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 font-bold transition"
+                          title={`Thêm 1 ${getItemUnitLabel(item)}`}
                         >
                           +
                         </button>
@@ -277,7 +312,7 @@ export default function CartPage() {
                   {/* Pricing Details */}
                   <div className="space-y-3 text-sm border-t border-gray-100 dark:border-slate-800 pt-4">
                     <div className="flex justify-between text-gray-600 dark:text-slate-400">
-                      <span>Tạm tính ({items.reduce((s, i) => s + i.guests, 0)} khách):</span>
+                      <span>Tạm tính ({items.length} dịch vụ):</span>
                       <span className="font-semibold text-gray-800 dark:text-slate-200">{formatPrice(totalPrice)}</span>
                     </div>
 

@@ -14,6 +14,14 @@ export interface CartItem {
   guests: number;
   location?: string;
   duration?: number | string;
+  unitLabel?: string; // 'phòng' | 'khách' | 'bàn'
+  roomType?: string;
+  checkIn?: string;
+  checkOut?: string;
+  nights?: number;
+  adults?: number;
+  children?: number;
+  discount?: number;
 }
 
 interface CartContextType {
@@ -49,7 +57,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items]);
 
   const addItem = (newItem: Omit<CartItem, 'id'>) => {
-    const id = `${newItem.type}-${newItem.itemId}-${newItem.date || 'default'}`;
+    const id = `${newItem.type}-${newItem.itemId}-${newItem.date || 'default'}-${newItem.roomType || ''}`;
     setItems((prev) => {
       const existingIndex = prev.findIndex((item) => item.id === id);
       if (existingIndex > -1) {
