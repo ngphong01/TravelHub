@@ -61,7 +61,7 @@ const LUXURY_COMBOS: ComboDeal[] = [
     originalPrice: 6200000,
     salePrice: 4340000,
     discount: 30,
-    imageUrl: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
+    imageUrl: '/images/destinations/phu-quoc.jpg',
     destination: 'Phú Quốc',
     duration: '4 ngày 3 đêm',
     rating: 4.9,

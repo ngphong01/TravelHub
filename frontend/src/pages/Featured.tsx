@@ -47,7 +47,7 @@ export default function Featured() {
   const topTours = [
     { id: 0, name: 'Paris Seine Cruise & Eiffel', bookings: 1680, price: 27800000, originalPrice: 32500000, discount: 14, Icon: MapPinIcon, imageUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80' },
     { id: 1, name: 'Combo Đà Lạt 3N2Đ', bookings: 1250, price: 4500000, originalPrice: 5600000, discount: 20, Icon: MapPinIcon, imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80' },
-    { id: 2, name: 'Tour Phú Quốc 4N3Đ', bookings: 980, price: 3570000, originalPrice: 4200000, discount: 15, Icon: SunIcon, imageUrl: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80' },
+    { id: 2, name: 'Tour Phú Quốc 4N3Đ', bookings: 980, price: 3570000, originalPrice: 4200000, discount: 15, Icon: SunIcon, imageUrl: '/images/destinations/phu-quoc.jpg' },
     { id: 3, name: 'Sapa 2 ngày trekking', bookings: 756, price: 2520000, originalPrice: 2800000, discount: 10, Icon: MapPinIcon, imageUrl: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80' },
     { id: 4, name: 'Hà Nội - Hạ Long - Ninh Bình', bookings: 650, price: 3344000, originalPrice: 3800000, discount: 12, Icon: BuildingOffice2Icon, imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80' },
     { id: 5, name: 'Combo Hội An - Đà Nẵng', bookings: 542, price: 2624000, originalPrice: 3200000, discount: 18, Icon: MapPinIcon, imageUrl: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80' },
@@ -101,7 +101,7 @@ export default function Featured() {
       location: 'Phú Quốc',
       type: 'Sự kiện',
       Icon: FireIcon,
-      imageUrl: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
+      imageUrl: '/images/destinations/phu-quoc.jpg',
       attendees: '100K+',
     },
   ];
@@ -663,7 +663,7 @@ export default function Featured() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
                   'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-                  'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=800&q=80',
+                  '/images/destinations/phu-quoc.jpg',
                   'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=800&q=80',
                   'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
                   'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80',

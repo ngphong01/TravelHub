@@ -51,7 +51,7 @@ const HERO_SLIDES = [
     link: '/tours/tour-da-nang-ba-na-hills-3n2d',
   },
   {
-    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1920&q=85',
+    image: '/images/destinations/phu-quoc.jpg',
     tag: 'Đảo Ngọc Phú Quốc',
     title: 'Thiên Đường Nghỉ Dưỡng Nhiệt Đới',
     subtitle: 'Hòa mình vào làn nước trong vắt bãi Sao, cáp treo vượt biển Hòn Thơm và ẩm thực bún quậy trứ danh.',
@@ -143,7 +143,7 @@ const FALLBACK_TOURS = [
     duration: '3 ngày 2 đêm',
     departureSchedule: 'Khởi hành hàng ngày',
     transport: 'Máy bay + Resort 5 Sao',
-    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/phu-quoc.jpg',
     rating: 4.92,
     reviewsCount: 1650,
     price: 3390000,
@@ -344,7 +344,7 @@ const TRAVEL_GUIDES = [
     title: 'Kinh nghiệm du lịch Phú Quốc 3N2Đ: Lịch trình tối ưu & Địa điểm check-in không thể bỏ lỡ',
     category: 'Cẩm nang biển đảo',
     readTime: '5 phút đọc',
-    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/phu-quoc.jpg',
     link: '/destinations/phu-quoc',
   },
   {

@@ -20,7 +20,7 @@ type SearchMode = 'tours' | 'hotels' | 'destinations';
 const POPULAR_TOURS = [
   { id: 1, name: 'Đà Nẵng - Hội An', tag: 'Biển & Di sản', image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=300&q=80' },
   { id: 2, name: 'Vịnh Hạ Long', tag: 'Kỳ quan thiên nhiên', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=300&q=80' },
-  { id: 3, name: 'Đảo Ngọc Phú Quốc', tag: 'Thiên đường nghỉ dưỡng', image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=300&q=80' },
+  { id: 3, name: 'Đảo Ngọc Phú Quốc', tag: 'Thiên đường nghỉ dưỡng', image: '/images/destinations/phu-quoc.jpg' },
   { id: 4, name: 'Sa Pa - Fansipan', tag: 'Săn mây & Núi rừng', image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=300&q=80' },
   { id: 5, name: 'Ninh Bình - Tràng An', tag: 'Non nước hữu tình', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=300&q=80' },
   { id: 6, name: 'Đà Lạt Mộng Mơ', tag: 'Khí hậu ôn đới', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80' },

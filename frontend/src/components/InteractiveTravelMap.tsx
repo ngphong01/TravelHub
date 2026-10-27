@@ -152,7 +152,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'south',
     top: '88%',
     left: '30%',
-    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=800&q=80',
+    image: '/images/destinations/phu-quoc.jpg',
     priceFrom: '3.490.000 đ',
     rating: 5.0,
     toursCount: 10,

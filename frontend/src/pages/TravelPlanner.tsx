@@ -61,7 +61,7 @@ interface GeneratedPlan {
 const PRESET_DESTINATIONS = [
   { id: 'da-nang', name: 'Đà Nẵng - Hội An', image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80' },
   { id: 'ha-long', name: 'Vịnh Hạ Long', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80' },
-  { id: 'phu-quoc', name: 'Đảo Ngọc Phú Quốc', image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=600&q=80' },
+  { id: 'phu-quoc', name: 'Đảo Ngọc Phú Quốc', image: '/images/destinations/phu-quoc.jpg' },
   { id: 'ninh-binh', name: 'Ninh Bình - Tràng An', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=600&q=80' },
   { id: 'da-lat', name: 'Đà Lạt Mộng Mơ', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80' },
   { id: 'ha-noi', name: 'Thủ Đô Hà Nội', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80' },

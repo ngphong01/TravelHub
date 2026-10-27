@@ -244,7 +244,7 @@ const FALLBACK_TOURS_LIST: Tour[] = [
     rating: 4.92,
     reviewCount: 1650,
     featured: true,
-    image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80',
+    image: '/images/destinations/phu-quoc.jpg',
     transport: 'Máy bay + Resort 5 Sao',
     departurePoint: 'Hà Nội / TP.HCM',
     destination: { id: 3, name: 'Đảo Ngọc Phú Quốc', slug: 'phu-quoc' },
