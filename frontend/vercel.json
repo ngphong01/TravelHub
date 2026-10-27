@@ -1,7 +1,7 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://wilderness-eng-phil-scenario.trycloudflare.com/api/$1" },
+    { "source": "/api/(.*)", "destination": "https://travelhub-yexb.onrender.com/api/$1" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
