@@ -43,9 +43,10 @@ async function main() {
     console.log('Using native mysql.exe client for high-speed import...');
     try {
       const sslFlag = targetUrl.includes('ssl-mode') || host.includes('aiven') ? '--ssl-mode=REQUIRED' : '';
-      const cmd = `& "${mysqlExe}" -h "${host}" -P ${port} -u "${user}" -p"${password}" ${sslFlag} "${database}" < "${dumpPath}"`;
-      execSync(`powershell -Command "${cmd}"`, { stdio: 'inherit' });
-      console.log('Database import completed successfully via mysql.exe!');
+      // In PowerShell, pipe Get-Content to native executable handles UTF-16/UTF-8 seamlessly
+      const cmd = `Get-Content -Path "${dumpPath}" | & "${mysqlExe}" -h "${host}" -P ${port} -u "${user}" -p"${password}" ${sslFlag} "${database}"`;
+      execSync(`powershell -ExecutionPolicy Bypass -Command "${cmd}"`, { stdio: 'inherit' });
+      console.log('✅ Database import completed successfully via mysql.exe!');
       return;
     } catch (err) {
       console.warn('Native mysql.exe import encountered an error, falling back to mysql2 JS engine...', err.message);
@@ -65,10 +66,18 @@ async function main() {
   });
 
   console.log('Connected! Reading SQL dump...');
-  const sqlContent = fs.readFileSync(dumpPath, 'utf8');
+  const buffer = fs.readFileSync(dumpPath);
+  let sqlContent;
+  if (buffer[0] === 0xff && buffer[1] === 0xfe) {
+    sqlContent = buffer.toString('utf16le');
+  } else {
+    sqlContent = buffer.toString('utf8');
+  }
+
+  console.log(`Executing SQL script (${Math.round(sqlContent.length / 1024)} KB)...`);
   await conn.query(sqlContent);
   await conn.end();
-  console.log('Database import completed successfully via mysql2!');
+  console.log('✅ Database import completed successfully via mysql2!');
 }
 
 main().catch(err => {

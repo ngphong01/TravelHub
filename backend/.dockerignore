@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+.env
+uploads
+database_dump.sql
+database_dump_utf8.sql
+scripts/aiven_automator.py

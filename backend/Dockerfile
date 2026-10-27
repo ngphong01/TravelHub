@@ -2,16 +2,15 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install build dependencies if needed
+# Install build dependencies
 RUN apk add --no-cache openssl
 
-# Install production dependencies
+# Copy package files and prisma directory
 COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy prisma and generate client
 COPY prisma ./prisma/
-RUN npx prisma generate
+
+# Install dependencies (runs postinstall prisma generate successfully)
+RUN npm install
 
 # Copy source code
 COPY . .
@@ -22,3 +21,4 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 CMD ["npm", "start"]
+

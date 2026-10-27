@@ -109,4 +109,11 @@ coverage/
 *.temp
 cloudflared.exe
 *.exe
-backend/database_dump.sql
+backend/database_dump.sql
+backend/database_dump_utf8.sql
+backend/scripts/aiven_automator.py
+backend/scripts/fix-table-names.js
+backend/scripts/test-prisma.js
+screenshot*.png
+crop_*.png
+
