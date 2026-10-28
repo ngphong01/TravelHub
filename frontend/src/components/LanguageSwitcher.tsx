@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useI18n } from '../hooks/useI18n';
 import { ChevronDownIcon, CheckIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
   const { t, language, changeLanguage, currentLanguage, supportedLanguages } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -42,13 +42,13 @@ export default function LanguageSwitcher() {
       <button
         onClick={handleToggle}
         type="button"
-        className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${variant === 'dark' ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'}`}
         aria-label={t('common:selectLanguage')}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         <GlobeAltIcon className="h-5 w-5" />
-        <span className="hidden sm:inline font-medium">{currentLanguage.nativeLabel}</span>
+        <span className="hidden lg:inline font-medium">{currentLanguage.nativeLabel}</span>
         <ChevronDownIcon className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 

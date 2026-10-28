@@ -606,7 +606,7 @@ export default function Stories() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-cyan-500 via-teal-500 to-sky-500 text-white py-16">
+      <section className="relative overflow-hidden bg-[#003580] text-white py-10 sm:py-12">
         {/* Animated Background */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute inset-0" style={{
@@ -625,7 +625,7 @@ export default function Stories() {
               <BookOpenIcon className="h-6 w-6" />
               <span className="font-semibold">TravelHub Stories</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3">
               Câu chuyện du lịch
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
@@ -653,7 +653,7 @@ export default function Stories() {
                 onClick={() => setActiveTab(tab.id as StoryType)}
                 className={`flex items-center gap-2 px-6 py-3 font-semibold border-b-2 transition-colors ${
                   activeTab === tab.id
-                    ? 'border-purple-500 text-purple-500'
+                    ? 'border-blue-600 text-blue-700'
                     : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >

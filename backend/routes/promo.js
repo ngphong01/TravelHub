@@ -5,6 +5,23 @@ const prisma = require('../lib/prisma');
 const { authRequired, isAdmin } = require('../middleware/auth');
 const { promoLimiter } = require('../middleware/rateLimit');
 
+// Public catalogue uses the same validity rules as checkout validation.
+router.get('/active', async (req, res) => {
+  try {
+    const now = new Date();
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 50));
+    const promos = await prisma.promoCode.findMany({
+      where: { active: true, validFrom: { lte: now }, validUntil: { gte: now } },
+      orderBy: { validUntil: 'asc' },
+      take: limit,
+    });
+    res.json(promos.filter((promo) => !promo.usageLimit || promo.usedCount < promo.usageLimit));
+  } catch (error) {
+    console.error('Error listing active promo codes:', error);
+    res.status(500).json({ message: 'Không tải được mã giảm giá' });
+  }
+});
+
 // GET /api/promo/validate/:code - Validate promo code (public)
 router.get('/validate/:code', promoLimiter, async (req, res) => {
   try {
@@ -54,6 +71,7 @@ router.get('/validate/:code', promoLimiter, async (req, res) => {
     } else {
       discountAmount = promoCode.discountValue;
     }
+    discountAmount = Math.min(discountAmount, Math.max(0, Number(amount) || 0));
 
     res.json({
       valid: true,
@@ -127,6 +145,7 @@ router.post('/apply', authRequired, async (req, res) => {
     } else {
       discountAmount = promoCode.discountValue;
     }
+    discountAmount = Math.min(discountAmount, Math.max(0, Number(amount) || 0));
 
     res.json({
       success: true,

@@ -203,129 +203,6 @@ const FALLBACK_DESTINATIONS: Destination[] = [
   },
 ];
 
-const FALLBACK_TOURS_LIST: Tour[] = [
-  {
-    id: 101,
-    name: 'Tour Hạ Long 2N1Đ - Du Thuyền 5 Sao Đẳng Cấp Heritage',
-    slug: 'tour-ha-long-2n1d-du-thuyen-5-sao',
-    duration: 2,
-    price: 2490000,
-    originalPrice: 3890000,
-    rating: 4.9,
-    reviewCount: 1420,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe Limousine Dcar',
-    departurePoint: 'Hà Nội',
-    destination: { id: 1, name: 'Vịnh Hạ Long', slug: 'ha-long' },
-  },
-  {
-    id: 102,
-    name: 'Tour Đà Nẵng - Cầu Vàng Bà Nà Hills - Phố Cổ Hội An',
-    slug: 'tour-da-nang-ba-na-hills-3n2d',
-    duration: 3,
-    price: 2990000,
-    originalPrice: 4500000,
-    rating: 4.85,
-    reviewCount: 980,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Máy bay khứ hồi + Ô tô',
-    departurePoint: 'TP. Hồ Chí Minh',
-    destination: { id: 2, name: 'Đà Nẵng & Hội An', slug: 'da-nang' },
-  },
-  {
-    id: 103,
-    name: 'Nghỉ Dưỡng Đảo Ngọc Phú Quốc - Cáp Treo Hòn Thơm 3N2Đ',
-    slug: 'nghi-duong-phu-quoc-3n2d',
-    duration: 3,
-    price: 3390000,
-    originalPrice: 5200000,
-    rating: 4.92,
-    reviewCount: 1650,
-    featured: true,
-    image: '/images/destinations/phu-quoc.jpg',
-    transport: 'Máy bay + Resort 5 Sao',
-    departurePoint: 'Hà Nội / TP.HCM',
-    destination: { id: 3, name: 'Đảo Ngọc Phú Quốc', slug: 'phu-quoc' },
-  },
-  {
-    id: 104,
-    name: 'Tour Sa Pa - Chinh Phục Đỉnh Fansipan - Bản Cát Cát',
-    slug: 'tour-sa-pa-fansipan-2n1d',
-    duration: 2,
-    price: 1890000,
-    originalPrice: 2600000,
-    rating: 4.8,
-    reviewCount: 760,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe giường nằm Cabin đôi',
-    departurePoint: 'Hà Nội',
-    destination: { id: 4, name: 'Sa Pa - Fansipan', slug: 'sa-pa' },
-  },
-  {
-    id: 105,
-    name: 'Khám Phá Ninh Bình - Tràng An - Hang Múa - Bái Đính Trong Ngày',
-    slug: 'tour-ninh-binh-trang-an-1-ngay',
-    duration: 1,
-    price: 850000,
-    originalPrice: 1200000,
-    rating: 4.9,
-    reviewCount: 1120,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe du lịch máy lạnh cao cấp',
-    departurePoint: 'Hà Nội',
-    destination: { id: 5, name: 'Ninh Bình - Tràng An', slug: 'ninh-binh' },
-  },
-  {
-    id: 106,
-    name: 'Tour Khám Phá Cao Nguyên Đá Hà Giang - Đèo Mã Pí Lèng',
-    slug: 'tour-ha-giang-ma-pi-leng-3n2d',
-    duration: 3,
-    price: 2650000,
-    originalPrice: 3500000,
-    rating: 4.95,
-    reviewCount: 890,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe Limousine + Xe máy bản địa',
-    departurePoint: 'Hà Nội',
-    destination: { id: 10, name: 'Cao Nguyên Hà Giang', slug: 'ha-giang' },
-  },
-  {
-    id: 107,
-    name: 'Đà Lạt Săn Mây - Thung Lũng Tình Yêu - Đồi Chè Cầu Đất 3N2Đ',
-    slug: 'tour-da-lat-san-may-3n2d',
-    duration: 3,
-    price: 2150000,
-    originalPrice: 2900000,
-    rating: 4.88,
-    reviewCount: 820,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe Limousine cao cấp',
-    departurePoint: 'TP. Hồ Chí Minh',
-    destination: { id: 6, name: 'Đà Lạt Mộng Mơ', slug: 'da-lat' },
-  },
-  {
-    id: 108,
-    name: 'Tour Hà Nội City Tour - Tràng An Bái Đính - Hạ Long 4N3Đ',
-    slug: 'tour-ha-noi-trang-an-ha-long-4n3d',
-    duration: 4,
-    price: 3890000,
-    originalPrice: 5100000,
-    rating: 4.91,
-    reviewCount: 640,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe ô tô du lịch + Du thuyền',
-    departurePoint: 'Hà Nội',
-    destination: { id: 7, name: 'Thủ Đô Hà Nội', slug: 'ha-noi' },
-  },
-];
-
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================
@@ -882,33 +759,13 @@ export default function Destinations() {
     error: toursError 
   } = useQuery({
     queryKey: ['tours', currentPage, tourApiParams, i18n.language],
-    queryFn: async () => {
-      try {
-        const res = await getToursPaged(currentPage, PAGINATION.PAGE_SIZE, tourApiParams);
-        if (res?.items?.length) return res;
-      } catch (err) {
-        // Fallback
-      }
-      let filtered = [...FALLBACK_TOURS_LIST];
-      if (tourApiParams.q) {
-        const q = tourApiParams.q.toLowerCase();
-        filtered = filtered.filter(t => t.name.toLowerCase().includes(q) || (t.destination?.name && t.destination.name.toLowerCase().includes(q)));
-      }
-      if (tourApiParams.minPrice) filtered = filtered.filter(t => (t.price || 0) >= tourApiParams.minPrice!);
-      if (tourApiParams.maxPrice) filtered = filtered.filter(t => (t.price || 0) <= tourApiParams.maxPrice!);
-      return {
-        items: filtered,
-        total: filtered.length,
-        page: currentPage,
-        pageSize: PAGINATION.PAGE_SIZE,
-      };
-    },
+    queryFn: () => getToursPaged(currentPage, PAGINATION.PAGE_SIZE, tourApiParams),
     enabled: currentViewMode === 'tours',
   });
 
   // Sort tours client-side
   const sortedToursList = useMemo(() => {
-    const tourItems = (toursResponse?.items?.length ? toursResponse.items : FALLBACK_TOURS_LIST);
+    const tourItems = toursResponse?.items || [];
     
     switch (filters.sortBy) {
       case 'price-asc':
@@ -925,7 +782,7 @@ export default function Destinations() {
   // Calculate totals
   const totalItems = currentViewMode === 'destinations' 
     ? (destinationsResponse?.total ?? FALLBACK_DESTINATIONS.length)
-    : (toursResponse?.total ?? FALLBACK_TOURS_LIST.length);
+    : (toursResponse?.total ?? 0);
   const totalPages = Math.ceil(totalItems / PAGINATION.PAGE_SIZE) || 1;
   
   const destinationsList = destinationsResponse?.items?.length ? destinationsResponse.items : FALLBACK_DESTINATIONS;
@@ -997,7 +854,7 @@ export default function Destinations() {
       />
 
       {/* Hero Header with Animated Background */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-slate-950 via-cyan-950 to-teal-950 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-cyan-800/30">
+      <div className="relative overflow-hidden bg-[#003580] text-white py-8 px-4 sm:px-6 lg:px-8 border-b border-blue-800">
         <TravelAnimatedBackground
           className="z-0 opacity-40"
           intensity="vibrant"
@@ -1008,7 +865,7 @@ export default function Destinations() {
             <MapPinIcon className="w-4 h-4 text-cyan-400" />
             Khám Phá Danh Thắng & Kỳ Quan
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-cyan-100 to-teal-200 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
             Điểm Đến & Trải Nghiệm Hấp Dẫn
           </h1>
           <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto">

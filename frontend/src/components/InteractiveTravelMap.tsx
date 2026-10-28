@@ -70,7 +70,7 @@ const VIETNAM_PINS: MapPin[] = [
     region: 'north',
     top: '24%',
     left: '49%',
-    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=800&q=80',
+    image: '/images/destinations/ninh-binh.jpg',
     priceFrom: '1.250.000 đ',
     rating: 4.9,
     toursCount: 5,

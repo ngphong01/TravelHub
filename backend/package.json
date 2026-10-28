@@ -6,7 +6,7 @@
     "start": "node index.js",
     "dev": "node index.js",
     "demo": "cross-env DATABASE_URL=mysql://root:123456@localhost:3306/travelgo_demo node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test test/**/*.test.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:seed": "node prisma/seed.js",

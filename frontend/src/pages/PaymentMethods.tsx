@@ -72,7 +72,7 @@ export default function PaymentMethods() {
 
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-indigo-900 to-slate-900 text-white py-16 lg:py-24">
+        <section className="relative overflow-hidden bg-[#003580] text-white py-10 sm:py-12">
           <div className="absolute inset-0 opacity-20 pointer-events-none">
             <div 
               className="w-full h-full"
@@ -88,11 +88,11 @@ export default function PaymentMethods() {
               <ShieldCheckIcon className="h-4 w-4 text-emerald-300 animate-pulse" />
               <span>Bảo Mật Giao Dịch Chuẩn Quốc Tế PCI-DSS</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-5 tracking-tight text-white">
-              Hình Thức <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-sky-200 to-teal-200">Thanh Toán</span>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3 tracking-tight text-white">
+              Hình thức thanh toán
             </h1>
-            <p className="text-lg text-blue-100/90 max-w-2xl mx-auto font-light leading-relaxed mb-8">
-              Hệ thống thanh toán đa kênh thông minh, nhanh chóng, minh bạch và an toàn 100% cho mọi du khách.
+            <p className="text-base text-blue-100 max-w-2xl mx-auto leading-relaxed">
+              Xem các phương thức và các bước thanh toán cho dịch vụ của bạn.
             </p>
           </div>
         </section>

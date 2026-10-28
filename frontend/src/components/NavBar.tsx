@@ -516,17 +516,17 @@ export default function NavBar() {
         </nav>
 
         {/* Auth Area */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1 sm:gap-2.5">
           <Link 
             to="/orders" 
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors whitespace-nowrap"
+            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors whitespace-nowrap"
           >
             <CreditCardIcon className="h-4 w-4 flex-shrink-0" />
             <span className="whitespace-nowrap">Đặt chỗ</span>
           </Link>
           
           {/* 🔥 CRITICAL: Language Switcher - Hiển thị luôn, bất kể đã đăng nhập hay chưa */}
-          <LanguageSwitcher />
+          <LanguageSwitcher variant="dark" />
 
           {/* Cart Icon Button - Opens CartSlideDrawer */}
           <button
@@ -616,7 +616,7 @@ export default function NavBar() {
           ) : (
             <Link 
               to="/signin" 
-              className="px-3.5 py-1.5 text-xs sm:text-sm font-bold text-[#003580] bg-white hover:bg-blue-50 rounded-lg shadow-sm transition-all whitespace-nowrap"
+              className="hidden lg:inline-flex px-3.5 py-1.5 text-xs sm:text-sm font-bold text-[#003580] bg-white hover:bg-blue-50 rounded-lg shadow-sm transition-all whitespace-nowrap"
             >
               Đăng nhập
             </Link>
@@ -626,7 +626,9 @@ export default function NavBar() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setOpen(!open)}
-          className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="lg:hidden p-2 text-white rounded-lg hover:bg-white/10 transition-colors"
+          aria-label={open ? 'Đóng menu' : 'Mở menu'}
+          aria-expanded={open}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -638,6 +640,11 @@ export default function NavBar() {
       {open && (
         <div className="lg:hidden bg-white border-t border-gray-100 py-4">
           <div className="container flex flex-col gap-2">
+            <Link to="/orders" onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50 rounded-lg">
+              <CreditCardIcon className="h-5 w-5" />
+              Đặt chỗ
+            </Link>
+            {!user && <Link to="/signin" onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50 rounded-lg">Đăng nhập</Link>}
             {/* Khám phá Dropdown Mobile */}
             <div className="relative">
               <button

@@ -37,20 +37,15 @@ export default function ReviewSection({ type, targetId, slug, title }: ReviewSec
   const [selectedStarFilter, setSelectedStarFilter] = useState<number | null>(null);
 
   // Query reviews
-  const { data: reviews = [], isLoading } = useQuery<Review[]>({
+  const { data: reviews = [], isLoading, isError, refetch } = useQuery<Review[]>({
     queryKey: ['reviews', type, targetId || slug],
     queryFn: async () => {
-      try {
-        if (type === 'tour') {
-          const res = await api.get(`/tour/${targetId}/reviews`);
-          return res.data || [];
-        } else {
-          const res = await api.get(`/review/slug/${slug}`);
-          return res.data || [];
-        }
-      } catch (err) {
-        console.error('Failed to fetch reviews', err);
-        return [];
+      if (type === 'tour') {
+        const res = await api.get(`/tour/${targetId}/reviews`);
+        return res.data || [];
+      } else {
+        const res = await api.get(`/review/slug/${slug}`);
+        return res.data || [];
       }
     },
     enabled: !!(targetId || slug),
@@ -113,25 +108,16 @@ export default function ReviewSection({ type, targetId, slug, title }: ReviewSec
   const totalReviews = reviews.length;
   const avgRating =
     totalReviews > 0
-      ? (reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / totalReviews).toFixed(1)
-      : '5.0';
+      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
+      : '—';
 
   const starCounts = [5, 4, 3, 2, 1].map((s) => {
     const count = reviews.filter((r) => Math.round(r.rating) === s).length;
-    const percent = totalReviews > 0 ? (count / totalReviews) * 100 : s === 5 ? 85 : 15;
+    const percent = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
     return { star: s, count, percent };
   });
 
-  const [travelerCategoryFilter, setTravelerCategoryFilter] = useState<string>('all');
-  const [selectedPhotoModal, setSelectedPhotoModal] = useState<string | null>(null);
 
-  // Sample authentic traveler photos for Tripadvisor gallery
-  const travelerPhotos = [
-    { url: '/uploads/tours/halong-sunset.jpg', caption: 'Hoàng hôn trên vịnh tuyệt đẹp, chụp bằng iPhone 15', author: 'Lê Minh Huy' },
-    { url: '/uploads/tours/halong-luxury-cabin.jpg', caption: 'Phòng VIP du thuyền view biển rất sang trọng và sạch sẽ', author: 'Trần Thu Thảo' },
-    { url: '/uploads/tours/halong-seafood-dinner.jpg', caption: 'Bữa tối hải sản tươi rói trong tour rất đầy đặn', author: 'Nguyễn Đăng Khoa' },
-    { url: '/uploads/tours/danang-cauvang.jpg', caption: 'Hướng dẫn viên nhiệt tình check-in Cầu Vàng cho cả đoàn', author: 'Phạm Thuỳ Linh' },
-  ];
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-200/80 dark:border-slate-800 p-6 sm:p-10 shadow-sm mt-10 transition-colors">
@@ -140,131 +126,36 @@ export default function ReviewSection({ type, targetId, slug, title }: ReviewSec
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-300 text-xs font-bold mb-2">
             <CheckBadgeIcon className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-            Đánh giá theo chuẩn Tripadvisor
+            Đánh giá TravelHub
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
             <ChatBubbleBottomCenterTextIcon className="w-7 h-7 text-cyan-600 dark:text-cyan-400" />
             Đánh Giá & Nhận Xét Từ Cộng Đồng
           </h2>
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-            Tổng hợp nhận xét thực tế 100% từ du khách đã tham gia và trải nghiệm {title}
+            Nhận xét đã được duyệt về {title}
           </p>
         </div>
       </div>
 
-      {/* Tripadvisor Review Metrics Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10 pb-8 border-b border-gray-100 dark:border-slate-800">
-        {/* Left: Overall Big Score */}
-        <div className="lg:col-span-4 bg-gradient-to-br from-cyan-50 via-teal-50 to-indigo-50/30 dark:from-slate-800 dark:to-slate-850 rounded-2xl p-6 text-center flex flex-col items-center justify-center border border-cyan-100/60 dark:border-slate-700">
-          <span className="text-5xl font-black text-cyan-600 dark:text-cyan-400 tracking-tight">{avgRating}</span>
-          <div className="flex items-center text-amber-400 my-2">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <StarSolid key={i} className="w-5 h-5" />
-            ))}
-          </div>
-          <span className="text-sm font-bold text-gray-900 dark:text-white">Tuyệt vời</span>
-          <span className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-            Dựa trên {totalReviews || 128} lượt đánh giá thực tế
-          </span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 pb-8 border-b border-gray-100 dark:border-slate-800">
+        <div className="rounded-2xl bg-cyan-50 dark:bg-slate-800 p-6 text-center">
+          <span className="text-4xl font-bold text-cyan-700 dark:text-cyan-300">{avgRating}</span>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{totalReviews} đánh giá đã duyệt</p>
         </div>
-
-        {/* Center: Stars Breakdown */}
-        <div className="lg:col-span-4 space-y-2.5 flex flex-col justify-center">
-          <span className="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-            Phân bổ điểm số
-          </span>
-          {starCounts.map((sc) => (
-            <div key={sc.star} className="flex items-center gap-3 text-xs">
-              <span className="w-12 font-medium text-gray-700 dark:text-slate-300 flex items-center gap-1">
-                {sc.star} <StarSolid className="w-3.5 h-3.5 text-amber-400" />
-              </span>
-              <div className="flex-1 h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-amber-400 rounded-full transition-all duration-500"
-                  style={{ width: `${sc.percent}%` }}
-                ></div>
+        <div className="space-y-2">
+          {starCounts.map((item) => (
+            <div key={item.star} className="flex items-center gap-3 text-sm">
+              <span className="w-8">{item.star} ★</span>
+              <div className="h-2 flex-1 rounded bg-gray-100 dark:bg-slate-700">
+                <div className="h-2 rounded bg-amber-400" style={{ width: `${item.percent}%` }} />
               </div>
-              <span className="w-10 text-right text-gray-400 dark:text-slate-500">{Math.round(sc.percent)}%</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Right: Tripadvisor Sub-ratings Criteria */}
-        <div className="lg:col-span-4 flex flex-col justify-center space-y-3 bg-gray-50/70 dark:bg-slate-800/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">
-          <span className="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider">
-            Tiêu chí đánh giá
-          </span>
-          {[
-            { label: 'Vị trí & Cảnh quan', score: '4.9', percent: 98 },
-            { label: 'Chất lượng dịch vụ', score: '4.8', percent: 96 },
-            { label: 'Đáng giá tiền', score: '4.7', percent: 94 },
-            { label: 'Vệ sinh & An toàn', score: '4.9', percent: 98 },
-          ].map((item, idx) => (
-            <div key={idx} className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-600 dark:text-slate-300">{item.label}</span>
-                <span className="font-bold text-gray-900 dark:text-white">{item.score} / 5</span>
-              </div>
-              <div className="h-1.5 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div className="h-full bg-cyan-600 dark:bg-cyan-400 rounded-full" style={{ width: `${item.percent}%` }} />
-              </div>
+              <span className="w-8 text-right">{item.count}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Tripadvisor Traveler Photos Gallery */}
-      <div className="mb-10 pb-8 border-b border-gray-100 dark:border-slate-800">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              📸 Ảnh thực tế do du khách cung cấp
-            </h3>
-            <p className="text-xs text-gray-500 dark:text-slate-400">Hình ảnh chân thật từ hành trình, không qua xử lý của công ty tour</p>
-          </div>
-          <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold cursor-pointer hover:underline">
-            Xem tất cả (128 ảnh)
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {travelerPhotos.map((photo, i) => (
-            <div
-              key={i}
-              onClick={() => setSelectedPhotoModal(photo.url)}
-              className="group relative h-28 sm:h-36 rounded-2xl overflow-hidden cursor-pointer border border-gray-200 dark:border-slate-800 shadow-sm"
-            >
-              <img
-                src={photo.url}
-                alt={photo.caption}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2.5 text-white">
-                <p className="text-[11px] font-semibold line-clamp-2">{photo.caption}</p>
-                <span className="text-[10px] text-gray-300 mt-0.5">Bởi: {photo.author}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Lightbox Modal for Photo */}
-      {selectedPhotoModal && (
-        <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
-          onClick={() => setSelectedPhotoModal(null)}
-        >
-          <div className="relative max-w-3xl w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl p-2" onClick={(e) => e.stopPropagation()}>
-            <img src={selectedPhotoModal} alt="Preview" className="w-full max-h-[80vh] object-contain rounded-2xl" />
-            <button
-              onClick={() => setSelectedPhotoModal(null)}
-              className="absolute top-4 right-4 bg-black/60 text-white rounded-full p-2 hover:bg-black transition"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Submit Review Form */}
       <form
@@ -351,7 +242,7 @@ export default function ReviewSection({ type, targetId, slug, title }: ReviewSec
             <h3 className="text-base font-bold text-gray-900 dark:text-white">
               Đánh giá từ khách hàng ({reviews.length})
             </h3>
-            <p className="text-xs text-gray-500 dark:text-slate-400">Phản hồi thực tế từ các du khách đã trải nghiệm dịch vụ</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400">Nhận xét đã được duyệt</p>
           </div>
 
           {/* Star Filter Tabs */}
@@ -386,33 +277,12 @@ export default function ReviewSection({ type, targetId, slug, title }: ReviewSec
           </div>
         </div>
 
-        {/* Tripadvisor Traveler Type Filter Pills */}
-        <div className="flex items-center gap-2 flex-wrap pb-2">
-          <span className="text-xs font-bold text-gray-500 dark:text-slate-400">Đối tượng đi:</span>
-          {[
-            { id: 'all', label: 'Tất cả đối tượng' },
-            { id: 'couple', label: 'Cặp đôi (Couples)' },
-            { id: 'family', label: 'Gia đình (Family)' },
-            { id: 'friends', label: 'Nhóm bạn (Friends)' },
-            { id: 'solo', label: 'Đi một mình (Solo)' },
-          ].map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setTravelerCategoryFilter(cat.id)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition border ${
-                travelerCategoryFilter === cat.id
-                  ? 'bg-cyan-50 dark:bg-cyan-950/40 border-cyan-500 text-cyan-700 dark:text-cyan-300'
-                  : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:border-gray-300'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
 
         {/* Reviews List */}
         {isLoading ? (
           <p className="text-xs text-gray-400 italic">Đang tải đánh giá...</p>
+        ) : isError ? (
+          <div role="alert" className="text-sm text-red-700">Không tải được đánh giá. <button type="button" onClick={() => refetch()} className="underline">Thử lại</button></div>
         ) : reviews.length === 0 ? (
           <div className="text-center py-8 bg-gray-50 dark:bg-slate-800/40 rounded-2xl border border-gray-100 dark:border-slate-800">
             <p className="text-sm text-gray-500 dark:text-slate-400">Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá!</p>
@@ -423,7 +293,6 @@ export default function ReviewSection({ type, targetId, slug, title }: ReviewSec
             const dateStr = rev.date || rev.createdAt ? new Date(rev.date || rev.createdAt!).toLocaleDateString('vi-VN') : 'Gần đây';
             const reviewId = rev.id || idx;
             const extraVotes = helpfulVotes[String(reviewId)] || 0;
-            const sampleTravelType = ['Cặp đôi', 'Gia đình', 'Nhóm bạn', 'Du lịch nghỉ dưỡng'][idx % 4];
 
             return (
               <div
@@ -440,10 +309,7 @@ export default function ReviewSection({ type, targetId, slug, title }: ReviewSec
                         <h4 className="font-bold text-gray-900 dark:text-white text-sm">{author}</h4>
                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                           <CheckBadgeIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                          Đã trải nghiệm tour
-                        </span>
-                        <span className="text-[11px] font-medium text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
-                          {sampleTravelType}
+                          Đã duyệt
                         </span>
                       </div>
                       <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-0.5">{dateStr}</p>

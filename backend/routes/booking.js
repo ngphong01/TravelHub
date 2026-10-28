@@ -4,6 +4,11 @@ const prisma = require('../lib/prisma');
 const { authRequired } = require('../middleware/auth');
 const { sendBookingConfirmationEmail } = require('../lib/email');
 
+const hasPublishedRefundPolicy = (policies) =>
+  policies && typeof policies === 'object' &&
+  typeof policies.cancellation === 'string' && policies.cancellation.trim() &&
+  typeof policies.refund === 'string' && policies.refund.trim();
+
 // Tạo mã booking ngẫu nhiên
 const generateBookingCode = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -17,6 +22,31 @@ const generateBookingCode = () => {
 // POST /api/booking - Tạo booking mới
 router.post('/', async (req, res) => {
   try {
+    if (req.body.type === 'combo' || req.body.comboId) {
+      return res.status(422).json({ message: 'Đặt combo trực tuyến tạm dừng cho đến khi lịch, số đêm và giá được xác thực.' });
+    }
+    if (['hotel', 'restaurant'].includes(req.body.type) ||
+        (req.body.type === 'cart' && Array.isArray(req.body.items) &&
+          req.body.items.some(item => ['hotel', 'restaurant'].includes(item?.type)))) {
+      return res.status(422).json({ message: 'Khách sạn và nhà hàng chưa có dữ liệu phòng/bàn trống được xác thực. Chưa thể nhận thanh toán trực tuyến.' });
+    }
+    if (req.body.type === 'cart') {
+      if (!Array.isArray(req.body.items) || !req.body.items.length) {
+        return res.status(422).json({ message: 'Giỏ hàng chưa có dịch vụ hợp lệ.' });
+      }
+      for (const item of req.body.items) {
+        if (item?.type !== 'tour' || !Number.isInteger(Number(item.itemId))) {
+          return res.status(422).json({ message: 'Giỏ hàng có dịch vụ chưa được xác thực.' });
+        }
+        const cartTour = await prisma.tour.findUnique({ where: { id: Number(item.itemId) } });
+        if (!cartTour || !hasPublishedRefundPolicy(cartTour.policies)) {
+          return res.status(422).json({ message: 'Tour trong giỏ chưa công bố chính sách hoàn hủy. Chưa thể thanh toán trực tuyến.' });
+        }
+        if (Number(item.children) > 0 && cartTour.childPrice == null) {
+          return res.status(422).json({ message: 'Tour trong giỏ chưa công bố giá trẻ em.' });
+        }
+      }
+    }
     console.log('📦 Booking Request Body:', JSON.stringify(req.body, null, 2));
 
     const {
@@ -39,6 +69,7 @@ router.post('/', async (req, res) => {
       totalAmount,
       paymentMethod,
       couponCode,
+      promoBaseAmount,
       discountPercent,
       discountAmount,
       cardMeta,
@@ -49,6 +80,7 @@ router.post('/', async (req, res) => {
     let dest = null;
     let tour = null;
     let userId = null;
+    let isAuthenticatedBooking = false;
 
     // ========== XỬ LÝ COMBO BOOKING ==========
     if (type === 'combo' || comboId) {
@@ -90,6 +122,12 @@ router.post('/', async (req, res) => {
       if (!tour) {
         console.log('❌ Tour not found with id:', tourId);
         return res.status(404).json({ message: 'Tour not found' });
+      }
+      if (!hasPublishedRefundPolicy(tour.policies)) {
+        return res.status(422).json({ message: 'Tour chưa công bố chính sách hoàn hủy. Chưa thể thanh toán trực tuyến.' });
+      }
+      if (Number(children) > 0 && tour.childPrice == null) {
+        return res.status(422).json({ message: 'Tour chưa công bố giá trẻ em.' });
       }
       
       console.log('✅ Found tour:', tour.name, '| destinationId:', tour.destinationId);
@@ -157,6 +195,12 @@ router.post('/', async (req, res) => {
         });
         
         if (tour) {
+          if (!hasPublishedRefundPolicy(tour.policies)) {
+            return res.status(422).json({ message: 'Tour chưa công bố chính sách hoàn hủy. Chưa thể thanh toán trực tuyến.' });
+          }
+          if (Number(children) > 0 && tour.childPrice == null) {
+            return res.status(422).json({ message: 'Tour chưa công bố giá trẻ em.' });
+          }
           console.log('✅ Found tour by slug:', tour.name);
           
           // Nếu tour có destinationId
@@ -222,6 +266,7 @@ router.post('/', async (req, res) => {
         const jwt = require('jsonwebtoken');
         const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
         userId = decoded.userId || decoded.id;
+        isAuthenticatedBooking = Boolean(userId);
         console.log('✅ User authenticated:', userId);
       } catch (err) {
         console.log('⚠️ Token invalid, continuing without userId');
@@ -260,10 +305,13 @@ router.post('/', async (req, res) => {
     }
 
     // ========== XỬ LÝ PROMO CODE ==========
-    let finalAmount = totalAmount || price;
+    let finalAmount = Number(totalAmount || price);
     let appliedPromo = null;
 
     if (couponCode) {
+      if (!isAuthenticatedBooking) {
+        return res.status(401).json({ message: 'Vui lòng đăng nhập để sử dụng mã giảm giá.' });
+      }
       const promo = await prisma.promoCode.findFirst({
         where: {
           code: couponCode.toUpperCase(),
@@ -273,27 +321,29 @@ router.post('/', async (req, res) => {
         }
       });
 
-      if (promo) {
-        if (promo.discountType === 'PERCENTAGE') {
-          const discount = Math.round(price * (promo.discountValue / 100));
-          finalAmount = Math.max(0, price - (promo.maxDiscount ? Math.min(discount, promo.maxDiscount) : discount));
-        } else {
-          finalAmount = Math.max(0, price - promo.discountValue);
-        }
-        appliedPromo = promo;
-        console.log('✅ Applied promo:', couponCode, '| Discount:', price - finalAmount);
-        
-        // Update promo usage count
-        await prisma.promoCode.update({
-          where: { id: promo.id },
-          data: { usedCount: { increment: 1 } }
-        });
+      const baseAmount = Number(promoBaseAmount);
+      if (!promo || !Number.isFinite(baseAmount) || baseAmount <= 0 || baseAmount < promo.minAmount ||
+          (promo.usageLimit && promo.usedCount >= promo.usageLimit)) {
+        return res.status(400).json({ message: 'Mã giảm giá không hợp lệ hoặc đã hết hiệu lực' });
       }
+      const rawDiscount = promo.discountType === 'PERCENTAGE'
+        ? Math.floor(baseAmount * promo.discountValue / 100)
+        : promo.discountValue;
+      const expectedDiscount = Math.min(baseAmount, promo.maxDiscount ? Math.min(rawDiscount, promo.maxDiscount) : rawDiscount);
+      const priorUse = await prisma.promoCodeUsage.findFirst({
+        where: { promoCodeId: promo.id, userId },
+      });
+      if (priorUse) {
+        return res.status(400).json({ message: 'Bạn đã sử dụng mã giảm giá này rồi' });
+      }
+      if (Number(discountAmount) !== expectedDiscount || finalAmount !== Number(price)) {
+        return res.status(400).json({ message: 'Số tiền giảm giá không khớp mã ưu đãi' });
+      }
+      appliedPromo = promo;
     }
 
-    // Nếu có discountAmount từ frontend
     if (discountAmount && !appliedPromo) {
-      finalAmount = Math.max(0, price - discountAmount);
+      return res.status(400).json({ message: 'Giảm giá phải có mã ưu đãi hợp lệ' });
     }
 
     // ========== SERVER-SIDE PRICE TAMPERING PROTECTION ==========
@@ -332,6 +382,12 @@ router.post('/', async (req, res) => {
         }
       }
     });
+    if (appliedPromo) {
+      await prisma.promoCode.update({
+        where: { id: appliedPromo.id },
+        data: { usedCount: { increment: 1 } },
+      });
+    }
     console.log('✅ Booking created:', booking.id, booking.code);
 
     // ========== TẠO PAYMENT RECORD ==========

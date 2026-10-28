@@ -307,7 +307,7 @@ export default function DestinationDetail() {
         </div>
 
         {/* Hero Section with Parallax Effect */}
-        <section className="relative h-[70vh] min-h-[600px] overflow-hidden">
+        <section className="relative h-[55vh] min-h-[420px] max-h-[620px] overflow-hidden">
           {/* Background Image with Parallax */}
           <div className="absolute inset-0" style={{ transform: `translateY(${scrolled ? '50px' : '0'})`, transition: 'transform 0.3s ease-out' }}>
             <img
@@ -342,7 +342,7 @@ export default function DestinationDetail() {
           </div>
 
           {/* Content */}
-          <div className="absolute bottom-0 left-0 right-0 pb-12">
+          <div className="absolute bottom-0 left-0 right-0 pb-6 sm:pb-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               {/* Tags */}
               {destination.featured && (
@@ -361,12 +361,12 @@ export default function DestinationDetail() {
               )}
 
               {/* Title */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 drop-shadow-2xl">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-lg">
                 {destination.name}
               </h1>
 
               {/* Info Cards */}
-              <div className="flex flex-wrap gap-4 mb-6">
+              <div className="flex flex-wrap gap-3 mb-4">
                 {destination.country && (
                   <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-3 border border-white/20">
                     <div className="flex items-center gap-2">
@@ -385,12 +385,6 @@ export default function DestinationDetail() {
                 )}
               </div>
 
-              {/* Short Description */}
-              {destination.description && (
-                <p className="text-white/90 text-xl max-w-4xl leading-relaxed backdrop-blur-sm">
-                  {destination.description.substring(0, 200)}...
-                </p>
-              )}
             </div>
           </div>
         </section>
@@ -673,7 +667,7 @@ export default function DestinationDetail() {
 
                   <button
                     onClick={() => navigate(`/destinations?destination=${destination.name}&view=tours`)}
-                    className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <TicketIcon className="w-5 h-5" />
                     Xem các tour tại đây
@@ -683,24 +677,24 @@ export default function DestinationDetail() {
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
                       <CheckBadgeIcon className="w-5 h-5 text-green-600" />
-                      <span className="font-semibold text-gray-900">{relatedTours.length}+</span>
+                      <span className="font-semibold text-gray-900">{relatedTours.length}</span>
                       <span>tour có sẵn</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Contact Buttons */}
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl shadow-xl p-6 border border-green-100">
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-slate-200">
                   <h3 className="font-bold text-gray-900 mb-4 text-center">Cần hỗ trợ?</h3>
                   <div className="space-y-3">
                     <a
                       href="tel:0868156027"
-                      className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg"
+                      className="w-full flex items-center justify-center gap-2 py-3 border border-blue-700 text-blue-700 rounded-xl font-semibold hover:bg-blue-50 transition-colors"
                     >
                       <PhoneIcon className="w-5 h-5" />
                       Gọi: 0868156027
                     </a>
-                    <button className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg">
+                    <button onClick={() => navigate('/chatbot')} className="w-full flex items-center justify-center gap-2 py-3 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors">
                       <ChatBubbleLeftRightIcon className="w-5 h-5" />
                       Chat ngay
                     </button>

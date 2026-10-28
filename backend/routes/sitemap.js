@@ -16,7 +16,7 @@ router.get('/sitemap.xml', async (req, res) => {
 
     // Get all published blogs
     const blogs = await prisma.blog.findMany({
-      where: { isPublished: true },
+      where: { published: true },
       select: { slug: true, updatedAt: true },
     });
 

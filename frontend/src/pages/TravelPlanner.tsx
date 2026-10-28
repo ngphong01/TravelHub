@@ -64,7 +64,7 @@ const PRESET_DESTINATIONS = [
   { id: 'da-nang', name: 'Đà Nẵng - Hội An', nameEn: 'Da Nang - Hoi An', image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80' },
   { id: 'ha-long', name: 'Vịnh Hạ Long', nameEn: 'Ha Long Bay', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80' },
   { id: 'phu-quoc', name: 'Đảo Ngọc Phú Quốc', nameEn: 'Phu Quoc Island', image: '/images/destinations/phu-quoc.jpg' },
-  { id: 'ninh-binh', name: 'Ninh Bình - Tràng An', nameEn: 'Ninh Binh - Trang An', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=600&q=80' },
+  { id: 'ninh-binh', name: 'Ninh Bình - Tràng An', nameEn: 'Ninh Binh - Trang An', image: '/images/destinations/ninh-binh.jpg' },
   { id: 'da-lat', name: 'Đà Lạt Mộng Mơ', nameEn: 'Da Lat City', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80' },
   { id: 'ha-noi', name: 'Thủ Đô Hà Nội', nameEn: 'Hanoi Capital', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80' },
   { id: 'sa-pa', name: 'Sa Pa - Fansipan', nameEn: 'Sa Pa - Fansipan', image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=600&q=80' },
@@ -736,14 +736,14 @@ export default function TravelPlanner() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
         {/* Hero Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-900 via-indigo-950 to-slate-950 p-8 md:p-12 text-center text-white shadow-2xl border border-indigo-800/40">
+        <div className="relative overflow-hidden rounded-2xl bg-[#003580] p-6 md:p-8 text-center text-white shadow-sm border border-blue-800">
           <TravelAnimatedBackground className="z-0 opacity-40" intensity="vibrant" showDrifters={true} />
           <div className="relative z-10 max-w-3xl mx-auto space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-cyan-300 text-xs md:text-sm font-semibold border border-white/15 shadow-sm">
               <CalendarDaysIcon className="w-4 h-4 text-cyan-400" />
               <span>{isEn ? 'Smart AI Travel Itinerary & Budget Generator' : 'Công Cụ Gợi Ý Lịch Trình & Chi Phí Thông Minh'}</span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-white via-cyan-200 to-indigo-200 bg-clip-text text-transparent tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
               {isEn ? 'Plan Your Trip & Estimate Budget' : 'Lập Kế Hoạch & Dự Toán Chi Phí Du Lịch'}
             </h1>
             <p className="text-slate-300 text-sm md:text-base leading-relaxed">

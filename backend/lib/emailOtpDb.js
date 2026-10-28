@@ -255,8 +255,9 @@ async function cleanupExpiredOTPs() {
   return result.count;
 }
 
-// Auto cleanup every 15 minutes
-setInterval(cleanupExpiredOTPs, 15 * 60 * 1000);
+// Auto cleanup every 15 minutes. The database cleanup must not be the only
+// active handle keeping a CLI command or test process alive.
+setInterval(cleanupExpiredOTPs, 15 * 60 * 1000).unref();
 
 // ============================================================================
 // MAIN FUNCTIONS

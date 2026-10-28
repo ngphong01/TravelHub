@@ -24,7 +24,7 @@ export default function PromoCodes() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [filterTab, setFilterTab] = useState<'all' | 'percent' | 'fixed' | 'expiring'>('all');
 
-  const { data: promos, isLoading } = useQuery({
+  const { data: promos, isLoading, isError, refetch } = useQuery({
     queryKey: ['promos', 'active'],
     queryFn: () => getActivePromos(50),
   });
@@ -70,13 +70,13 @@ export default function PromoCodes() {
     <>
       <SEOHead
         title="Kho Voucher & Mã Giảm Giá Du Lịch - TravelHub"
-        description="Tổng hợp mã giảm giá tour, khách sạn, vé vui chơi mới nhất hôm nay. Sao chép mã và nhận ưu đãi đặt tour lên đến 50% cùng TravelHub."
+        description="Xem các mã giảm giá còn hiệu lực và điều kiện áp dụng tại TravelHub."
         url="/promo-codes"
       />
 
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-blue-900 to-slate-900 text-white py-16 lg:py-24">
+        <section className="relative overflow-hidden bg-[#003580] text-white py-10 sm:py-12">
           <div className="absolute inset-0 opacity-20 pointer-events-none">
             <div 
               className="w-full h-full"
@@ -92,34 +92,14 @@ export default function PromoCodes() {
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 dark:bg-white/5 border border-white/20 backdrop-blur-md rounded-full text-blue-200 text-sm font-semibold mb-6 shadow-sm">
               <SparklesIcon className="h-4 w-4 text-amber-300 animate-pulse" />
-              <span>Kho Ưu Đãi Độc Quyền TravelHub 2026</span>
+              <span>Mã ưu đãi TravelHub</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-5 tracking-tight text-white">
-              Săn Mã Giảm Giá <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-rose-300 to-blue-200">Du Lịch Hôm Nay</span>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3 tracking-tight text-white">
+              Mã giảm giá du lịch
             </h1>
-            <p className="text-lg sm:text-xl text-blue-100/90 max-w-2xl mx-auto font-light leading-relaxed mb-8">
-              Lưu ngay voucher đặt tour trọn gói, phòng khách sạn và vé tham quan với mức chiết khấu cực sốc.
+            <p className="text-base text-blue-100 max-w-2xl mx-auto leading-relaxed">
+              Chọn mã còn hiệu lực và xem điều kiện áp dụng trước khi đặt dịch vụ.
             </p>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 border-t border-white/10">
-              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-                <div className="text-2xl font-black text-amber-300">{activePromos.length}+</div>
-                <div className="text-xs text-blue-200 mt-0.5">Mã đang mở dùng</div>
-              </div>
-              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-                <div className="text-2xl font-black text-emerald-300">50%</div>
-                <div className="text-xs text-blue-200 mt-0.5">Mức giảm cao nhất</div>
-              </div>
-              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-                <div className="text-2xl font-black text-cyan-300">100%</div>
-                <div className="text-xs text-blue-200 mt-0.5">Áp dụng tức thì</div>
-              </div>
-              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-                <div className="text-2xl font-black text-rose-300">0đ</div>
-                <div className="text-xs text-blue-200 mt-0.5">Phí nhận mã</div>
-              </div>
-            </div>
           </div>
         </section>
 
@@ -186,6 +166,11 @@ export default function PromoCodes() {
                 </div>
               ))}
             </div>
+          ) : isError ? (
+            <div role="alert" className="text-center py-16 bg-white rounded-2xl">
+              <p className="font-bold mb-3">Không tải được kho voucher.</p>
+              <button type="button" onClick={() => refetch()} className="rounded-lg bg-blue-600 px-4 py-2 text-white">Thử lại</button>
+            </div>
           ) : filteredPromos.length === 0 ? (
             <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
               <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-4">
@@ -193,7 +178,7 @@ export default function PromoCodes() {
               </div>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Chưa tìm thấy mã phù hợp</h3>
               <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
-                Vui lòng thử chọn danh mục khác hoặc quay lại vào khung giờ vàng tiếp theo.
+                Hiện chưa có mã còn hiệu lực cho bộ lọc này.
               </p>
               <button
                 onClick={() => setFilterTab('all')}

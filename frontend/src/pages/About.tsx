@@ -88,30 +88,30 @@ export default function About() {
   const pillars = [
     {
       icon: ShieldCheckIcon,
-      titleVi: 'Minh bạch 100% — Không phí ẩn',
-      titleEn: '100% Transparent — Zero Hidden Fees',
+      titleVi: 'Thông tin giá và điều kiện đặt dịch vụ',
+      titleEn: 'Prices and booking terms',
       descVi:
-        'Giá hiển thị là mức giá thanh toán trọn gói cuối cùng. Mọi dịch vụ kèm theo, thuế phí hay ưu đãi đều được công khai chi tiết và cam kết hoàn tiền nếu có sai lệch.',
+        'Giá hiển thị là giá niêm yết. Vui lòng kiểm tra các khoản thuế, phí, dịch vụ kèm theo và điều kiện hoàn hủy của từng đơn trước khi thanh toán.',
       descEn:
-        'The displayed price is the final all-inclusive rate. Every inclusion, tax, or discount is published clearly with a money-back guarantee.',
+        'Displayed prices are listed rates. Check taxes, fees, inclusions and refund terms before payment.',
     },
     {
       icon: SparklesIcon,
-      titleVi: 'Đối tác tuyển chọn chất lượng cao',
-      titleEn: 'Strictly Verified Premium Partners',
+      titleVi: 'Thông tin đối tác dịch vụ',
+      titleEn: 'Service partner information',
       descVi:
-        'Tất cả khách sạn, hãng tàu du thuyền, nhà hàng và xe vận chuyển Limousine đều trải qua quy trình đánh giá thực tế nghiêm ngặt trước khi hợp tác.',
+        'Thông tin khách sạn, nhà hàng và đối tác vận chuyển được cập nhật theo dữ liệu hiện có. Tình trạng chỗ cần được xác nhận trước khi đặt.',
       descEn:
-        'All partner hotels, luxury cruise lines, restaurants, and limousine fleets undergo rigorous on-site verification before listing.',
+        'Hotel, restaurant and transport details use available catalog data. Availability must be confirmed before booking.',
     },
     {
       icon: CheckBadgeIcon,
-      titleVi: 'Xác nhận tức thì & Vé điện tử QR',
-      titleEn: 'Instant Confirmation & QR E-Tickets',
+      titleVi: 'Theo dõi đơn đặt dịch vụ',
+      titleEn: 'Track your booking',
       descVi:
-        'Quy trình đặt chỗ hoàn toàn tự động hóa. Nhận ngay vé điện tử và mã QR xác nhận qua Email và SMS chỉ sau 30 giây thanh toán an toàn.',
+        'Xem trạng thái đơn đặt dịch vụ trong tài khoản. TravelHub chỉ xác nhận dịch vụ sau khi kiểm tra đủ thông tin và điều kiện áp dụng.',
       descEn:
-        'Fully automated reservation system. Receive your instant e-ticket and QR check-in voucher via email and SMS within 30 seconds.',
+        'Track booking status in your account. TravelHub confirms services after checking the details and applicable terms.',
     },
     {
       icon: UserGroupIcon,
@@ -145,8 +145,8 @@ export default function About() {
     {
       qVi: 'Chính sách hủy tour và hoàn tiền tại TravelHub ra sao?',
       qEn: 'What is TravelHub cancellation and refund policy?',
-      aVi: 'Phần lớn các tour và phòng nghỉ đều hỗ trợ hủy miễn phí trước 24h - 48h khởi hành. Tiền hoàn sẽ được chuyển tự động về tài khoản ngân hàng hoặc thẻ của quý khách trong 2 - 5 ngày làm việc theo đúng chính sách minh bạch.',
-      aEn: 'Most tours and hotels support free cancellation 24-48 hours before departure. Refunds are automatically processed back to your original payment method within 2-5 business days.',
+      aVi: 'Điều kiện hủy và hoàn tiền phụ thuộc vào chính sách của từng tour hoặc phòng nghỉ. Vui lòng xác nhận chính sách áp dụng cho đơn của mình trước khi thanh toán.',
+      aEn: 'Cancellation and refunds follow the policy of the selected tour or hotel. Please confirm the policy for your booking before payment.',
     },
     {
       qVi: 'Tôi có thể liên hệ trực tiếp với bộ phận chăm sóc khách hàng bằng cách nào?',
@@ -298,7 +298,7 @@ export default function About() {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6 text-white">
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/90 text-xs font-bold text-white mb-2 shadow-sm">
-                    <CheckBadgeIcon className="w-4 h-4" /> 100% Khách sạn & Tour Được Kiểm Định
+                    <CheckBadgeIcon className="w-4 h-4" /> Xem thông tin và điều kiện từng dịch vụ
                   </div>
                   <h3 className="text-xl font-bold">Vịnh Hạ Long — Kỳ Quan Thiên Nhiên Thế Giới</h3>
                   <p className="text-xs text-slate-200 mt-1">Trải nghiệm du thuyền Heritage 5 sao đẳng cấp quốc tế độc quyền tại TravelHub</p>

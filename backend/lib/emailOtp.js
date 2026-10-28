@@ -118,8 +118,9 @@ function cleanupExpiredOTPs() {
   }
 }
 
-// Auto cleanup every 15 minutes
-setInterval(cleanupExpiredOTPs, OTP_CONFIG.cleanupIntervalMinutes * 60 * 1000);
+// Auto cleanup every 15 minutes. Do not keep a process alive solely for this
+// best-effort maintenance task (important for scripts and automated tests).
+setInterval(cleanupExpiredOTPs, OTP_CONFIG.cleanupIntervalMinutes * 60 * 1000).unref();
 
 // ============================================================================
 // EMAIL TEMPLATE

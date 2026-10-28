@@ -63,7 +63,7 @@ setInterval(() => {
       otpRateLimiter.delete(key);
     }
   }
-}, 60000); // Every minute
+}, 60000).unref(); // Every minute
 
 // ============================================================================
 // ROUTES

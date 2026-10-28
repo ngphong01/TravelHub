@@ -353,14 +353,16 @@ router.post('/login', authLimiter, async (req, res) => {
     const token = signToken(user);
     const refreshToken = await createRefreshToken(user.id);
     
-    // Send login notification email
-    try {
-      const { sendLoginNotificationEmail } = require('../lib/email');
-      sendLoginNotificationEmail(safe).catch(err => {
-        console.error('❌ Failed to send login notification email:', err);
-      });
-    } catch (emailError) {
-      console.error('❌ Error sending login notification email:', emailError);
+    // Test requests must not trigger external email delivery.
+    if (process.env.NODE_ENV !== 'test') {
+      try {
+        const { sendLoginNotificationEmail } = require('../lib/email');
+        sendLoginNotificationEmail(safe).catch(err => {
+          console.error('❌ Failed to send login notification email:', err);
+        });
+      } catch (emailError) {
+        console.error('❌ Error sending login notification email:', emailError);
+      }
     }
     
     res.json({ user: safe, token, refreshToken });

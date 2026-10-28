@@ -22,7 +22,7 @@ const POPULAR_TOURS = [
   { id: 2, name: 'Vịnh Hạ Long', tag: 'Kỳ quan thiên nhiên', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=300&q=80' },
   { id: 3, name: 'Đảo Ngọc Phú Quốc', tag: 'Thiên đường nghỉ dưỡng', image: '/images/destinations/phu-quoc.jpg' },
   { id: 4, name: 'Sa Pa - Fansipan', tag: 'Săn mây & Núi rừng', image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=300&q=80' },
-  { id: 5, name: 'Ninh Bình - Tràng An', tag: 'Non nước hữu tình', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=300&q=80' },
+  { id: 5, name: 'Ninh Bình - Tràng An', tag: 'Non nước hữu tình', image: '/images/destinations/ninh-binh.jpg' },
   { id: 6, name: 'Đà Lạt Mộng Mơ', tag: 'Khí hậu ôn đới', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80' },
 ];
 
@@ -37,7 +37,7 @@ const POPULAR_HOTELS = [
 
 const POPULAR_DESTINATIONS = [
   { id: 1, name: 'Vịnh Hạ Long', tag: 'Kỳ quan Thiên nhiên Thế giới (UNESCO)', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=300&q=80' },
-  { id: 2, name: 'Quần thể Tràng An', tag: 'Di sản Văn hóa & Thiên nhiên Kép', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=300&q=80' },
+  { id: 2, name: 'Quần thể Tràng An', tag: 'Di sản Văn hóa & Thiên nhiên Kép', image: '/images/destinations/ninh-binh.jpg' },
   { id: 3, name: 'Phố cổ Hội An', tag: 'Di sản Văn hóa & Đèn lồng lung linh', image: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=300&q=80' },
   { id: 4, name: 'Hà Giang', tag: 'Công viên Địa chất Toàn cầu Đồng Văn', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=300&q=80' },
   { id: 5, name: 'Phong Nha - Kẻ Bàng', tag: 'Vương quốc hang động thạch nhũ', image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=300&q=80' },

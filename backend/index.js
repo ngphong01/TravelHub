@@ -38,6 +38,7 @@ const allowedOrigins = [
   'https://www.daophong.id.vn',
   /^https:\/\/.*\.vercel\.app$/,
   ...(process.env.NODE_ENV !== 'production' ? [
+    /^http:\/\/127\.0\.0\.1:300[0-3]$/,
     /^https:\/\/.*\.trycloudflare\.com$/,
     /^https:\/\/.*\.devtunnels\.ms$/
   ] : []),
@@ -480,7 +481,9 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
-// Start the server
+// Start background work only when this file is executed directly. Tests can
+// import the Express app without starting schedulers or modifying data.
+if (require.main === module) {
 startServer();
 
 // Periodically clean up expired password reset tokens (every 1 minute)
@@ -503,3 +506,6 @@ setInterval(async () => {
     // ignore cleanup errors
   }
 }, 60 * 1000);
+}
+
+module.exports = { app, startServer };

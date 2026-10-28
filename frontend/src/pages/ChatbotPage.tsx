@@ -29,6 +29,7 @@ export default function ChatbotPage() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [lastFailedPrompt, setLastFailedPrompt] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const samplePrompts = [
@@ -60,15 +61,21 @@ export default function ChatbotPage() {
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setLoading(true);
+    setLastFailedPrompt(null);
 
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 20000);
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ message: query })
       });
+
+      if (!response.ok) throw new Error(`Chat service returned ${response.status}`);
 
       const data = await response.json();
       const botReply = data.reply || data.response || 'Xin lỗi, em đang gặp sự cố kết nối. Quý khách vui lòng thử lại sau ít phút hoặc liên hệ hotline 0868156027.';
@@ -82,14 +89,16 @@ export default function ChatbotPage() {
 
       setMessages(prev => [...prev, botMsg]);
     } catch (error) {
+      setLastFailedPrompt(query);
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'bot',
-        text: 'Dạ hiện tại hệ thống AI đang phản hồi chậm. Anh/chị có thể xem thêm mục "Giải đáp thắc mắc (FAQ)" hoặc gọi trực tiếp hotline để được hỗ trợ tức thì ạ.',
+        text: 'Dịch vụ tư vấn chưa phản hồi trong 20 giây hoặc đang gián đoạn. Anh/chị có thể thử lại hoặc xem mục Giải đáp thắc mắc (FAQ).',
         time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, botMsg]);
     } finally {
+      window.clearTimeout(timer);
       setLoading(false);
     }
   };
@@ -200,6 +209,9 @@ export default function ChatbotPage() {
           </div>
 
           {/* Quick Prompt Chips */}
+          {lastFailedPrompt && !loading && (
+            <button type="button" onClick={() => handleSend(lastFailedPrompt)} className="mb-3 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white">Thử gửi lại câu hỏi</button>
+          )}
           <div className="mb-4">
             <div className="text-xs font-semibold text-slate-400 mb-2 flex items-center gap-1">
               <SparklesIcon className="h-3.5 w-3.5 text-amber-400" />

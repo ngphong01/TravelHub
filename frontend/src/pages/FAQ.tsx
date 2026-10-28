@@ -32,13 +32,13 @@ const FAQ_DATA: FAQItem[] = [
     id: 'b2',
     category: 'booking',
     question: 'Sau khi đặt tour thành công, tôi sẽ nhận vé và lịch trình như thế nào?',
-    answer: 'Ngay sau khi hoàn tất thanh toán, hệ thống sẽ tự động gửi Mã xác nhận đơn hàng (Booking Reference Code), vé điện tử (E-Ticket) cùng file lịch trình chi tiết (PDF Itinerary) qua email đã đăng ký của bạn. Bạn cũng có thể xem và tải lại bất cứ lúc nào trong mục "Đơn hàng của tôi".'
+    answer: 'Bạn có thể theo dõi mã và trạng thái đơn trong tài khoản. Vé hoặc tài liệu hành trình, nếu áp dụng, sẽ được cung cấp sau khi dịch vụ được xác nhận.'
   },
   {
     id: 'b3',
     category: 'booking',
     question: 'Giá tour đã bao gồm những chi phí gì?',
-    answer: 'Giá tour trọn gói tại TravelHub tiêu chuẩn bao gồm: xe đưa đón đời mới, phòng khách sạn/resort theo tiêu chuẩn đã chọn, các bữa ăn theo chương trình, vé tham quan các điểm đến trong lịch trình, hướng dẫn viên chuyên nghiệp và bảo hiểm du lịch lên đến 100.000.000 VNĐ/người/vụ.'
+    answer: 'Dịch vụ bao gồm phụ thuộc vào từng tour. Hãy xem lịch trình và mục dịch vụ bao gồm trên trang chi tiết; nếu chưa được công bố, vui lòng xác nhận với TravelHub trước khi thanh toán.'
   },
   {
     id: 'p1',
@@ -56,19 +56,19 @@ const FAQ_DATA: FAQItem[] = [
     id: 'p3',
     category: 'payment',
     question: 'Tôi có được xuất hóa đơn giá trị gia tăng (VAT) không?',
-    answer: 'Có. Khi điền thông tin đặt tour, bạn vui lòng tích chọn "Yêu cầu xuất hóa đơn VAT" và điền đầy đủ tên công ty, mã số thuế và địa chỉ. Hóa đơn điện tử hợp lệ sẽ được gửi về email của bạn trong vòng 3-5 ngày làm việc sau khi kết thúc chuyến đi.'
+    answer: 'Vui lòng liên hệ TravelHub để xác nhận thông tin xuất hóa đơn, thuế và thời điểm cung cấp hóa đơn trước khi thanh toán.'
   },
   {
     id: 'c1',
     category: 'refund',
     question: 'Chính sách hoàn hủy tour của TravelHub được quy định như thế nào?',
-    answer: 'Chính sách hoàn tiền linh hoạt: Hủy trước ngày khởi hành từ 7 ngày trở lên: Miễn phí hoàn tiền 100%. Hủy từ 4 - 6 ngày trước khởi hành: Hoàn lại 70% giá trị tour. Hủy từ 1 - 3 ngày: Hoàn lại 30% giá trị tour. Trường hợp sự kiện bất khả kháng (thiên tai, dịch bệnh theo công bố nhà nước), quý khách được hoàn 100% hoặc đổi ngày miễn phí.'
+    answer: 'Điều kiện hủy và mức hoàn tiền áp dụng theo chính sách của tour hoặc dịch vụ trong đơn đặt. Hãy xem chính sách trên trang chi tiết và xác nhận trước thanh toán. Nếu chưa có chính sách công bố, vui lòng liên hệ TravelHub để được cung cấp điều kiện bằng văn bản.'
   },
   {
     id: 'c2',
     category: 'refund',
     question: 'Thời gian nhận lại tiền hoàn là bao lâu?',
-    answer: 'Sau khi yêu cầu hoàn tiền được duyệt, số tiền sẽ được hoàn về tài khoản thanh toán ban đầu của quý khách: từ 1-3 ngày làm việc đối với chuyển khoản VietQR / MoMo / ZaloPay, và từ 3-7 ngày làm việc đối với thẻ tín dụng/quốc tế.'
+    answer: 'Thời gian nhận lại tiền phụ thuộc phương thức thanh toán và đơn vị xử lý. TravelHub sẽ thông báo thời hạn cụ thể khi xác nhận yêu cầu hoàn tiền.'
   },
   {
     id: 'd1',
@@ -124,7 +124,7 @@ export default function FAQ() {
 
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-teal-900 via-teal-800 to-slate-900 text-white py-16 lg:py-24">
+        <section className="relative overflow-hidden bg-[#003580] text-white py-10 sm:py-12">
           <div className="absolute inset-0 opacity-20 pointer-events-none">
             <div 
               className="w-full h-full"
@@ -141,11 +141,11 @@ export default function FAQ() {
               <SparklesIcon className="h-4 w-4 text-amber-300 animate-pulse" />
               <span>Trung Tâm Hỗ Trợ Khách Hàng TravelHub</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-5 tracking-tight text-white">
-              Giải Đáp <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 via-emerald-200 to-amber-200">Mọi Thắc Mắc</span>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3 tracking-tight text-white">
+              Câu hỏi thường gặp
             </h1>
-            <p className="text-lg text-teal-100/90 max-w-2xl mx-auto font-light leading-relaxed mb-8">
-              Tìm câu trả lời nhanh chóng cho các câu hỏi phổ biến về đặt tour, thanh toán và trải nghiệm du lịch.
+            <p className="text-base text-blue-100 max-w-2xl mx-auto leading-relaxed mb-6">
+              Tìm câu trả lời về đặt tour, thanh toán và chuyến đi.
             </p>
 
             {/* Live Search Input */}
@@ -156,7 +156,7 @@ export default function FAQ() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Nhập từ khóa cần hỏi (VD: hoàn tiền, visa, hóa đơn VAT, trẻ em...)"
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xl border border-white/20 focus:outline-none focus:ring-4 focus:ring-teal-500/30 text-sm sm:text-base placeholder-slate-400"
+                className="w-full pl-12 pr-4 py-3 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm border border-white/20 focus:outline-none focus:ring-4 focus:ring-blue-500/30 text-sm sm:text-base placeholder-slate-400"
               />
             </div>
           </div>
@@ -175,7 +175,7 @@ export default function FAQ() {
                   onClick={() => setActiveCategory(cat.key)}
                   className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-all duration-200 ${
                     isActive
-                      ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/25 scale-105'
+                      ? 'bg-blue-700 text-white shadow-sm'
                       : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200/90 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >

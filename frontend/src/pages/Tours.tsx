@@ -23,128 +23,6 @@ import FloatingCompareDrawer, { CompareTourItem } from '../components/FloatingCo
 import toast from 'react-hot-toast';
 import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
 
-const FALLBACK_TOURS: Tour[] = [
-  {
-    id: 101,
-    name: 'Tour Hạ Long 2N1Đ - Du Thuyền 5 Sao Đẳng Cấp Heritage',
-    slug: 'tour-ha-long-2n1d-du-thuyen-5-sao',
-    duration: 2,
-    price: 2490000,
-    originalPrice: 3890000,
-    rating: 4.9,
-    reviewCount: 1420,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe Limousine Dcar',
-    departurePoint: 'Hà Nội',
-    destination: { id: 1, name: 'Vịnh Hạ Long', slug: 'ha-long' },
-  },
-  {
-    id: 102,
-    name: 'Tour Đà Nẵng - Cầu Vàng Bà Nà Hills - Phố Cổ Hội An',
-    slug: 'tour-da-nang-ba-na-hills-3n2d',
-    duration: 3,
-    price: 2990000,
-    originalPrice: 4500000,
-    rating: 4.85,
-    reviewCount: 980,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Máy bay khứ hồi + Ô tô',
-    departurePoint: 'TP. Hồ Chí Minh',
-    destination: { id: 2, name: 'Đà Nẵng & Hội An', slug: 'da-nang' },
-  },
-  {
-    id: 103,
-    name: 'Nghỉ Dưỡng Đảo Ngọc Phú Quốc - Cáp Treo Hòn Thơm 3N2Đ',
-    slug: 'nghi-duong-phu-quoc-3n2d',
-    duration: 3,
-    price: 3390000,
-    originalPrice: 5200000,
-    rating: 4.92,
-    reviewCount: 1650,
-    featured: true,
-    image: '/images/destinations/phu-quoc.jpg',
-    transport: 'Máy bay + Resort 5 Sao',
-    departurePoint: 'Hà Nội / TP.HCM',
-    destination: { id: 3, name: 'Đảo Ngọc Phú Quốc', slug: 'phu-quoc' },
-  },
-  {
-    id: 104,
-    name: 'Tour Sa Pa - Chinh Phục Đỉnh Fansipan - Bản Cát Cát',
-    slug: 'tour-sa-pa-fansipan-2n1d',
-    duration: 2,
-    price: 1890000,
-    originalPrice: 2600000,
-    rating: 4.8,
-    reviewCount: 760,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe giường nằm Cabin đôi',
-    departurePoint: 'Hà Nội',
-    destination: { id: 4, name: 'Sa Pa - Fansipan', slug: 'sa-pa' },
-  },
-  {
-    id: 105,
-    name: 'Khám Phá Ninh Bình - Tràng An - Hang Múa - Bái Đính Trong Ngày',
-    slug: 'tour-ninh-binh-trang-an-1-ngay',
-    duration: 1,
-    price: 850000,
-    originalPrice: 1200000,
-    rating: 4.9,
-    reviewCount: 1120,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe du lịch máy lạnh cao cấp',
-    departurePoint: 'Hà Nội',
-    destination: { id: 5, name: 'Ninh Bình - Tràng An', slug: 'ninh-binh' },
-  },
-  {
-    id: 106,
-    name: 'Tour Khám Phá Cao Nguyên Đá Hà Giang - Đèo Mã Pí Lèng',
-    slug: 'tour-ha-giang-ma-pi-leng-3n2d',
-    duration: 3,
-    price: 2650000,
-    originalPrice: 3500000,
-    rating: 4.95,
-    reviewCount: 890,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe Limousine + Xe máy bản địa',
-    departurePoint: 'Hà Nội',
-    destination: { id: 10, name: 'Cao Nguyên Hà Giang', slug: 'ha-giang' },
-  },
-  {
-    id: 107,
-    name: 'Đà Lạt Săn Mây - Thung Lũng Tình Yêu - Đồi Chè Cầu Đất 3N2Đ',
-    slug: 'tour-da-lat-san-may-3n2d',
-    duration: 3,
-    price: 2150000,
-    originalPrice: 2900000,
-    rating: 4.88,
-    reviewCount: 820,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe Limousine cao cấp',
-    departurePoint: 'TP. Hồ Chí Minh',
-    destination: { id: 6, name: 'Đà Lạt Mộng Mơ', slug: 'da-lat' },
-  },
-  {
-    id: 108,
-    name: 'Tour Hà Nội City Tour - Tràng An Bái Đính - Hạ Long 4N3Đ',
-    slug: 'tour-ha-noi-trang-an-ha-long-4n3d',
-    duration: 4,
-    price: 3890000,
-    originalPrice: 5100000,
-    rating: 4.91,
-    reviewCount: 640,
-    featured: true,
-    image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80',
-    transport: 'Xe ô tô du lịch + Du thuyền',
-    departurePoint: 'Hà Nội',
-    destination: { id: 7, name: 'Thủ Đô Hà Nội', slug: 'ha-noi' },
-  },
-];
 
 export default function ToursPage() {
   const { addItem } = useCart();
@@ -245,30 +123,15 @@ export default function ToursPage() {
     queryFn: getDestinations,
   });
 
-  const { data: toursData, isLoading } = useQuery({
+  const { data: toursData, isLoading, isError, refetch } = useQuery({
     queryKey: ['tours-list', page, searchTerm, selectedDestination],
-    queryFn: async () => {
-      try {
-        const res = await getToursPaged(page, 9, {
-          q: searchTerm || undefined,
-          destinationId: selectedDestination,
-        });
-        if (res?.items?.length) return res;
-      } catch (err) {}
-      let filtered = [...FALLBACK_TOURS];
-      if (searchTerm) {
-        const q = searchTerm.toLowerCase();
-        filtered = filtered.filter(t => t.name.toLowerCase().includes(q) || (t.destination?.name && t.destination.name.toLowerCase().includes(q)));
-      }
-      return {
-        items: filtered,
-        total: filtered.length,
-        pages: Math.ceil(filtered.length / 9) || 1,
-      };
-    },
+    queryFn: () => getToursPaged(page, 9, {
+      q: searchTerm || undefined,
+      destinationId: selectedDestination,
+    }),
   });
 
-  const tours = toursData?.items?.length ? toursData.items : FALLBACK_TOURS;
+  const tours = toursData?.items || [];
   const totalPages = toursData?.pages || 1;
 
   const sortedTours = [...tours].sort((a, b) => {
@@ -312,22 +175,13 @@ export default function ToursPage() {
 
       <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 py-10 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header Banner - Booking.com & Klook Style */}
-          <div className="bg-[#003580] rounded-3xl p-8 sm:p-12 text-white mb-8 shadow-md relative overflow-hidden">
-            <div className="relative z-10 max-w-2xl">
-              <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 backdrop-blur-md mb-3 inline-block border border-white/20">
-                {isEn ? 'All-Inclusive Tours & Experiences' : 'Tour Trọn Gói & Trải Nghiệm'}
-              </span>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-3">
-                {isEn ? 'Featured Travel Tours' : 'Các Tour Du Lịch Nổi Bật Nhất'}
-              </h1>
-              <p className="text-blue-100 text-sm sm:text-base leading-relaxed">
-                {isEn
-                  ? 'Explore Vietnam with TravelHub: flexible itineraries, premium hotels, and attentive all-inclusive services.'
-                  : 'Đồng hành cùng TravelHub khám phá vẻ đẹp bất tận từ Bắc chí Nam với lịch trình linh hoạt, khách sạn chuẩn mực và dịch vụ trọn gói chu đáo.'}
-              </p>
-            </div>
-            <div className="absolute -right-10 -bottom-10 w-72 h-72 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+          <div className="mb-6">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-2">
+              {isEn ? 'Find a tour' : 'Tìm tour du lịch'}
+            </h1>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              {isEn ? 'Compare destinations, duration and listed prices.' : 'So sánh điểm đến, thời lượng và giá niêm yết của từng tour.'}
+            </p>
           </div>
 
           {/* Filter & Search Bar */}
@@ -470,6 +324,11 @@ export default function ToursPage() {
                 <Skeleton key={i} className="h-96 w-full rounded-2xl" />
               ))}
             </div>
+          ) : isError ? (
+            <div role="alert" className="rounded-2xl bg-white p-8 text-center text-slate-700">
+              Không tải được dữ liệu tour. Vui lòng thử lại sau.
+              <button type="button" onClick={() => refetch()} className="block mx-auto mt-4 text-blue-700 font-semibold">Tải lại</button>
+            </div>
           ) : displayTours.length === 0 ? (
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-12 text-center border border-gray-200 dark:border-slate-800">
               <p className="text-gray-500 dark:text-slate-400 text-base">
@@ -569,7 +428,7 @@ export default function ToursPage() {
                             </span>
                           </div>
                           <span className="text-xs text-gray-400">
-                            ({tour.reviewCount || 12} {isEn ? 'reviews' : 'đánh giá'})
+                            ({tour.reviewCount ?? 0} {isEn ? 'reviews' : 'đánh giá'})
                           </span>
                         </div>
                       </div>

@@ -37,7 +37,7 @@ export default function Hotels() {
     sort: searchParams.get('sort') || 'created_desc',
   };
 
-  const { data: hotelsData, isLoading } = useQuery({
+  const { data: hotelsData, isLoading, isError, refetch } = useQuery({
     queryKey: ['hotels', page, filters],
     queryFn: () => getHotelsPaged(page, pageSize, {
       q: filters.search,
@@ -68,7 +68,7 @@ export default function Hotels() {
     setSearchParams({});
   };
 
-  const hasActiveFilters = filters.city || filters.minPrice || filters.maxPrice;
+  const hasActiveFilters = filters.search || filters.city || filters.minPrice || filters.maxPrice;
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 transition-colors">
@@ -79,20 +79,20 @@ export default function Hotels() {
 
       {/* Hero Section (Booking.com Royal Navy Blue) */}
       <section className="relative overflow-hidden bg-[#003580] text-white">
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
-          <div className="text-center mb-8">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+          <div className="text-center">
             <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 backdrop-blur-md mb-3 inline-block border border-white/20">
               Nghỉ dưỡng đẳng cấp
             </span>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black mb-3 leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2 leading-tight tracking-tight">
               Khách sạn & Resort Hàng Đầu
             </h1>
-            <p className="text-base sm:text-lg text-blue-100 max-w-2xl mx-auto mb-8 font-normal">
+            <p className="text-base text-blue-100 max-w-2xl mx-auto mb-5 font-normal">
               Khám phá không gian lưu trú sang trọng, view biển đắt giá và dịch vụ chuẩn mực.
             </p>
 
             {/* Search Bar */}
-            <div className="max-w-3xl mx-auto bg-amber-400 p-1 sm:p-1.5 rounded-2xl shadow-2xl">
+            <div className="max-w-3xl mx-auto bg-white/15 p-1 rounded-xl shadow-sm">
               <div className="relative">
                 <MagnifyingGlassIcon className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
@@ -181,6 +181,11 @@ export default function Hotels() {
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-96 rounded-2xl" />
             ))}
+          </div>
+        ) : isError ? (
+          <div role="alert" className="text-center py-20 bg-white rounded-3xl border border-gray-200">
+            <p className="text-lg font-bold mb-3">Không tải được danh sách khách sạn</p>
+            <button type="button" onClick={() => refetch()} className="px-4 py-2 bg-blue-600 text-white rounded-xl">Thử lại</button>
           </div>
         ) : hotels.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-gray-200 dark:border-slate-800">

@@ -6,6 +6,26 @@ const cacheResponse = require('../middleware/cache');
 const { invalidatePattern } = require('../lib/redis');
 const { chatWithAnthropic } = require('../services/anthropicClient');
 
+// Public ratings must reflect the same approved reviews shown in the review list.
+async function withReviewSummary(tours) {
+  if (tours.length === 0) return [];
+  const summaries = await prisma.tourReview.groupBy({
+    by: ['tourId'],
+    where: { tourId: { in: tours.map((tour) => tour.id) }, approved: true },
+    _count: { _all: true },
+    _avg: { rating: true },
+  });
+  const byTourId = new Map(summaries.map((row) => [row.tourId, row]));
+  return tours.map((tour) => {
+    const summary = byTourId.get(tour.id);
+    return {
+      ...tour,
+      reviewCount: summary?._count._all || 0,
+      rating: summary?._avg.rating || 0,
+    };
+  });
+}
+
 // Helper: Normalize Vietnamese text (remove diacritics)
 const normalizeVietnamese = (str) => {
   if (!str) return '';
@@ -13,6 +33,7 @@ const normalizeVietnamese = (str) => {
     .toString()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
     .toLowerCase()
     .trim();
 };
@@ -170,7 +191,7 @@ router.get('/', async (req, res) => {
       console.log(`Returning ${paginatedTours.length} tours (page ${page}/${Math.ceil(total / limit)})`);
 
       return res.json({
-        items: paginatedTours,
+        items: await withReviewSummary(paginatedTours),
         total,
         page,
         pages: Math.ceil(total / limit),
@@ -209,7 +230,7 @@ router.get('/', async (req, res) => {
     console.log(`Found ${total} tours (showing ${items.length})`);
 
     res.json({
-      items,
+      items: await withReviewSummary(items),
       total,
       page,
       pages: Math.ceil(total / limit),
@@ -257,7 +278,7 @@ router.get('/by-id/:id', async (req, res) => {
       return res.status(404).json({ message: 'Tour not found' });
     }
 
-    res.json(tour);
+    res.json((await withReviewSummary([tour]))[0]);
   } catch (error) {
     console.error('Error fetching tour by ID:', error);
     res.status(500).json({ message: 'Error fetching tour' });
@@ -303,7 +324,7 @@ router.get('/:slug', async (req, res) => {
       return res.status(404).json({ message: 'Tour not found' });
     }
 
-    res.json(tour);
+    res.json((await withReviewSummary([tour]))[0]);
   } catch (error) {
     console.error('Error fetching tour:', error);
     res.status(500).json({ message: 'Error fetching tour' });

@@ -13,7 +13,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
+    <footer className="bg-slate-950 text-white">
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 py-10 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
@@ -23,7 +23,7 @@ export default function Footer() {
             <div className="mb-4">
               <TravelHubLogo variant="light" size="md" asLink={true} />
             </div>
-            <p className="text-gray-400 text-xs leading-relaxed mb-4">
+            <p className="text-slate-300 text-sm leading-relaxed mb-4">
               Nền tảng du lịch hàng đầu giúp bạn khám phá những điểm đến tuyệt vời trên khắp thế giới. 
               Đặt chỗ nhanh chóng, giá cả hợp lý và trải nghiệm không thể quên.
             </p>
@@ -84,7 +84,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/destinations" 
-                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
+                  className="text-slate-300 hover:text-white transition-colors flex items-center gap-2 group text-sm"
                 >
                   <MapPinIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
                   <span>Điểm đến</span>
@@ -93,7 +93,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/hotels" 
-                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
+                  className="text-slate-300 hover:text-white transition-colors flex items-center gap-2 group text-sm"
                 >
                   <BuildingOfficeIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
                   <span>Khách sạn & Resort</span>
@@ -102,7 +102,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/tours" 
-                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
+                  className="text-slate-300 hover:text-white transition-colors flex items-center gap-2 group text-sm"
                 >
                   <GlobeAltIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
                   <span>Tours du lịch</span>
@@ -111,7 +111,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/restaurants" 
-                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
+                  className="text-slate-300 hover:text-white transition-colors flex items-center gap-2 group text-sm"
                 >
                   <GlobeAltIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
                   <span>Ẩm thực & Nhà hàng</span>
@@ -120,7 +120,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/stories" 
-                  className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group text-xs"
+                  className="text-slate-300 hover:text-white transition-colors flex items-center gap-2 group text-sm"
                 >
                   <HeartIcon className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
                   <span>Cẩm nang du lịch</span>
@@ -136,7 +136,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/about" 
-                  className="text-slate-400 hover:text-white transition-colors text-xs block"
+                  className="text-slate-300 hover:text-white transition-colors text-sm block"
                 >
                   Giới thiệu TravelHub
                 </Link>
@@ -144,7 +144,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/faq" 
-                  className="text-slate-400 hover:text-white transition-colors text-xs block"
+                  className="text-slate-300 hover:text-white transition-colors text-sm block"
                 >
                   Giải đáp thắc mắc (FAQ)
                 </Link>
@@ -152,7 +152,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/payment-methods" 
-                  className="text-slate-400 hover:text-white transition-colors text-xs block"
+                  className="text-slate-300 hover:text-white transition-colors text-sm block"
                 >
                   Hình thức thanh toán
                 </Link>
@@ -160,7 +160,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/chatbot" 
-                  className="text-slate-400 hover:text-white transition-colors text-xs block"
+                  className="text-slate-300 hover:text-white transition-colors text-sm block"
                 >
                   Trợ lý du lịch AI (24/7)
                 </Link>
@@ -168,7 +168,7 @@ export default function Footer() {
               <li>
                 <Link 
                   to="/contact" 
-                  className="text-slate-400 hover:text-white transition-colors text-xs block"
+                  className="text-slate-300 hover:text-white transition-colors text-sm block"
                 >
                   Liên hệ & Khiếu nại
                 </Link>
@@ -232,17 +232,17 @@ export default function Footer() {
       <div className="border-t border-gray-700">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3">
-            <p className="text-gray-400 text-xs text-center md:text-left">
+            <p className="text-slate-300 text-sm text-center md:text-left">
               © {currentYear} <span className="text-white font-semibold">TravelHub</span>. Tất cả quyền được bảo lưu.
             </p>
             <div className="flex items-center gap-4 text-xs">
-              <Link to="/terms" className="text-gray-400 hover:text-white transition-colors">
+              <Link to="/terms" className="text-slate-300 hover:text-white transition-colors">
                 Điều khoản
               </Link>
-              <Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">
+              <Link to="/privacy" className="text-slate-300 hover:text-white transition-colors">
                 Bảo mật
               </Link>
-              <Link to="/about" className="text-gray-400 hover:text-white transition-colors">
+              <Link to="/about" className="text-slate-300 hover:text-white transition-colors">
                 Về chúng tôi
               </Link>
             </div>

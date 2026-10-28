@@ -107,7 +107,7 @@ export default function Contact() {
         {/* =========================================================================
             1. LUXURY HERO BANNER - Cohesive Royal Navy & Gold TravelHub Palette
             ========================================================================= */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#00224f] via-[#003580] to-[#0f172a] text-white py-16 sm:py-20 lg:py-24">
+        <section className="relative overflow-hidden bg-[#003580] text-white py-10 sm:py-12">
           <div className="absolute inset-0 opacity-15 pointer-events-none">
             <div
               className="w-full h-full"
@@ -121,7 +121,7 @@ export default function Contact() {
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 backdrop-blur-md rounded-full text-blue-200 text-sm font-semibold mb-6 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full text-blue-100 text-sm font-semibold mb-4">
               <ShieldCheckIcon className="h-5 w-5 text-amber-400" />
               <span>Trung Tâm Trợ Giúp & Chăm Sóc Khách Hàng TravelHub</span>
             </div>
@@ -130,36 +130,16 @@ export default function Contact() {
               Chúng Tôi Luôn Sẵn Sàng <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500">Đồng Hành Cùng Bạn</span>
             </h1>
 
-            <p className="text-base sm:text-lg text-blue-100/90 max-w-2xl mx-auto font-normal leading-relaxed mb-10">
-              Đội ngũ tư vấn viên chuyên nghiệp và Trợ lý ảo AI hoạt động 24/7 giải quyết mọi thắc mắc về lịch trình, thanh toán và bảo hành dịch vụ.
+            <p className="text-base sm:text-lg text-blue-100 max-w-2xl mx-auto leading-relaxed">
+              Chọn kênh liên hệ phù hợp hoặc gửi yêu cầu qua biểu mẫu bên dưới.
             </p>
-
-            {/* Quick Metrics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 border-t border-white/10">
-              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 text-center">
-                <div className="text-2xl font-black text-amber-300">24/7</div>
-                <div className="text-xs text-blue-200 mt-0.5">Tổng đài hoạt động</div>
-              </div>
-              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 text-center">
-                <div className="text-2xl font-black text-emerald-300">&lt; 5 phút</div>
-                <div className="text-xs text-blue-200 mt-0.5">Thời gian phản hồi</div>
-              </div>
-              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 text-center">
-                <div className="text-2xl font-black text-cyan-300">100%</div>
-                <div className="text-xs text-blue-200 mt-0.5">Bảo mật thông tin</div>
-              </div>
-              <div className="p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 text-center">
-                <div className="text-2xl font-black text-amber-300">99.8%</div>
-                <div className="text-xs text-blue-200 mt-0.5">Khách hàng hài lòng</div>
-              </div>
-            </div>
           </div>
         </section>
 
         {/* =========================================================================
             2. DIRECT CONTACT CHANNELS (Hotline, Zalo, AI Chat, Email)
             ========================================================================= */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-20">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Hotline Card */}
             <a
@@ -209,7 +189,7 @@ export default function Contact() {
               </div>
               <div>
                 <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">Hòm Thư Điện Tử</span>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white mt-0.5 truncate max-w-[200px]">phong@triennguyen.com</h3>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-0.5 break-all">phong@triennguyen.com</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Gửi hợp đồng, đối tác & xuất hóa đơn VAT</p>
                 <span className="inline-block mt-3 text-xs font-bold text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform">
                   Gửi thư điện tử →

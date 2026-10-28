@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500" role="img" aria-label="Khách sạn chưa có ảnh xác thực">
+  <rect width="800" height="500" fill="#e2e8f0"/>
+  <path d="M290 320V190h220v130M330 190v-40h140v40M330 230h35m35 0h35m35 0h0M330 270h35m35 0h35m35 0h0M390 320v-45h35v45" fill="none" stroke="#64748b" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="400" y="390" fill="#475569" font-family="Arial,sans-serif" font-size="24" text-anchor="middle">Chưa có ảnh khách sạn xác thực</text>
+</svg>

@@ -11,6 +11,8 @@ export type Tour = {
   photos?: any;
   duration?: number;
   price?: number;
+  adultPrice?: number | null;
+  childPrice?: number | null;
   originalPrice?: number | null;
   rating?: number;
   reviewCount?: number;

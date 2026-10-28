@@ -31,8 +31,8 @@ i18n
   .use(initReactI18next) // Pass i18n down to react-i18next
   .init({
     // Default language
-    lng: 'en',
-    fallbackLng: 'en',
+    lng: 'vi',
+    fallbackLng: 'vi',
     
     // Supported languages
     supportedLngs: SUPPORTED_LANGUAGES.map(lang => lang.code),

@@ -66,16 +66,7 @@ export default function TermsPage() {
                 <span className="w-7 h-7 rounded-lg bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 flex items-center justify-center text-xs font-black">4</span>
                 Chính Sách Hoàn Hủy & Đổi Lịch Trình
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                  <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-1">Hủy trước 7 ngày khởi hành</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Hoàn tiền 100% chi phí tour hoặc bảo lưu miễn phí trong 12 tháng.</p>
-                </div>
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                  <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-1">Hủy từ 3 - 6 ngày trước</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Hoàn tiền 50% chi phí tour hoặc đổi ngày có phụ phí điều chỉnh dịch vụ.</p>
-                </div>
-              </div>
+              <p>Điều kiện hủy và mức hoàn tiền phụ thuộc vào từng tour hoặc dịch vụ. Chính sách riêng được hiển thị trên trang chi tiết và cần được xác nhận trước khi thanh toán. Nếu dịch vụ chưa công bố chính sách, vui lòng liên hệ TravelHub để nhận điều kiện bằng văn bản trước khi đặt.</p>
             </section>
 
             <section className="space-y-3">

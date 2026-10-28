@@ -1,3 +1,5 @@
+import { restaurantImages } from './restaurantImages';
+
 /**
  * Intelligent Image Fallback & CDN Resolver
  * TravelHub - Match authentic high-res images to destination & tour names
@@ -72,7 +74,7 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
     gallery: [
       '/images/destinations/hoi-an.jpg',
       'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
+      '/images/destinations/hoi-an.jpg',
       'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80'
     ]
@@ -84,7 +86,7 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
       '/images/destinations/ha-noi.jpg',
       'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
+      '/images/destinations/ha-noi.jpg',
       'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80'
     ]
   },
@@ -94,7 +96,7 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
     gallery: [
       '/images/destinations/hue.jpg',
       'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
+      '/images/destinations/hue.jpg',
       'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80'
     ]
@@ -104,7 +106,7 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
     image: '/images/destinations/ninh-binh.jpg', // Tràng An Ninh Bình
     gallery: [
       '/images/destinations/ninh-binh.jpg',
-      'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
+      '/images/destinations/ninh-binh.jpg',
       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'
@@ -272,7 +274,7 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
     image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=80', // Singapore Marina Bay Sands
     gallery: [
       'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=1200&q=80'
@@ -372,8 +374,8 @@ export const AUTHENTIC_LOCATION_MAP: KeywordImageMap[] = [
 export const CATEGORY_DEFAULTS = {
   destination: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
   tour: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80',
-  hotel: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
-  restaurant: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
+  hotel: '/images/hotel-placeholder.svg',
+  restaurant: '/images/restaurant-placeholder.svg',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'
 };
 
@@ -413,6 +415,25 @@ export function getAuthenticImage(
   nameOrSlug?: string | null,
   type: 'destination' | 'tour' | 'hotel' | 'restaurant' | 'avatar' = 'tour'
 ): string {
+  if (type === 'restaurant') {
+    const knownPhoto = restaurantImages[nameOrSlug || ''];
+    if (knownPhoto) return knownPhoto;
+    if (rawUrl?.startsWith('/uploads/restaurants/')) return rawUrl;
+    if (rawUrl && /^https?:\/\//.test(rawUrl) && !rawUrl.includes('images.unsplash.com')) return rawUrl;
+    return CATEGORY_DEFAULTS.restaurant;
+  }
+
+  if (type === 'hotel') {
+    if (rawUrl?.startsWith('/uploads/hotels/')) return rawUrl;
+    if (rawUrl && /^https?:\/\//.test(rawUrl) && !rawUrl.includes('images.unsplash.com')) return rawUrl;
+    return CATEGORY_DEFAULTS.hotel;
+  }
+
+  if (type === 'tour' && (!rawUrl || rawUrl.includes('images.unsplash.com'))) {
+    const destinationPhoto = findAuthenticImageMatch(nameOrSlug || '');
+    if (destinationPhoto?.image.startsWith('/images/destinations/')) return destinationPhoto.image;
+  }
+
   // Filter out known mistaken Unsplash IDs
   const isMismatched = rawUrl && (
     rawUrl.includes('photo-1540959733332') || // Tokyo arcade mistakenly assigned to Phu Quoc
@@ -454,6 +475,10 @@ export function getAuthenticGallery(
   nameOrSlug?: string | null,
   type: 'destination' | 'tour' | 'hotel' = 'tour'
 ): string[] {
+  if (type === 'hotel') {
+    const first = Array.isArray(rawPhotos) ? rawPhotos[0] : typeof rawPhotos === 'string' ? rawPhotos : null;
+    return [getAuthenticImage(first, nameOrSlug, 'hotel')];
+  }
   let photoList: string[] = [];
 
   if (Array.isArray(rawPhotos)) {

@@ -35,7 +35,7 @@ export default function Restaurants() {
     sort: searchParams.get('sort') || 'created_desc',
   };
 
-  const { data: restaurantsData, isLoading } = useQuery({
+  const { data: restaurantsData, isLoading, isError, refetch } = useQuery({
     queryKey: ['restaurants', page, filters],
     queryFn: () => getRestaurantsPaged(page, pageSize, {
       q: filters.search,
@@ -66,26 +66,26 @@ export default function Restaurants() {
     setSearchParams({});
   };
 
-  const hasActiveFilters = filters.city || filters.cuisine || filters.priceRange;
+  const hasActiveFilters = filters.search || filters.city || filters.cuisine || filters.priceRange;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50">
       {/* Hero Section (Booking.com Style Royal Navy) */}
       <section className="relative overflow-hidden bg-[#003580] text-white">
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
-          <div className="text-center mb-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+          <div className="text-center">
             <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 backdrop-blur-md mb-3 inline-block border border-white/20">
               Khám Phá Hương Vị Bản Địa
             </span>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black mb-3 leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2 leading-tight tracking-tight">
               Nhà Hàng & Ẩm Thực Du Lịch
             </h1>
-            <p className="text-base sm:text-lg text-blue-100 max-w-2xl mx-auto mb-8 font-normal">
+            <p className="text-base text-blue-100 max-w-2xl mx-auto mb-5 font-normal">
               Trải nghiệm tinh hoa ẩm thực 3 miền từ quán ăn truyền thống đến nhà hàng đạt chuẩn quốc tế
             </p>
 
             {/* Search Bar */}
-            <div className="max-w-2xl mx-auto bg-amber-400 p-1 sm:p-1.5 rounded-2xl shadow-2xl">
+            <div className="max-w-2xl mx-auto bg-white/15 p-1 rounded-xl shadow-sm">
               <div className="relative">
                 <MagnifyingGlassIcon className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
@@ -177,6 +177,11 @@ export default function Restaurants() {
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-80 rounded-2xl" />
             ))}
+          </div>
+        ) : isError ? (
+          <div role="alert" className="text-center py-20 bg-white rounded-2xl border border-slate-200">
+            <p className="text-lg font-bold mb-3">Không tải được danh sách nhà hàng</p>
+            <button type="button" onClick={() => refetch()} className="px-4 py-2 bg-blue-600 text-white rounded-xl">Thử lại</button>
           </div>
         ) : restaurants.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-slate-200">

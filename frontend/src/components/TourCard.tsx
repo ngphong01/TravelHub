@@ -20,6 +20,7 @@ interface TourCardProps {
     slug: string;
     image?: string | null;
     price?: number;
+    adultPrice?: number | null;
     originalPrice?: number | null;
     duration?: number;
     transport?: string | null;
@@ -56,24 +57,24 @@ export default function TourCard({
   };
 
   const getDurationText = (duration?: number) => {
-    if (!duration) return '1 ngày';
+    if (!duration) return 'Đang cập nhật';
     const nights = duration > 1 ? duration - 1 : 0;
     return nights > 0 ? `${duration}N${nights}Đ` : `${duration} Ngày`;
   };
 
   const getTransportText = (transport?: string | null) => {
-    if (!transport) return 'Xe ô tô';
-    return transport === 'Flight' || transport === 'Máy bay' ? 'Máy bay' : 'Xe du lịch';
+    if (!transport) return 'Đang cập nhật';
+    return transport === 'Flight' ? 'Máy bay' : transport;
   };
 
-  const hasDiscount = Boolean(tour.originalPrice && tour.price && tour.originalPrice > tour.price);
-  const discountPercent = hasDiscount && tour.originalPrice && tour.price
-    ? Math.round(((tour.originalPrice - tour.price) / tour.originalPrice) * 100)
+  const displayedPrice = tour.adultPrice ?? tour.price ?? 0;
+  const hasDiscount = Boolean(tour.originalPrice && displayedPrice && tour.originalPrice > displayedPrice);
+  const discountPercent = hasDiscount && tour.originalPrice
+    ? Math.round(((tour.originalPrice - displayedPrice) / tour.originalPrice) * 100)
     : null;
 
-  const ratingValue = tour.rating ? tour.rating.toFixed(1) : '4.9';
-  const reviewsCount = tour.reviewCount || 128 + (tour.id % 50) * 12;
-  const bookedCount = 500 + (tour.id % 80) * 45;
+  const ratingValue = tour.reviewCount && tour.rating ? tour.rating.toFixed(1) : '—';
+  const reviewsCount = tour.reviewCount ?? 0;
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 overflow-hidden hover:shadow-2xl transition-all duration-300 group flex flex-col md:flex-row">
@@ -99,10 +100,10 @@ export default function TourCard({
 
         {/* Klook Top Badges: Best Seller & Discount */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-          {(tour.featured || tour.id % 2 === 0) && (
+          {tour.featured && (
             <span className="px-2.5 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-extrabold rounded-lg shadow-md flex items-center gap-1 tracking-wide">
               <SparklesIcon className="w-3.5 h-3.5" />
-              Bán chạy nhất
+              Nổi bật
             </span>
           )}
           {hasDiscount && discountPercent && (
@@ -164,22 +165,10 @@ export default function TourCard({
             </h3>
           </Link>
 
-          {/* Klook Trust Highlights (Instant Confirm / Free Cancellation) */}
-          <div className="flex items-center gap-3 text-xs font-medium text-emerald-600 dark:text-emerald-400 mb-3 flex-wrap">
-            <span className="flex items-center gap-1">
-              <BoltIcon className="w-3.5 h-3.5 text-amber-500" />
-              Xác nhận tức thì
-            </span>
-            <span className="flex items-center gap-1">
-              <ShieldCheckIcon className="w-3.5 h-3.5 text-emerald-500" />
-              Hủy miễn phí trong 24h
-            </span>
-          </div>
-
           {/* Details metadata */}
           <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-slate-400 flex-wrap mb-3">
             <span>
-              <strong className="text-gray-700 dark:text-slate-300">Khởi hành:</strong> {departurePoint || 'Hà Nội'}
+              <strong className="text-gray-700 dark:text-slate-300">Khởi hành:</strong> {departurePoint || 'Đang cập nhật'}
             </span>
             <span>
               <strong className="text-gray-700 dark:text-slate-300">Phương tiện:</strong> {getTransportText(tour.transport)}
@@ -202,10 +191,6 @@ export default function TourCard({
             <span className="text-gray-400 dark:text-slate-500">
               ({reviewsCount} đánh giá)
             </span>
-            <span className="text-gray-300 dark:text-slate-700">•</span>
-            <span className="text-cyan-700 dark:text-cyan-400 font-semibold">
-              {bookedCount.toLocaleString('vi-VN')}+ đã đặt
-            </span>
           </div>
         </div>
 
@@ -215,7 +200,7 @@ export default function TourCard({
             <span className="text-[11px] text-gray-400 dark:text-slate-500 block">Giá trọn gói từ</span>
             <div className="flex items-baseline gap-2">
               <span className="text-xl sm:text-2xl font-black text-cyan-600 dark:text-cyan-400 tracking-tight">
-                {formatPrice(tour.price)} <span className="text-xs sm:text-sm font-semibold">₫</span>
+                {formatPrice(displayedPrice)} {displayedPrice > 0 && <span className="text-xs sm:text-sm font-semibold">₫</span>}
               </span>
               {hasDiscount && tour.originalPrice && (
                 <span className="text-xs text-gray-400 line-through">

@@ -5,6 +5,7 @@ import { getDestinationBySlug } from '../../services/destination';
 import { getTourById, getTourBySlug } from '../../services/tour';
 import { getHotelBySlug } from '../../services/hotel';
 import { getRestaurantBySlug } from '../../services/restaurant';
+import { validatePromoCode, applyPromoCode } from '../../services/promo';
 import { useCart } from '../../contexts/CartContext';
 import { getAuthenticImage, handleImageError } from '../../utils/imageFallback';
 import {
@@ -45,14 +46,6 @@ interface UserData {
 }
 
 // Constants
-const COUPONS: Record<string, number> = {
-  MEMBER10: 10,
-  EARLY10: 10,
-  TRAVELHUB10: 10,
-  TRAVELHUB20: 20,
-  GROUP5: 5,
-};
-
 const PAYMENT_OPTIONS: PaymentOption[] = [
   {
     id: 'credit_card',
@@ -181,6 +174,7 @@ export default function CheckoutPage() {
 
   // Tour booking state
   const [tourId, setTourId] = useState<number | null>(null);
+  const [tourPolicyReady, setTourPolicyReady] = useState(false);
   const [tourPackage, setTourPackage] = useState<string | null>(null);
   const [bookingDate, setBookingDate] = useState<string | null>(null);
   const [adultsCount, setAdultsCount] = useState<number>(1);
@@ -197,8 +191,9 @@ export default function CheckoutPage() {
   const [comboIncludes, setComboIncludes] = useState<string[]>([]);
 
   // Discount state
-  const [discountPercent, setDiscountPercent] = useState<number>(0);
+  const [couponDiscountAmount, setCouponDiscountAmount] = useState<number>(0);
   const [couponMsg, setCouponMsg] = useState<string | null>(null);
+  const [policyConfirmed, setPolicyConfirmed] = useState(false);
 
   // UI state
   const [copied, setCopied] = useState<boolean>(false);
@@ -206,6 +201,29 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
+  const [cartPolicyReady, setCartPolicyReady] = useState(false);
+
+  useEffect(() => {
+    if (!isCartBooking) return;
+    let cancelled = false;
+    setCartPolicyReady(false);
+    const tourItems = activeCartItems.filter((item: any) => item.type === 'tour');
+    if (!tourItems.length || tourItems.length !== activeCartItems.length) return;
+    Promise.all(tourItems.map((item: any) => getTourById(Number(item.itemId))))
+      .then((tours) => {
+        if (cancelled) return;
+        const ready = tours.every((tour) =>
+          typeof tour.policies?.cancellation === 'string' && tour.policies.cancellation.trim() &&
+          typeof tour.policies?.refund === 'string' && tour.policies.refund.trim()
+        );
+        setCartPolicyReady(ready);
+        if (!ready) setErrorMsg('Tour trong giỏ chưa công bố chính sách hoàn hủy. Chưa thể thanh toán trực tuyến.');
+      })
+      .catch(() => {
+        if (!cancelled) setErrorMsg('Không xác thực được điều kiện hoàn hủy của tour trong giỏ.');
+      });
+    return () => { cancelled = true; };
+  }, [isCartBooking, activeCartItems]);
 
   // Addon services state
   const [addonInsurance, setAddonInsurance] = useState<boolean>(false);
@@ -233,10 +251,7 @@ export default function CheckoutPage() {
   // Calculated values
   const subtotal = useMemo(() => Number(amount || 0), [amount]);
 
-  const discountAmount = useMemo(
-    () => Math.max(0, Math.round(subtotal * (discountPercent / 100))),
-    [subtotal, discountPercent]
-  );
+  const discountAmount = Math.min(subtotal, couponDiscountAmount);
 
   const finalAmount = useMemo(
     () => Math.max(0, subtotal - discountAmount + totalAddons),
@@ -307,30 +322,29 @@ export default function CheckoutPage() {
   }, [cardHolder, cardNumber, cardExpiry, cardCvv]);
 
   // Coupon handler
-  const applyCoupon = useCallback((code: string) => {
+  const applyCoupon = useCallback(async (code: string) => {
     const normalized = (code || '').trim().toUpperCase();
 
     if (!normalized) {
-      setDiscountPercent(0);
+      setCouponDiscountAmount(0);
       setCouponMsg(null);
       return;
     }
 
-    if (normalized === 'GROUP5' && guests < 4) {
-      setDiscountPercent(0);
-      setCouponMsg('Mã GROUP5 chỉ áp dụng cho nhóm từ 4 khách trở lên.');
-      return;
+    try {
+      const result = await validatePromoCode(normalized, subtotal);
+      if (!result.valid || !result.discountAmount) {
+        setCouponDiscountAmount(0);
+        setCouponMsg(result.message || 'Mã không hợp lệ hoặc đã hết hạn');
+        return;
+      }
+      setCouponDiscountAmount(result.discountAmount);
+      setCouponMsg(`Áp dụng mã ${normalized}: giảm ${formatCurrency(result.discountAmount)}đ`);
+    } catch {
+      setCouponDiscountAmount(0);
+      setCouponMsg('Không kiểm tra được mã. Vui lòng thử lại.');
     }
-
-    const pct = COUPONS[normalized];
-    if (pct) {
-      setDiscountPercent(pct);
-      setCouponMsg(`Áp dụng mã ${normalized}: giảm ${pct}%`);
-    } else {
-      setDiscountPercent(0);
-      setCouponMsg('Mã không hợp lệ hoặc đã hết hạn');
-    }
-  }, [guests]);
+  }, [subtotal]);
 
   // Method change handler
   const handleMethodChange = useCallback((value: PaymentOption['id']) => {
@@ -346,20 +360,17 @@ export default function CheckoutPage() {
       if (isCartBooking) return; // Giỏ hàng giữ nguyên tổng tiền từng dịch vụ
       const g = Math.max(1, newGuests);
       setGuests(g);
+      if (isCombo) {
+        setAdultsCount(g);
+        setChildrenCount(0);
+      }
       if (basePrice > 0) {
         setAmount(String(basePrice * g));
       }
-      if (coupon.trim().toUpperCase() === 'GROUP5') {
-        if (g < 4) {
-          setDiscountPercent(0);
-          setCouponMsg('Mã GROUP5 chỉ áp dụng cho nhóm từ 4 khách trở lên.');
-        } else {
-          setDiscountPercent(5);
-          setCouponMsg('Áp dụng mã GROUP5: giảm 5%');
-        }
-      }
+      setCouponDiscountAmount(0);
+      setCouponMsg(null);
     },
-    [basePrice, coupon, isCartBooking]
+    [basePrice, isCartBooking, isCombo]
   );
 
   // Copy to clipboard
@@ -375,15 +386,8 @@ export default function CheckoutPage() {
 
   // Calculate tour price
   const calculateTourPrice = useCallback(
-    (price: number, adults: number, children: number, pkg?: string | null): number => {
-      let delta = 0;
-      if (pkg === 'vip') delta = 350000;
-      else if (pkg === 'saver') delta = -150000;
-      const adultPrice = Math.max(0, price + delta);
-      const childPrice = Math.round(adultPrice * 0.7);
-      const subtotalPrice = adultPrice * adults + childPrice * children;
-      const discount = subtotalPrice >= 5000000 ? 150000 : (subtotalPrice >= 2000000 ? 80000 : 0);
-      return Math.max(0, subtotalPrice - discount);
+    (price: number, adults: number, children: number, childPrice?: number | null): number => {
+      return price * adults + (childPrice ?? 0) * children;
     },
     []
   );
@@ -394,18 +398,31 @@ export default function CheckoutPage() {
       try {
         const tour = await getTourById(tourIdParam);
 
-        setErrorMsg(null);
-        const price = Number(tour?.price || 0);
+        setTourPolicyReady(Boolean(
+          typeof tour.policies?.cancellation === 'string' && tour.policies.cancellation.trim() &&
+          typeof tour.policies?.refund === 'string' && tour.policies.refund.trim()
+        ));
+        setErrorMsg(
+          typeof tour.policies?.cancellation === 'string' && tour.policies.cancellation.trim() &&
+          typeof tour.policies?.refund === 'string' && tour.policies.refund.trim()
+            ? null
+            : 'Tour chưa công bố chính sách hoàn hủy. Vui lòng xác nhận bằng văn bản trước khi thanh toán.'
+        );
+        if (children > 0 && tour.childPrice == null) {
+          setErrorMsg('Tour chưa công bố giá trẻ em. Vui lòng xác nhận trước khi đặt.');
+          setAmount('0');
+          return;
+        }
+        const price = Number(tour?.adultPrice ?? tour?.price ?? 0);
 
         if (price > 0) {
-          const calculatedAmount = calculateTourPrice(price, adults, children, pkg);
-          const pkgSuffix = pkg === 'vip' ? ' [Gói VIP]' : pkg === 'saver' ? ' [Gói Tiết kiệm]' : ' [Gói Tiêu chuẩn]';
+          const calculatedAmount = calculateTourPrice(price, adults, children, tour.childPrice);
 
           setBasePrice(price);
           setDestinationId(tour?.destinationId || null);
           setDestinationName(tour?.name || null);
           setDestinationSlug(tourSlug || tour?.slug || null);
-          setDescription(`Thanh toán tour: ${tour.name || 'Tour'}${pkg ? pkgSuffix : ''}`);
+          setDescription(`Thanh toán tour: ${tour.name || 'Tour'}`);
           setGuests(adults + children);
           setAmount(String(calculatedAmount));
         } else {
@@ -417,18 +434,31 @@ export default function CheckoutPage() {
           try {
             const tour = await getTourBySlug(tourSlug);
 
-            setErrorMsg(null);
-            const price = Number(tour?.price || 0);
+            setTourPolicyReady(Boolean(
+              typeof tour.policies?.cancellation === 'string' && tour.policies.cancellation.trim() &&
+              typeof tour.policies?.refund === 'string' && tour.policies.refund.trim()
+            ));
+            setErrorMsg(
+              typeof tour.policies?.cancellation === 'string' && tour.policies.cancellation.trim() &&
+              typeof tour.policies?.refund === 'string' && tour.policies.refund.trim()
+                ? null
+                : 'Tour chưa công bố chính sách hoàn hủy. Vui lòng xác nhận bằng văn bản trước khi thanh toán.'
+            );
+            if (children > 0 && tour.childPrice == null) {
+              setErrorMsg('Tour chưa công bố giá trẻ em. Vui lòng xác nhận trước khi đặt.');
+              setAmount('0');
+              return;
+            }
+            const price = Number(tour?.adultPrice ?? tour?.price ?? 0);
 
             if (price > 0) {
-              const calculatedAmount = calculateTourPrice(price, adults, children, pkg);
-              const pkgSuffix = pkg === 'vip' ? ' [Gói VIP]' : pkg === 'saver' ? ' [Gói Tiết kiệm]' : ' [Gói Tiêu chuẩn]';
+              const calculatedAmount = calculateTourPrice(price, adults, children, tour.childPrice);
 
               setBasePrice(price);
               setDestinationId(tour?.destinationId || null);
               setDestinationName(tour?.name || null);
               setDestinationSlug(tourSlug);
-              setDescription(`Thanh toán tour: ${tour.name || 'Tour'}${pkg ? pkgSuffix : ''}`);
+              setDescription(`Thanh toán tour: ${tour.name || 'Tour'}`);
               setGuests(adults + children);
               setAmount(String(calculatedAmount));
               if (tour?.id) {
@@ -487,7 +517,7 @@ export default function CheckoutPage() {
     try {
       setDestinationSlug(slug);
       const hotel = await getHotelBySlug(slug);
-      const name = hotel?.name || 'Khách sạn nghỉ dưỡng cao cấp';
+      const name = hotel.name;
       setDestinationName(name);
       setDestinationId((hotel as any)?.id ?? null);
 
@@ -495,25 +525,17 @@ export default function CheckoutPage() {
         ? Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)))
         : 1;
 
-      let total = 0;
-      if (qAmount && Number(qAmount) > 0) {
-        total = Number(qAmount);
-      } else {
-        const roomCount = rooms || 1;
-        const pricePerNight = Number(hotel?.pricePerNight || 2500000);
-        total = pricePerNight * roomCount * nights;
-      }
+      const roomCount = rooms || 1;
+      const total = Number(hotel.pricePerNight || 0) * roomCount * nights;
 
       setBasePrice(total);
       setAmount(String(total));
       setDescription(`Đặt phòng nghỉ: ${name} (${rooms || 1} phòng, ${nights} đêm, từ ${checkIn || 'hôm nay'} đến ${checkOut || 'ngày mai'})`);
-      setErrorMsg(null);
+      setErrorMsg('Khách sạn chưa có dữ liệu phòng trống và điều kiện giá được xác thực. Chưa thể thanh toán trực tuyến.');
     } catch (err: any) {
-      const fallbackPrice = qAmount ? Number(qAmount) : 2500000;
-      setBasePrice(fallbackPrice);
-      setAmount(String(fallbackPrice));
-      setDestinationName('Khách sạn nghỉ dưỡng');
-      setDescription(`Đặt phòng khách sạn (${slug})`);
+      setBasePrice(0);
+      setAmount('0');
+      setErrorMsg('Không tải được thông tin khách sạn. Vui lòng thử lại sau.');
     } finally {
       setIsLoadingData(false);
     }
@@ -524,7 +546,7 @@ export default function CheckoutPage() {
     try {
       setDestinationSlug(slug);
       const res = await getRestaurantBySlug(slug);
-      const name = res?.name || 'Nhà hàng ẩm thực cao cấp';
+      const name = res.name;
       setDestinationName(name);
       setDestinationId((res as any)?.id ?? null);
 
@@ -533,12 +555,11 @@ export default function CheckoutPage() {
       setBasePrice(0);
       setAmount('0');
       setDescription(`Đặt bàn ẩm thực: ${name} cho ${guestsCount} khách vào lúc ${time || '18:30'} ngày ${date || 'hôm nay'} (Giữ chỗ miễn phí 0đ)`);
-      setErrorMsg(null);
+      setErrorMsg('Nhà hàng chưa có dữ liệu bàn trống được xác thực. Chưa thể xác nhận giữ chỗ trực tuyến.');
     } catch (err: any) {
       setBasePrice(0);
       setAmount('0');
-      setDestinationName('Nhà hàng ẩm thực');
-      setDescription(`Đặt bàn nhà hàng (${slug}) cho ${partySize || 2} khách (Giữ chỗ miễn phí 0đ)`);
+      setErrorMsg('Không tải được thông tin nhà hàng. Vui lòng thử lại sau.');
     } finally {
       setIsLoadingData(false);
     }
@@ -547,6 +568,7 @@ export default function CheckoutPage() {
   // Initialize from URL params
   useEffect(() => {
     setIsLoadingData(true);
+    setTourPolicyReady(false);
 
     const qAmount = searchParams.get('amount');
     const slug = searchParams.get('slug') || searchParams.get('destination');
@@ -559,7 +581,7 @@ export default function CheckoutPage() {
     const adults = Number(searchParams.get('adults') || '1');
     const children = Number(searchParams.get('children') || '0');
     const date = searchParams.get('date');
-    const qPackage = searchParams.get('package');
+    const qPackage = 'standard';
 
     if (qPackage) {
       setTourPackage(qPackage);
@@ -580,28 +602,8 @@ export default function CheckoutPage() {
     if (type === 'combo') {
       setIsCombo(true);
       setBookingType('combo');
-
-      if (title) {
-        const decodedTitle = decodeURIComponent(title);
-        setComboTitle(decodedTitle);
-        setDescription(`Thanh toán combo: ${decodedTitle}`);
-      }
-
-      if (includes) {
-        try {
-          const parsed = JSON.parse(decodeURIComponent(includes));
-          setComboIncludes(Array.isArray(parsed) ? parsed : []);
-        } catch {
-          setComboIncludes([]);
-        }
-      }
-
-      if (qAmount) {
-        const p = Number(qAmount);
-        setBasePrice(p);
-        setAmount(String(p * Math.max(1, qGuests)));
-      }
-
+      setErrorMsg('Combo chưa có dữ liệu xác thực về lịch sử dụng, số đêm và điều kiện dịch vụ. TravelHub tạm dừng thanh toán combo trực tuyến.');
+      setAmount('0');
       setIsLoadingData(false);
       return;
     }
@@ -609,9 +611,10 @@ export default function CheckoutPage() {
     // Cart booking
     if (searchParams.get('from') === 'cart') {
       setBookingType('cart');
-      const qDiscount = Number(searchParams.get('discount') || '0');
+      if (activeCartItems.some((item: any) => ['hotel', 'restaurant'].includes(item.type))) {
+        setErrorMsg('Giỏ hàng có khách sạn hoặc nhà hàng chưa được xác thực phòng/bàn trống. Chưa thể thanh toán trực tuyến.');
+      }
       const qCoupon = searchParams.get('coupon') || '';
-      if (qDiscount > 0) setDiscountPercent(qDiscount);
       if (qCoupon) setCoupon(qCoupon);
 
       const items = activeCartItems;
@@ -693,11 +696,24 @@ export default function CheckoutPage() {
     setIsLoadingData(false);
   }, [searchParams, fetchTourData, fetchDestinationData]);
 
+  const cartCouponFromUrl = searchParams.get('from') === 'cart' ? searchParams.get('coupon') : null;
+  useEffect(() => {
+    if (cartCouponFromUrl && subtotal > 0) void applyCoupon(cartCouponFromUrl);
+  }, [cartCouponFromUrl, subtotal, applyCoupon]);
+
   // Form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      if (isCombo || ['hotel', 'restaurant'].includes(bookingType) ||
+          (isCartBooking && activeCartItems.some((item: any) => ['hotel', 'restaurant'].includes(item.type)))) {
+        throw new Error('Dịch vụ này chưa có dữ liệu lịch và điều kiện đặt chỗ được xác thực. Chưa thể thanh toán trực tuyến.');
+      }
+      if ((tourId && !tourPolicyReady) || (isCartBooking && !cartPolicyReady)) {
+        throw new Error('Tour chưa công bố chính sách hoàn hủy. Chưa thể thanh toán trực tuyến.');
+      }
+      if (!policyConfirmed) throw new Error('Vui lòng xác nhận điều kiện hoàn hủy áp dụng cho đơn này.');
       setErrorMsg(null);
       setSubmitting(true);
 
@@ -754,7 +770,13 @@ export default function CheckoutPage() {
 
       // Prepare coupon data
       const appliedCoupon = coupon.trim().toUpperCase();
-      const hasCoupon = !!appliedCoupon && discountPercent > 0 && discountAmount > 0;
+      const hasCoupon = !!appliedCoupon && discountAmount > 0;
+      if (hasCoupon) {
+        const verified = await applyPromoCode(appliedCoupon, subtotal);
+        if (!verified.success || verified.discountAmount !== discountAmount) {
+          throw new Error('Mã giảm giá đã thay đổi. Vui lòng kiểm tra lại trước khi thanh toán.');
+        }
+      }
 
       // Prepare payment method for backend
       const paymentMethodValue = method === 'bank_qr' ? 'bank_transfer' : method;
@@ -810,6 +832,7 @@ export default function CheckoutPage() {
         if (hasCoupon) {
           bookingPayload.couponCode = appliedCoupon;
           bookingPayload.discountAmount = discountAmount;
+          bookingPayload.promoBaseAmount = subtotal;
         }
 
         console.log('📦 Cart Booking Payload:', bookingPayload);
@@ -844,6 +867,7 @@ export default function CheckoutPage() {
         if (hasCoupon) {
           bookingPayload.couponCode = appliedCoupon;
           bookingPayload.discountAmount = discountAmount;
+          bookingPayload.promoBaseAmount = subtotal;
         }
 
         console.log('📦 Combo Booking Payload:', bookingPayload);
@@ -913,6 +937,7 @@ export default function CheckoutPage() {
         if (hasCoupon) {
           bookingPayload.couponCode = appliedCoupon;
           bookingPayload.discountAmount = discountAmount;
+          bookingPayload.promoBaseAmount = subtotal;
         }
 
         console.log('📦 Tour Booking Payload:', bookingPayload);
@@ -949,6 +974,7 @@ export default function CheckoutPage() {
         if (hasCoupon) {
           bookingPayload.couponCode = appliedCoupon;
           bookingPayload.discountAmount = discountAmount;
+          bookingPayload.promoBaseAmount = subtotal;
         }
 
         console.log('📦 Destination Booking Payload:', bookingPayload);
@@ -1406,9 +1432,9 @@ export default function CheckoutPage() {
             <span className="font-semibold">+{formattedAddons} VNĐ</span>
           </div>
         )}
-        {discountPercent > 0 && (
+        {discountAmount > 0 && (
           <div className="flex items-center justify-between">
-            <span className="text-gray-600 dark:text-slate-400">Giảm giá {discountPercent}%</span>
+            <span className="text-gray-600 dark:text-slate-400">Giảm giá theo mã</span>
             <span className="font-semibold text-emerald-600 dark:text-emerald-400">
               − {formattedDiscount} VNĐ
             </span>
@@ -1456,7 +1482,7 @@ export default function CheckoutPage() {
             return (
               <div
                 key={item.id || idx}
-                className="flex items-center justify-between gap-4 p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm"
+                className="flex flex-col gap-3 p-3.5 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800"
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 dark:bg-slate-800 flex-shrink-0 border border-gray-100 dark:border-slate-800">
@@ -1484,7 +1510,7 @@ export default function CheckoutPage() {
                         </span>
                       )}
                     </div>
-                    <h5 className="font-semibold text-sm text-gray-900 dark:text-white truncate mt-1">
+                    <h5 className="font-semibold text-sm text-gray-900 dark:text-white line-clamp-2 mt-1">
                       {item.title}
                     </h5>
                     <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400 mt-1 flex-wrap">
@@ -1512,7 +1538,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 </div>
-                <div className="text-right flex-shrink-0">
+                <div className="text-left flex-shrink-0 pl-[70px]">
                   <div className="font-bold text-sm text-gray-900 dark:text-white">
                     {formatCurrency(sub)} VNĐ
                   </div>
@@ -1592,10 +1618,10 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50/20 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-8 px-4 transition-colors">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 overflow-hidden mb-6 transition-all">
-          <div className="bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 px-8 py-6 text-white">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden mb-6 transition-all">
+          <div className="bg-blue-700 px-6 sm:px-8 py-5 text-white">
             <h1 className="text-3xl font-bold mb-2">
               {isCombo ? 'Thanh toán combo' : isCartBooking ? 'Thanh toán giỏ hàng' : 'Thanh toán tour'}
             </h1>
@@ -1673,8 +1699,9 @@ export default function CheckoutPage() {
           )}
         </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] items-start gap-6">
         {/* Payment Form Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-800 overflow-hidden">
+        <div className="min-w-0 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
           {success && (
             <div className="px-8 py-4 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/40 dark:to-green-950/40 border-b border-green-100 dark:border-green-800/40">
               <div className="flex items-center gap-3 text-emerald-700 dark:text-emerald-400">
@@ -1686,12 +1713,12 @@ export default function CheckoutPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="p-8 space-y-6">
-            {/* Cart Items Breakdown (nếu đặt từ giỏ hàng) */}
-            {renderCartBreakdown()}
+          <form onSubmit={handleSubmit} className="p-5 sm:p-8 space-y-6">
 
-            {/* Booking Info Summary (nếu đặt lẻ) */}
-            {renderBookingInfo()}
+            <label className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-slate-700">
+              <input type="checkbox" checked={policyConfirmed} onChange={(event) => setPolicyConfirmed(event.target.checked)} required className="mt-1" />
+              <span>Tôi đã xem <Link to="/terms" className="font-semibold text-blue-700 underline">Điều khoản dịch vụ</Link> và xác nhận điều kiện hoàn hủy của dịch vụ đang đặt. Nếu chưa có chính sách riêng, tôi sẽ liên hệ TravelHub để được xác nhận bằng văn bản trước khi thanh toán.</span>
+            </label>
 
             {/* Amount Input */}
             <div className="space-y-2">
@@ -1721,7 +1748,7 @@ export default function CheckoutPage() {
                     <span className="text-gray-400">Đang tải thông tin...</span>
                   ) : amount && Number(amount) > 0 ? (
                     <>
-                      {discountPercent > 0 || totalAddons > 0 ? (
+                      {discountAmount > 0 || totalAddons > 0 ? (
                         <>
                           Tổng cần trả:{' '}
                           <span className="font-bold text-cyan-600 dark:text-cyan-400 text-lg">
@@ -1780,7 +1807,7 @@ export default function CheckoutPage() {
                   <input
                     value={coupon}
                     onChange={(e) => setCoupon(e.target.value)}
-                    placeholder="Nhập mã khuyến mãi (ví dụ: MEMBER10)"
+                    placeholder="Nhập mã từ kho voucher"
                     className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
                   />
                   <button
@@ -1794,13 +1821,12 @@ export default function CheckoutPage() {
                 {couponMsg && (
                   <p
                     className={`mt-2 text-sm font-medium ${
-                      discountPercent ? 'text-emerald-500' : 'text-red-500'
+                      discountAmount > 0 ? 'text-emerald-500' : 'text-red-500'
                     }`}
                   >
                     {couponMsg}
                   </p>
                 )}
-                {renderPriceSummary()}
               </div>
 
               {/* Payment options */}
@@ -1874,7 +1900,7 @@ export default function CheckoutPage() {
               className={`w-full px-6 py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all transform ${
                 !amount || Number(amount) <= 0 || submitting || !!errorMsg || isLoadingData
                   ? 'bg-gray-400 dark:bg-slate-700 cursor-not-allowed opacity-75'
-                  : 'bg-gradient-to-r from-cyan-500 via-teal-500 to-sky-500 hover:from-cyan-600 hover:via-teal-600 hover:to-sky-600 hover:scale-[1.01] active:scale-[0.99] shadow-cyan-500/25'
+                  : 'bg-blue-700 hover:bg-blue-800 active:bg-blue-900 shadow-blue-700/20'
               }`}
             >
               {submitting ? (
@@ -1898,6 +1924,16 @@ export default function CheckoutPage() {
               Xem lịch sử đơn hàng & thanh toán
             </Link>
           </div>
+        </div>
+        <aside aria-label="Tóm tắt đơn đặt dịch vụ" className="order-first lg:order-last lg:sticky lg:top-24 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm p-5 sm:p-6">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Tóm tắt đơn hàng</h2>
+          {renderCartBreakdown()}
+          {renderBookingInfo()}
+          {renderPriceSummary()}
+          <p className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+            Kiểm tra dịch vụ, ngày sử dụng và tổng tiền trước khi xác nhận thanh toán.
+          </p>
+        </aside>
         </div>
       </div>
     </div>

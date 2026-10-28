@@ -224,13 +224,14 @@ export default function SignInPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             {/* Email Input */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Địa Chỉ Email</label>
+              <label htmlFor="sign-in-email" className="block text-sm font-bold text-gray-700 mb-2">Địa Chỉ Email</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <EnvelopeIcon className="h-5 w-5 text-indigo-500" />
                 </div>
                 <input
                   type="email"
+                  id="sign-in-email"
                   placeholder="email.cua.ban@example.com"
                   value={email}
                   onChange={e => setEmail(e.target.value.trim())}
@@ -246,7 +247,7 @@ export default function SignInPage() {
             {/* Password Input */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-bold text-gray-700">Mật Khẩu</label>
+                <label htmlFor="sign-in-password" className="block text-sm font-bold text-gray-700">Mật Khẩu</label>
                 <Link to="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-700 font-bold transition-colors">
                   Quên mật khẩu?
                 </Link>
@@ -257,6 +258,7 @@ export default function SignInPage() {
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  id="sign-in-password"
                   placeholder="••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
@@ -269,6 +271,8 @@ export default function SignInPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                  aria-pressed={showPassword}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-indigo-500 hover:text-indigo-700 transition-colors"
                 >
                   {showPassword ? (

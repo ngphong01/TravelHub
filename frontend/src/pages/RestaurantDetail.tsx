@@ -56,7 +56,7 @@ export default function RestaurantDetail() {
     return false;
   });
 
-  const { data: dbRestaurant, isLoading } = useQuery({
+  const { data: dbRestaurant, isLoading, isError, refetch } = useQuery({
     queryKey: ['restaurant', slug],
     queryFn: () => getRestaurantBySlug(slug!),
     enabled: !!slug,
@@ -173,7 +173,7 @@ export default function RestaurantDetail() {
       guests: partySize,
       unitLabel: 'khách',
       location: restaurant.city || 'Việt Nam',
-      image: restaurant.image || undefined,
+      image: getAuthenticImage(restaurant.image, restaurant.name, 'restaurant'),
       adults: partySize,
       children: 0,
       pricePerAdult: 0,
@@ -235,20 +235,16 @@ export default function RestaurantDetail() {
         return [restaurant.amenities];
       }
     }
-    return ['Chỗ đỗ xe miễn phí', 'Không gian ngoài trời', 'Phòng VIP riêng', 'Thanh toán thẻ', 'WiFi miễn phí'];
+    return [];
   }, [restaurant.amenities]);
 
   const openingHours = restaurant.openingHours && typeof restaurant.openingHours === 'object'
     ? restaurant.openingHours
-    : {
-        'Thứ Hai': '10:00 - 22:30',
-        'Thứ Ba': '10:00 - 22:30',
-        'Thứ Tư': '10:00 - 22:30',
-        'Thứ Năm': '10:00 - 22:30',
-        'Thứ Sáu': '10:00 - 23:00',
-        'Thứ Bảy': '09:30 - 23:30',
-        'Chủ Nhật': '09:30 - 23:00',
-      };
+    : {};
+  const restaurantLocation = restaurant.address && restaurant.city &&
+    restaurant.address.toLocaleLowerCase('vi').includes(restaurant.city.toLocaleLowerCase('vi'))
+    ? restaurant.address
+    : [restaurant.address, restaurant.city].filter(Boolean).join(', ') || 'Chưa cập nhật địa chỉ';
 
   if (isLoading) {
     return (
@@ -259,11 +255,19 @@ export default function RestaurantDetail() {
     );
   }
 
+  if (isError || !dbRestaurant) {
+    return <div role="alert" className="min-h-[50vh] flex flex-col items-center justify-center gap-4 px-4 text-center">
+      <h1 className="text-2xl font-bold">Không tải được thông tin nhà hàng</h1>
+      <p>Nhà hàng không tồn tại hoặc máy chủ đang gián đoạn.</p>
+      <button type="button" onClick={() => refetch()} className="rounded-lg bg-blue-700 px-5 py-2 text-white">Tải lại</button>
+    </div>;
+  }
+
   return (
     <>
       <SEOHead
-        title={`${restaurant.name} - Đặt Bàn Nhà Hàng Ẩm Thực | TravelHub`}
-        description={restaurant.description || `Đặt bàn trước tại ${restaurant.name} nhanh chóng, tiện lợi, không mất phí giữ chỗ.`}
+        title={`${restaurant.name} - Thông Tin Nhà Hàng | TravelHub`}
+        description={restaurant.description || `Xem thông tin nhà hàng ${restaurant.name} trên TravelHub.`}
         url={`/restaurants/${restaurant.slug}`}
         image={restaurant.image || undefined}
       />
@@ -303,7 +307,7 @@ export default function RestaurantDetail() {
         </div>
 
         {/* Hero Banner */}
-        <div className="relative h-72 md:h-96 overflow-hidden bg-slate-900">
+        <div className="relative h-56 md:h-72 overflow-hidden bg-slate-900">
           <img
             src={getAuthenticImage(restaurant.image, restaurant.name || restaurant.slug, 'restaurant')}
             alt={restaurant.name}
@@ -318,7 +322,7 @@ export default function RestaurantDetail() {
               <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-600 text-white mb-2 inline-block">
                 {restaurant.cuisine || 'Ẩm thực địa phương'}
               </span>
-              <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
                 {restaurant.name}
               </h1>
             </div>
@@ -335,11 +339,11 @@ export default function RestaurantDetail() {
                 <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white font-black text-lg flex items-center justify-center shadow-md">
-                      {restaurant.rating ? Number(restaurant.rating).toFixed(1) : '4.8'}
+                      {restaurant.rating ? Number(restaurant.rating).toFixed(1) : '—'}
                     </div>
                     <div>
-                      <span className="font-extrabold text-slate-900 dark:text-white block text-sm">Tripadvisor Khuyên Dùng</span>
-                      <span className="text-xs text-slate-500">Dựa trên 340+ đánh giá ẩm thực</span>
+                      <span className="font-extrabold text-slate-900 dark:text-white block text-sm">Thông tin TravelHub</span>
+                      <span className="text-xs text-slate-500">Điểm hiển thị theo dữ liệu nhà hàng</span>
                     </div>
                   </div>
                   {restaurant.priceRange && (
@@ -354,7 +358,7 @@ export default function RestaurantDetail() {
 
                 <div className="mt-4 flex items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                   <MapPinIcon className="w-4 h-4 text-orange-600 flex-shrink-0" />
-                  <span>{restaurant.address || 'Trung tâm du lịch'}, {restaurant.city || 'Việt Nam'}</span>
+                  <span>{restaurantLocation}</span>
                 </div>
               </div>
 
@@ -369,7 +373,7 @@ export default function RestaurantDetail() {
               </div>
 
               {/* Amenities */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
+              {amenitiesList.length > 0 && <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                   <SparklesIcon className="w-6 h-6 text-amber-500" />
                   Tiện Nghi & Dịch Vụ Nhà Hàng
@@ -382,10 +386,10 @@ export default function RestaurantDetail() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </div>}
 
               {/* Opening Hours */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
+              {Object.keys(openingHours).length > 0 && <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                   <ClockIcon className="w-6 h-6 text-cyan-600" />
                   Thời Gian Phục Vụ
@@ -398,7 +402,7 @@ export default function RestaurantDetail() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </div>}
 
               {/* Location Map */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
@@ -417,13 +421,13 @@ export default function RestaurantDetail() {
               <div className="sticky top-20 bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5">
                 <div>
                   <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-400 inline-block mb-2">
-                    Đặt Chỗ Miễn Phí
+                    Thông Tin Đặt Bàn
                   </span>
                   <h3 className="text-2xl font-black text-slate-900 dark:text-white">
-                    Đặt Bàn Trực Tuyến
+                    Xem Thông Tin Đặt Bàn
                   </h3>
                   <p className="text-xs text-slate-500 mt-1">
-                    Xác nhận tức thì · Giữ bàn ưu tiên trong 30 phút
+                    Tình trạng bàn trống cần được nhà hàng xác nhận.
                   </p>
                 </div>
 
@@ -489,17 +493,17 @@ export default function RestaurantDetail() {
                 </div>
 
                 <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-300/40 text-xs text-emerald-700 dark:text-emerald-300 space-y-1">
-                  <p className="font-bold">✓ Không thu phí đặt trước</p>
-                  <p>Thanh toán trực tiếp tại nhà hàng sau khi dùng bữa</p>
+                  <p className="font-bold">Tình trạng bàn trống chưa được xác nhận</p>
+                  <p>Vui lòng xác nhận với nhà hàng trước khi đến.</p>
                 </div>
 
                 <div className="space-y-2">
                   <button
                     type="button"
                     onClick={handleReservation}
-                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-extrabold text-sm uppercase tracking-wider shadow-lg shadow-orange-500/25 hover:shadow-xl transition-all"
+                    className="w-full py-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm transition-colors"
                   >
-                    Xác Nhận Giữ Chỗ
+                    Xem Thông Tin Đặt Bàn
                   </button>
                   <button
                     type="button"

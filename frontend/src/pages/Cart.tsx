@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import SEOHead from '../components/SEOHead';
@@ -14,14 +14,20 @@ import {
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { getAuthenticImage, handleImageError } from '../utils/imageFallback';
+import { validatePromoCode } from '../services/promo';
 
 export default function CartPage() {
   const { items, removeItem, updateGuests, updateTourGuests, clearCart, totalPrice } = useCart();
   const navigate = useNavigate();
   const [couponCode, setCouponCode] = useState('');
-  const [discountPercent, setDiscountPercent] = useState(0);
+  const [couponDiscountAmount, setCouponDiscountAmount] = useState(0);
   const [appliedCoupon, setAppliedCoupon] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAppliedCoupon('');
+    setCouponDiscountAmount(0);
+  }, [totalPrice]);
 
   const formatPrice = (amount: number) => {
     return (amount || 0).toLocaleString('vi-VN') + ' đ';
@@ -69,7 +75,7 @@ export default function CartPage() {
     return (item.price || 0) * (item.guests || 1);
   };
 
-  const handleApplyCoupon = (e: React.FormEvent) => {
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError(null);
     const code = couponCode.trim().toUpperCase();
@@ -78,38 +84,25 @@ export default function CartPage() {
       return;
     }
 
-    if (code === 'MEMBER10' || code === 'TRAVELHUB10' || code === 'EARLY10') {
-      setDiscountPercent(10);
-      setAppliedCoupon(code);
-      setCouponError(null);
-      toast.success(`Đã áp dụng mã ${code} (Giảm 10%)`);
-    } else if (code === 'TRAVELHUB20') {
-      setDiscountPercent(20);
-      setAppliedCoupon('TRAVELHUB20');
-      setCouponError(null);
-      toast.success('Đã áp dụng mã TRAVELHUB20 (Giảm 20%)');
-    } else if (code === 'GROUP5') {
-      const totalGuests = items.reduce((s, i) => s + (i.guests || 1), 0);
-      if (totalGuests < 4) {
-        setDiscountPercent(0);
+    try {
+      const result = await validatePromoCode(code, totalPrice);
+      if (!result.valid || !result.discountAmount) {
+        setCouponDiscountAmount(0);
         setAppliedCoupon('');
-        setCouponError('Mã GROUP5 chỉ áp dụng cho nhóm từ 4 khách trở lên.');
-        toast.error('Mã GROUP5 chỉ áp dụng cho nhóm từ 4 khách trở lên!');
+        setCouponError(result.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.');
         return;
       }
-      setDiscountPercent(5);
-      setAppliedCoupon('GROUP5');
-      setCouponError(null);
-      toast.success('Đã áp dụng mã GROUP5 (Giảm 5%)');
-    } else {
-      setDiscountPercent(0);
+      setCouponDiscountAmount(result.discountAmount);
+      setAppliedCoupon(code);
+      toast.success(`Đã áp dụng mã ${code}`);
+    } catch {
+      setCouponDiscountAmount(0);
       setAppliedCoupon('');
-      setCouponError('Mã giảm giá không hợp lệ hoặc đã hết hạn.');
-      toast.error('Mã giảm giá không hợp lệ hoặc đã hết hạn');
+      setCouponError('Không kiểm tra được mã giảm giá. Vui lòng thử lại.');
     }
   };
 
-  const discountAmount = Math.round((totalPrice * discountPercent) / 100);
+  const discountAmount = Math.min(totalPrice, couponDiscountAmount);
   const finalPrice = Math.max(0, totalPrice - discountAmount);
 
   const handleProceedToCheckout = () => {
@@ -118,7 +111,7 @@ export default function CartPage() {
       return;
     }
     // Encode cart data or save session for checkout
-    navigate(`/checkout?from=cart&discount=${discountPercent}&coupon=${appliedCoupon}`);
+    navigate(`/checkout?from=cart&coupon=${encodeURIComponent(appliedCoupon)}`);
   };
 
   return (
@@ -432,7 +425,7 @@ export default function CartPage() {
                           type="text"
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value)}
-                          placeholder="MEMBER10, TRAVELHUB20..."
+                          placeholder="Nhập mã từ kho voucher"
                           className="w-full pl-9 pr-3 py-2 text-xs border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 uppercase"
                         />
                       </div>
@@ -446,7 +439,7 @@ export default function CartPage() {
                     {appliedCoupon && (
                       <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5 flex items-center gap-1 font-medium">
                         <CheckCircleIcon className="w-3.5 h-3.5" />
-                        Đang áp dụng: <strong>{appliedCoupon}</strong> (-{discountPercent}%)
+                        Đang áp dụng: <strong>{appliedCoupon}</strong> (-{formatPrice(discountAmount)})
                       </p>
                     )}
                     {couponError && (
@@ -466,7 +459,7 @@ export default function CartPage() {
 
                     {discountAmount > 0 && (
                       <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                        <span>Giảm giá ({discountPercent}%):</span>
+                        <span>Giảm giá:</span>
                         <span className="font-semibold">-{formatPrice(discountAmount)}</span>
                       </div>
                     )}

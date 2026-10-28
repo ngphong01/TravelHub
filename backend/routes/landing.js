@@ -63,11 +63,9 @@ router.get('/seasonal', async (req, res) => {
     });
 
     // Get flash sales
-    const flashSales = await prisma.tour.findMany({
+    const flashSaleCandidates = await prisma.tour.findMany({
       where: {
-        flashSale: true,
-        flashSaleStart: { lte: now },
-        flashSaleEnd: { gte: now },
+        originalPrice: { not: null },
       },
       select: {
         id: true,
@@ -75,14 +73,16 @@ router.get('/seasonal', async (req, res) => {
         slug: true,
         image: true,
         price: true,
-        flashSalePrice: true,
-        flashSaleEnd: true,
+        originalPrice: true,
       },
-      take: 4,
       orderBy: {
-        flashSaleStart: 'desc',
+        updatedAt: 'desc',
       },
     });
+
+    const flashSales = flashSaleCandidates
+      .filter((tour) => tour.originalPrice > tour.price)
+      .slice(0, 4);
 
     res.json({
       season,
@@ -92,9 +92,8 @@ router.get('/seasonal', async (req, res) => {
       featuredTours,
       flashSales: flashSales.map(tour => ({
         ...tour,
-        discountPercent: tour.flashSalePrice
-          ? Math.round(((tour.price - tour.flashSalePrice) / tour.price) * 100)
-          : 0,
+        flashSalePrice: tour.price,
+        discountPercent: Math.round(((tour.originalPrice - tour.price) / tour.originalPrice) * 100),
       })),
       banner: {
         title: `Du lịch ${seasonName} - ${seasonDescription}`,

@@ -7,12 +7,9 @@ const { authRequired, isAdmin } = require('../middleware/auth');
 // GET /api/flash-sale - Get active flash sales (public)
 router.get('/', async (req, res) => {
   try {
-    const now = new Date();
     const tours = await prisma.tour.findMany({
       where: {
-        flashSale: true,
-        flashSaleStart: { lte: now },
-        flashSaleEnd: { gte: now },
+        originalPrice: { not: null },
       },
       select: {
         id: true,
@@ -20,9 +17,7 @@ router.get('/', async (req, res) => {
         slug: true,
         image: true,
         price: true,
-        flashSalePrice: true,
-        flashSaleStart: true,
-        flashSaleEnd: true,
+        originalPrice: true,
         duration: true,
         rating: true,
         destination: {
@@ -33,18 +28,23 @@ router.get('/', async (req, res) => {
         },
       },
       orderBy: {
-        flashSaleStart: 'desc',
+        updatedAt: 'desc',
       },
     });
 
+    // The current Tour schema represents discounted tours with price and
+    // originalPrice. The former flashSale* columns are not part of this
+    // schema, so deriving the active deals here prevents Prisma validation
+    // failures and keeps the API contract useful to clients.
+    const flashSales = tours.filter((tour) => tour.originalPrice > tour.price);
+
     res.json({
       success: true,
-      tours: tours.map((tour) => ({
+      tours: flashSales.map((tour) => ({
         ...tour,
-        discountPercent: tour.flashSalePrice
-          ? Math.round(((tour.price - tour.flashSalePrice) / tour.price) * 100)
-          : 0,
-        timeRemaining: tour.flashSaleEnd ? Math.max(0, tour.flashSaleEnd - now) : 0,
+        flashSalePrice: tour.price,
+        discountPercent: Math.round(((tour.originalPrice - tour.price) / tour.originalPrice) * 100),
+        timeRemaining: null,
       })),
     });
   } catch (error) {
@@ -57,8 +57,6 @@ router.get('/', async (req, res) => {
 router.get('/:tourId', async (req, res) => {
   try {
     const tourId = parseInt(req.params.tourId);
-    const now = new Date();
-
     const tour = await prisma.tour.findUnique({
       where: { id: tourId },
       select: {
@@ -66,10 +64,7 @@ router.get('/:tourId', async (req, res) => {
         name: true,
         slug: true,
         price: true,
-        flashSale: true,
-        flashSalePrice: true,
-        flashSaleStart: true,
-        flashSaleEnd: true,
+        originalPrice: true,
       },
     });
 
@@ -77,24 +72,19 @@ router.get('/:tourId', async (req, res) => {
       return res.status(404).json({ message: 'Tour not found' });
     }
 
-    const isActive =
-      tour.flashSale &&
-      tour.flashSaleStart &&
-      tour.flashSaleEnd &&
-      now >= tour.flashSaleStart &&
-      now <= tour.flashSaleEnd;
+    const isActive = Boolean(tour.originalPrice && tour.originalPrice > tour.price);
 
     res.json({
       success: true,
       flashSale: isActive,
-      originalPrice: tour.price,
-      flashSalePrice: isActive ? tour.flashSalePrice : null,
-      discountPercent: isActive && tour.flashSalePrice
-        ? Math.round(((tour.price - tour.flashSalePrice) / tour.price) * 100)
+      originalPrice: tour.originalPrice || tour.price,
+      flashSalePrice: isActive ? tour.price : null,
+      discountPercent: isActive && tour.originalPrice
+        ? Math.round(((tour.originalPrice - tour.price) / tour.originalPrice) * 100)
         : 0,
-      startTime: tour.flashSaleStart,
-      endTime: tour.flashSaleEnd,
-      timeRemaining: isActive && tour.flashSaleEnd ? Math.max(0, tour.flashSaleEnd - now) : 0,
+      startTime: null,
+      endTime: null,
+      timeRemaining: null,
     });
   } catch (error) {
     console.error('Error fetching flash sale details:', error);
@@ -105,15 +95,15 @@ router.get('/:tourId', async (req, res) => {
 // POST /api/flash-sale/admin - Create/update flash sale (Admin)
 router.post('/admin', authRequired, isAdmin, async (req, res) => {
   try {
-    const { tourId, flashSalePrice, startTime, endTime } = req.body;
+    const { tourId, flashSalePrice } = req.body;
 
-    if (!tourId || !flashSalePrice || !startTime || !endTime) {
+    if (!tourId || !flashSalePrice) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
     const tour = await prisma.tour.findUnique({
       where: { id: parseInt(tourId) },
-      select: { price: true },
+      select: { price: true, originalPrice: true },
     });
 
     if (!tour) {
@@ -127,10 +117,12 @@ router.post('/admin', authRequired, isAdmin, async (req, res) => {
     const updatedTour = await prisma.tour.update({
       where: { id: parseInt(tourId) },
       data: {
-        flashSale: true,
-        flashSalePrice: parseInt(flashSalePrice),
-        flashSaleStart: new Date(startTime),
-        flashSaleEnd: new Date(endTime),
+        // price is the selling price; originalPrice retains the crossed-out
+        // price used throughout the existing Tour UI.
+        price: parseInt(flashSalePrice),
+        originalPrice: tour.originalPrice && tour.originalPrice > tour.price
+          ? tour.originalPrice
+          : tour.price,
       },
     });
 
@@ -150,13 +142,20 @@ router.delete('/admin/:tourId', authRequired, isAdmin, async (req, res) => {
   try {
     const tourId = parseInt(req.params.tourId);
 
+    const tour = await prisma.tour.findUnique({
+      where: { id: tourId },
+      select: { price: true, originalPrice: true },
+    });
+
+    if (!tour) {
+      return res.status(404).json({ message: 'Tour not found' });
+    }
+
     const updatedTour = await prisma.tour.update({
       where: { id: tourId },
       data: {
-        flashSale: false,
-        flashSalePrice: null,
-        flashSaleStart: null,
-        flashSaleEnd: null,
+        price: tour.originalPrice || tour.price,
+        originalPrice: null,
       },
     });
 
